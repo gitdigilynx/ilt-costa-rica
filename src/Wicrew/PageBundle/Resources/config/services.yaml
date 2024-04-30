@@ -1,0 +1,19 @@
+services:
+    wicrew.page.page_listener:
+        class: App\Wicrew\PageBundle\EventListener\PageListener
+        arguments: ['@wicrew.core.utils', '@request_stack']
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception }
+
+    wicrew.page.validator.unique_slug:
+        class: App\Wicrew\PageBundle\Validator\Constraints\UniqueSlugValidator
+        arguments: ['@wicrew.core.utils']
+        #        calls:
+        #            - [setUtils, ['@wicrew.core.utils']]
+        public: false
+
+    wicrew.page.controller.page_content:
+        class: App\Wicrew\PageBundle\Controller\PageController
+        calls:
+            - [setContainer, ['@service_container']]
+        public: true

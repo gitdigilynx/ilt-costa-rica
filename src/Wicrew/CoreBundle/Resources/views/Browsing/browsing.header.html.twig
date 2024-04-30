@@ -1,0 +1,19 @@
+<section class="page-header">
+    <div class="container">
+        <div class="d-flex content">
+            <div class="align-self-center">
+                <h1>
+                    {% block title %}
+                        Title <br>Spaced Title
+                    {% endblock %}
+                </h1>
+                <h2>
+                    {% block subTitle %}
+                        Sub
+                    {% endblock %}
+                </h2>
+            </div>
+        </div>
+    </div>
+    {% block background_header %}<div class="bg" style="background-image: url('{{ backgroundImageURL }}');"></div>{% endblock %}
+</section>

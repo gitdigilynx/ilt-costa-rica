@@ -1,0 +1,17 @@
+{% if dl_googlePlaceID is defined and  dl_googlePlaceID['area_' ~ type] is defined %}
+        {% set googlePlaceID = dl_googlePlaceID['area_' ~ type] %}
+{% endif %}
+<input type="text" id="additionalFee_search_{{ identifier }}" name="{{ areaPostName }}[address]"
+        {% if ( 'area_from' in areaPostName ) and ( pickAddress is defined ) %} 
+                value="{{ pickAddress }}" 
+        {% elseif ('area_to' in areaPostName) and ( dropAddress is defined ) %} 
+                value="{{ dropAddress }}" 
+        {% elseif dl_areaAddress[bookingNumber]["area_" ~ type] is defined and dl_areaAddress is iterable %} 
+                value="{{ dl_areaAddress[bookingNumber]["area_" ~ type] }}" 
+        {% endif %} 
+
+        />
+        {# {% if required is defined and required %}required="required"{% endif %} #}
+<label class="floating-label" for="additionalFee_search_{{ identifier }}">{{ type == "from" ? 'booking.from.pickup'|trans() : 'booking.to.dropoff'|trans }}</label>
+
+<input type="hidden" id="placeID_{{ identifier }}" class="updates-summary-of-{{ bookingNumber }}" name="{{ areaPostName }}[googlePlaceID]" {% if googlePlaceID is defined %}value="{{ googlePlaceID }}"{% endif %} />

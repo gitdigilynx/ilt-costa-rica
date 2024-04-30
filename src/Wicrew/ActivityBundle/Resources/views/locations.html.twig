@@ -1,0 +1,133 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ 'activities.all.destination'|trans() }}{% endblock %}
+
+{% block body %}
+
+    <section class="page-header">
+        <div class="container">
+            <div class="d-flex content">
+                <div class="align-self-center">
+                    <h1>{{ "Best Activities"|trans }}</h1>
+                    <h2>{{ "Experience the best activities & day tours.<br>Adventure, Rainforests & Wildlife, sight-seeing, culture, and more."|trans | raw }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid view-all-activities">
+            <a href="#locations">{{ 'activities.view.all.activities'|trans }}</a>
+        </div>
+        <div class="bg"
+             style="background-image: url('{{ absolute_url(asset('bundles/wicrewcore/images/bg_activities_destination.jpg')) }}');"></div>
+    </section>
+
+    <section class="benefits has-content">
+        <div class="container">
+
+            <div class="benefit">
+                <h2>{{ "Your Benefits"|trans }}</h2>
+                <div class="row benefit-items">
+
+                    <div class="col-lg-3 col-sm-6 benefit-col">
+                        <div class="benefit-item">
+                            <div class="benefit-icon">
+                                <img src="{{ absolute_url(asset('bundles/wicrewcore/images/pricetag.svg')) }}" alt="">
+                            </div>
+                            <div class="benefit-content">
+                                <h4>All-inclusive rates</h4>
+                                There are no hidden surprises. Your affordable, all-inclusive rate covers all taxes.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-sm-6 benefit-col">
+                        <div class="benefit-item">
+                            <div class="benefit-icon">
+                                <img src="{{ absolute_url(asset('bundles/wicrewcore/images/group.svg')) }}" alt="">
+                            </div>
+                            <div class="benefit-content">
+                                <h4>Private & Group Tours</h4>
+                                Group tours are a great way to share your experience with people you’d otherwise never
+                                meet. Private tours are more personal and enjoyed with a group of your own choosing.
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-lg-3 col-sm-6 benefit-col">
+                        <div class="benefit-item">
+                            <div class="benefit-icon">
+                                <img src="{{ absolute_url(asset('bundles/wicrewcore/images/handpicked.svg')) }}" alt="">
+                            </div>
+                            <div class="benefit-content">
+                                <h4>Handpicked Activities & Tours</h4>
+                                Our team handpicks the best local tours and activity partners, and pre-vet all tours to
+                                make sure you always have an exceptional experience.
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-lg-3 col-sm-6 benefit-col">
+                        <div class="benefit-item">
+                            <div class="benefit-icon">
+                                <img src="{{ absolute_url(asset('bundles/wicrewcore/images/price.svg')) }}" alt="">
+                            </div>
+                            <div class="benefit-content">
+                                <h4>Low Price Guarantee</h4>
+                                Our Low Price Guarantee means if you find a lower price for the same tour or activity
+                                offered by the same operator. We’ll match it. No gimmicks, no exceptions.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="content">
+                <h2>Costa Rica Tours and Activities</h2>
+                Costa Rica offers many exciting ways to immerse yourself in its natural elements. It is the perfect
+                destination for exploring ecosystems and connecting with a peaceful culture. Whether discovering
+                fascinating species with a friendly Costa Rican guide, zipping across the rainforest canopy, or relaxing
+                in a volcano-heated hot spring, there are a variety of tours and activities to engage travelers of all
+                types.
+                <br><br>
+                Our team of insiders handpicks the best local tour and activity partner. We pre-vet them all to make
+                sure you always have an exceptional experience.
+                <br><br>
+                Enjoy 24/7 Customer Service & All-Inclusive rates with a price match guarantee. It’s that simple!
+            </div>
+
+        </div>
+    </section>
+
+    <section id="locations" class="locations">
+        <div class="container">
+            <div class="row location-items">
+                {% for location in locations %}
+                    <div class="col-lg-4 col-sm-6">
+                        {% set params = checkForOrderItemQueryString(app.request) %}
+                        <a href="{{ path("wicrew_activities", params|merge({ location: location.slug })) }}"
+                           title="{{ location.name }}" class="location-item">
+                            <div class="image">
+                                {% if location.image != "" %}
+                                    <img src="{{ app.request.getSchemeAndHttpHost() ~ vich_uploader_asset(location, 'imageFile') }}"
+                                         alt="{{ location.name }}"/>
+                                {% else %}
+                                    <img src="{{ absolute_url(asset('bundles/wicrewcore/images/placeholder.png')) }}">
+                                {% endif %}
+                            </div>
+                            <div class="d-flex title">
+                                <h3 class="align-self-center">Tours from {{ location.name }}</h3>
+                            </div>
+                            <div class="d-flex btn"><span class="align-self-center">{{ "View Tours"|trans }}</span>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    {# {% include "@WicrewPage/testimonials.html.twig" %} #}
+
+{% endblock %}

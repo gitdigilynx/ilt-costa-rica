@@ -1,0 +1,125 @@
+{% extends "@WicrewSale/Booking/Base/booking.detail.html.twig" %}
+
+{% block bookingForm %}
+    {# @var activity \App\Wicrew\ActivityBundle\Entity\Activity #}
+    {# @var areaFrom \App\Wicrew\ProductBundle\Entity\Area #}
+    {# @var areaTo \App\Wicrew\ProductBundle\Entity\Area #}
+    {% if areaFrom is not defined %}
+        {% set areaFrom = activity.area %}
+        {% set areaTo = activity.area %}
+    {% endif %}
+
+    {% set pickupDateID = 'pickup_date_' ~ bookingNumber %}
+    {% set pickupTimeID = 'pickup_time_' ~ bookingNumber %}
+    {% set adultCountID = 'passenger_number_adult_' ~ bookingNumber %}
+    {% set childCountID = 'passenger_number_children_' ~ bookingNumber %}
+
+    <div class="booking-section-inner">
+        <input type="hidden" name="{{ postDataSection }}[id]" value="{{ activity.id }}"/>
+        <input type="hidden" name="{{ postDataSection }}[type]" value="activity"/>
+        <input type="hidden" id="subtotal-for-{{ bookingNumber }}"
+               value="{{ summaries[bookingNumber].subtotalPrice.rackPrice.toCents() }}"/>
+        <input type="hidden" id="taxes-for-{{ bookingNumber }}"
+               value="{{ summaries[bookingNumber].totalTaxes.rackPrice.toCents() }}"/>
+        {% if dl_actionType == "edit_item" %}
+            <div class="row-block all_activities">
+                <div class="col-block bg-field" style="width: 100%;">
+                    <label for="dl_activity_id" class="floating-label">Select Activity </label>
+                    <select id="dl_activity_id" class="updates-summary-of-{{ bookingNumber }}" name="{{ postDataSection }}[dl_activity_id]" required>
+                        {% for _activity in all_activities %}
+                            <option data-types="{{_activity.types|join(',')}}" value="{{_activity.id}}" {% if activity.id == _activity.id %} selected{% endif %}> {{_activity.name}} </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        {% endif %}
+        <div class="row-block">
+            <div class="col-block booking-pickup-block booking-form-block input-calendar-icon black-icon floating-label-w-icon">
+                <div class="floating-label-wrap float-fixed">
+                    {% include "@WicrewSale/Booking/Inputs/form.booking.pickup_date.html.twig" with { "pickupDate": pickDates[bookingNumber] } %}
+                </div>
+            </div>
+
+            <div class="col-block bg-field">
+                <select id="{{ pickupTimeID }}" class="updates-summary-of-{{ bookingNumber }}"
+                        name="{{ postDataSection }}[tourTime]" required>
+                    <option value="">{{ 'activity.tour_time'|trans() }}</option>
+                    {% for tourTime in activity.tourTime %}
+                        <option value="{{ tourTime }}"
+                                {% if selectedTourTime is defined and selectedTourTime|date("H:i") == tourTime %}
+                                    selected="selected"
+                                {% elseif dl_activity[bookingNumber]["tourTime"] is defined and dl_activity[bookingNumber]["tourTime"]|date("H:i") == tourTime %}
+                                    selected="selected"
+                                {% endif %}
+                                 >{{ tourTime }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="row-block">
+            <div class="col-block">
+                <div class="floating-label-wrap float-fixed">
+                    {% include "@WicrewSale/Booking/Inputs/form.booking.type.html.twig" with { "readonly": false } %}
+                </div>
+            </div>
+            <div class="col-block activity-tour-time-note">
+                * Please note that your pick-up time will be available on your confirmation email. Please be ready at the lobby of your hotel or villa rental.
+            </div>
+        </div>
+
+
+        <div class="row-block">
+            <div class="col-block">
+                <div class="floating-label-wrap float-fixed">
+                    {% include "@WicrewSale/Booking/Inputs/form.booking.adult.html.twig" with { "readonly": false } %}
+                </div>
+            </div>
+
+            <div class="col-block">
+                <div class="floating-label-wrap float-fixed">
+                    {% include "@WicrewSale/Booking/Inputs/form.booking.child.html.twig" with { "readonly": false } %}
+                </div>
+            </div>
+        </div>
+
+        <div class="row-block booking-area-main-block">
+            <div class="col-block">
+                {% include "@WicrewSale/Booking/Inputs/form.booking.area.html.twig" with { "selectEnable": true, "type": "from", "areaObj": areaFrom, "bookingNumber": bookingNumber, "required": true } %}
+            </div>
+            <div class="col-block">
+                {% include "@WicrewSale/Booking/Inputs/form.booking.area.html.twig" with { "selectEnable": true, "type": "to", "areaObj": areaTo, "bookingNumber": bookingNumber, "required": true } %}
+            </div>
+        </div>
+
+        <div class="row-block special">
+            <h3>Special notes</h3>
+            * If the hotel or villa rental is outside the main zone, an additional fee will apply.<br />
+            * If a 4x4 is needed to reach the hotel or villa rental, an additional fee will apply.
+        </div>
+
+    </div>
+    <style>
+    span#select2-dl_activity_id-container {
+        padding-left: 15px;
+        padding-bottom: 5px;
+    }
+    .row-block.all_activities {
+        position: relative;
+    }
+
+    .row-block.all_activities label {
+        font-size: 10px;
+        font-weight: bold;
+        top: 10px;
+    }
+    </style>
+    {% include "@WicrewActivity/Booking/detail.activity.children-ages.html.twig" with { "childCountID":  childCountID, "postDataSection": postDataSection, "childrenAges": childrenAges[bookingNumber] } %}
+    {% include "@WicrewSale/Booking/Base/booking.summary_watcher.js.html.twig" with { "bookingNumber": bookingNumber, "idType": "activityID", "bookingID": activity.id } %}
+    {% include "@WicrewSale/Booking/Inputs/booking.area_watcher.js.html.twig" %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% include "@WicrewActivity/Booking/detail.activity.js.html.twig" %}
+{% endblock %}
+

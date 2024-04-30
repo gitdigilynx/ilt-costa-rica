@@ -1,0 +1,100 @@
+{% extends "@WicrewProduct/Product/Booking/detail.private_jbj.html.twig" %}
+
+{% block headerAndInfo %}
+    <div class="row-block">
+        <div class="departure-location-block input-pin-icon black-icon">
+            <select id="departure-at" required class="form-select-simple jbj_destination">
+                {% block departureSelectOptions %}
+                    <option value="" selected="selected">{{ 'booking.jbj.select_service_time'|trans() }}</option>
+                    {% for departureOption in getDepartureOptions(products) %}
+                        {% set value = '{"fromID":' ~ departureOption.product.areaFrom.id ~ ',"toID":' ~ departureOption.product.areaTo.id ~ '}' %}
+                        <option 
+                            {% if selectedProduct is defined and selectedProduct.id in departureOption.productIDs %}selected{% endif %}
+                            value="{{ value }}" 
+                            id="departure_at_{{departureOption.product.areaFrom.id ~ '_' ~ departureOption.product.areaTo.id}}"
+                            data-area-from-id="{{ departureOption.product.areaFrom.id }}"
+                            data-area-to-id="{{ departureOption.product.areaTo.id }}"
+                        >{{ departureOption.product.areaFrom.name ~ ' - ' ~ departureOption.product.areaTo.name }}</option>
+                    {% endfor %}
+                {% endblock %}
+            </select>
+        </div>
+    </div>
+    <div class="row-block" style="margin: 13px 0px 0px 46px;display:none;" id="departure-time">
+        {% set products = getOrderedProductsbyDepartureTime(products) %}
+        {% for product in products %}
+            {% set value = '{"productID":' ~ product.id ~ ', "pickTime":"' ~ product.departureTime|formatNoNull("H:i") ~ '"}' %}
+            <div class="form-check">
+                <input 
+                    class="form-check-input departure_time_choice departure_time_{{product.areaFrom.id ~ '_' ~ product.areaTo.id}}" 
+                    type="radio" name="departure_time"  
+                    value="{{ value }}"
+                    data-area-from-id="{{ product.areaFrom.id }}"
+                    data-area-to-id="{{ product.areaTo.id }}"
+                    id="departure_time_{{product.id}}"
+                    {% if selectedProduct is defined and selectedProduct.id == product.id %}checked{% endif %}
+                >
+                <label class="form-check-label" for="departure_time_{{product.id}}">
+                    {{ product.departureTime|formatNoNull("H:i") }}
+                </label>
+            </div>  
+        {% endfor %}
+    </div>
+    {% if custom_services is defined and custom_services|length > 0 %}
+        <div class="addon booking-addon-section">
+            <div class="addon-section-title">
+                <h4>Custom Services</h4>
+                <p>Following are the added custom services, you can also delete them from booking.</p>
+            </div>
+    
+            <div id="custom_services-for-{{ bookingNumber }}" class="addon-table">
+                {% for custom_service in custom_services %}
+                    <div class="single-customService-container" style='font-size: 16px;font-weight: 400;margin-bottom: 20px; padding: 15px; border: 1px #aaadb4 solid; display: flex; width: 100%; gap: 15px;'>
+                        <div class="single-customService-name" style='flex: 50%;'> {{custom_service.label}} </div>
+                        <div class="single-customService-price" style='flex: auto;'> {{'currency.symbol'|trans() ~ custom_service.rackPrice|number_format(2, '.', ',') }} </div>
+                        <div class="single-customService-action" style='flex: auto; text-align: end;'> <button type='button' data-bookingnumber='{{bookingNumber}}' data-loopindex='{{loop.index0}}' data-label='{{custom_service.label}}' data-id='{{custom_service.id}}' onclick="remove_custom_service(this)" style='background: transparent;border: none;color: #d10000;' class='remove_custom_service' title='Remove custom service from booking'> <i class="fas fa-times-circle"></i> </button> </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block addons %}
+    {% if product.addons|length > 0 %}
+        <div class="addon booking-addon-section">
+            <div class="addon-section-title">
+                <h4>{{ 'booking.addons'|trans() }}</h4>
+                <p>{{ 'booking.addons.subtitle'|trans() }}</p>
+            </div>
+
+            <div id="addons-for-{{ bookingNumber }}" class="addon-table">
+                {% for addon in product.addons %}
+                    {% include "@WicrewAddon/Addon/addon.detail.html.twig" with { "addon": addon, "bookingNumber": bookingNumber, "type": "addon" } %}
+                {% endfor %}
+            </div>
+        </div>
+    {# SHOWING ADDED ADDONS IN ORDER ITEM  #}
+    {% elseif (edit_order_item is defined) %} {# and ( orderItem_obj.addons|length > 0 ) #}
+        <div class="addon booking-addon-section">
+            <div class="addon-section-title">
+                <h4>{{ 'booking.addons'|trans() }}</h4>
+                <p>{{ 'booking.addons.subtitle'|trans() }}</p>
+            </div>
+
+            <div id="addons-for-{{ bookingNumber }}" class="addon-table">
+                {% for addon in all_addons %}
+                    {% include "@WicrewAddon/Addon/addon.detail.html.twig" with { "addon": addon, "bookingNumber": bookingNumber, "type": "addon" } %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+{# SHOWING ADDED ADDONS IN ORDER ITEM  #}
+{% endblock %}
+
+{% block timeBlock %}{% endblock %}
+
+{% block perProductJS %}
+    {% include "@WicrewSale/Booking/Base/booking.summary_watcher.js.html.twig" with { "bookingNumber": bookingNumber, "idType": "jbj" } %}
+    {% include "@WicrewSale/Booking/Inputs/booking.area_watcher.js.html.twig" %}
+{% endblock %}

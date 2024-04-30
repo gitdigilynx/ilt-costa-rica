@@ -1,0 +1,2 @@
+wicrew_systemconfiguration:
+    resource: "@WicrewSystemConfigurationBundle/Resources/config/routes.yaml"

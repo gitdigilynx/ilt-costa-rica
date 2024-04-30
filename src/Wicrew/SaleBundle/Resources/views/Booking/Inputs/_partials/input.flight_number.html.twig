@@ -1,0 +1,6 @@
+<input type="text" id="flight_number_{{ identifier }}" name="{{ areaPostName }}[flightNumber]" 
+{% if flightNumber is defined and flightNumber != "" %}value="{{ flightNumber }}"{% elseif dl_flightNumber[bookingNumber] is defined %}value="{{ dl_flightNumber[bookingNumber] }}"{% endif %}
+/>
+
+<label class="floating-label"
+        for="flight_number_{{ identifier }}">{{ 'booking.from.flight.number'|trans() }}</label>

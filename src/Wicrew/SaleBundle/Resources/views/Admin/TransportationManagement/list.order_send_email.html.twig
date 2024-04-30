@@ -1,0 +1,9 @@
+{% set driverAssigned = item is not null and item.supplier is not null %}
+{% set emailSent = item is not null and item.sendEmail is null %}
+
+<div class="sent-email-btn-wrapper">
+    <label {{ driverAssigned and not emailSent ? '': 'hidden' }}>
+        {{ 'transport_management.email.driver'|trans }} <input type="checkbox" data-sent-email="{{ driverAssigned and emailSent }}"
+           name="send_email">
+    </label>
+</div>

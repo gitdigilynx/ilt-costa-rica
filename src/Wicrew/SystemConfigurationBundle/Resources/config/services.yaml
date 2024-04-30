@@ -1,0 +1,5 @@
+services:
+    wicrew.systemconfiguration.utils:
+        class: App\Wicrew\SystemConfigurationBundle\Service\SystemConfigurationService
+        arguments: ["@wicrew.core.utils"]
+        public: true

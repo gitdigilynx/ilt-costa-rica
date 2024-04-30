@@ -1,0 +1,220 @@
+{% extends "base.html.twig" %}
+
+{% set current_path = app.request.get('_route') %}
+
+{% block title %}Frequently asked questions{% endblock %}
+
+{% block body %}
+<style>
+    .gap-20 {
+        gap: 20px;
+    }
+
+    .faq_wrapper_box {
+        margin-top: 50px;
+        border-radius: 4px;
+        border: #BABCC2 1px solid;
+    }
+
+    .faq_question { 
+        font-size: 20px;
+        color: #000000;
+        padding: 20px 0 20px 0;
+        cursor: pointer;
+        border-bottom: 1px solid #C8CACE;
+    }
+
+    .faq_tab {
+        display: flex;
+        background: #A8865B;
+        border-top-left-radius: 4px;
+    }
+
+    .faq_tab_left {
+        background: white;
+        color: #A8865B;
+        padding: 10px;
+        border-top-left-radius: 4px;       
+    }
+
+    .faq_tab_right {
+        color: white; 
+        padding: 10px 0 10px 30px;
+    }
+
+    .faq_content {
+        padding: 30px 50px 30px 50px;
+    }
+
+    .faq_answer {
+        display: none;
+        padding: 10px 0 30px 0;
+        border-bottom: 1px solid #C8CACE;
+    }
+
+    .faq_question.active + .faq_answer {
+        display: block;
+    }
+
+    .faq_question::after {
+        float: right;
+        content: '';
+        background-image: url(/images/faq/arrow-down-icon.svg);
+        width: 20px;
+        height: 20px;
+        background-size: 20px 20px;
+        margin-top: 5px;
+    }
+
+    .faq_question.active::after {
+        content: '';
+        background-image: url(/images/faq/arrow-up-icon.svg);
+        width: 20px;
+        height: 20px;
+        background-size: 20px 20px;
+        margin-top: 5px;
+    }
+
+    .faq_card {
+        padding-bottom: 10px;
+    }
+
+    .faq_card_image {
+        width: 202px; 
+        height:161px
+    }
+
+    .faq_card_label {
+        border: #AAACB4 1px solid;
+        border-top: none;
+        padding: 10px; text-align: center;
+        letter-spacing: 0px;
+        border-radius: 0 0 4px 4px;
+        font: normal normal 600 14px/21px Poppins;
+        color: #000000;
+    }
+
+    .faq_card_label.active {
+        background: #A8865B;
+        color: white;
+    }
+
+    media screen and (max-width: 768px) {
+        .faq_card_image {
+            width: 100%; 
+            height: auto;
+        }
+    }
+</style>
+
+<section class="page-header">
+    <div class="container">
+         <div class="d-flex content justify-content-center">
+            <div class="align-self-center" style="color: white; font-size: 30px">
+                <svg style="margin-top: -4px" xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather feather-help-circle">
+                    <circle cx="12" cy="12" r="10" fill="white" />
+                    <text stroke="black" x="13" y="18" font-size="15" text-anchor="middle">?</text>
+                </svg>
+                How can we help you?
+            </div>
+        </div>
+    </div>
+    {% if 'private-transportation' in app.request.uri %}
+        <div class="bg" style="background-image: url('/bundles/wicrewcore/images/header/private-transportation-cover.jpg');"></div>
+    {% elseif 'jeep-boat-jeep-service' in app.request.uri %}
+        <div class="bg" style="background-image: url('/jbj_moutain_boat.png');"></div>
+    {% elseif 'water-taxi' in app.request.uri %}
+        <div class="bg" style="background-image: url('/bundles/wicrewcore/images/header/water-taxi-cover.jpg');"></div>
+    {% elseif 'private-domestic-flights' in app.request.uri %}
+        <div class="bg" style="background-image: url('/bundles/wicrewcore/images/header/private-flights-cover.jpg');"></div>
+    {% elseif 'activities' in app.request.uri %}
+        <div class="bg" style="background-image: url('/images/faq/faq-activities-banner.jpg');"></div>
+    {% else %}
+        <div class="bg" style="background-image: url('/bundles/wicrewcore/images/bg-jeep-boat-jeep.jpg');"></div>
+    {% endif %}
+</section>
+
+<div class="cms-page">
+    <div class="container">
+        <div style="font-weight: bold; text-align: center; margin-bottom: 15px">FAQs</div>
+        <div style="padding-bottom: 57px; text-align: center;">
+            <div>For your convenience, we've put together answers to the most frequently asked</div>
+            <div>questions about our private transportation services and activities below.</div>
+        </div>
+
+        <div class="d-flex flex-wrap justify-content-center justify-content-sm-between gap-20">
+            <a href="/faq/private-transportation">
+                <div class="card faq_card">
+                    <div class="faq_card_image"><img src="/images/faq/private-transportation.png" /></div>
+                    <div class="faq_card_label {% if current_path == 'faq_private_transportation' %}active{% endif %}">Private transportation</div>
+                </div>
+            </a>
+
+            <a href="/faq/jeep-boat-jeep-service">
+                <div class="card faq_card">
+                    <div class="faq_card_image"><img src="/images/faq/jeep-boat-jeep-service.png" /></div>
+                    <div class="faq_card_label {% if current_path == 'faq_jeep_boat_jeep_service' %}active{% endif %}">Jeep-Boat-Jeep service</div>
+                </div>
+            </a>
+
+            <a href="/faq/water-taxi">
+                <div class="card faq_card">
+                    <div class="faq_card_image"><img src="/images/faq/water-taxi.png" /></div>
+                    <div class="faq_card_label {% if current_path == 'faq_water_taxi' %}active{% endif %}">Water-Taxi</div>
+                </div>
+            </a>
+
+            <a href="/faq/private-domestic-flights">
+                <div class="card faq_card">
+                    <div class="faq_card_image"><img src="/images/faq/private-domestic-flights.png" /></div>
+                    <div class="faq_card_label {% if current_path == 'faq_private_domestic_flights' %}active{% endif %}">Private domestic flights</div>
+                </div>
+            </a>
+
+            <a href="/faq/activities">
+                <div class="card faq_card">
+                    <div class="faq_card_image"><img src="/images/faq/activities.png" /></div>
+                    <div class="faq_card_label {% if current_path == 'faq_activities' %}active{% endif %}">Activities</div>
+                </div>
+            </a>            
+        </div>
+
+        {% if current_path != 'faq' %}
+        <div class="faq_wrapper_box">
+            <div class="faq_tab">
+                <div class="faq_tab_left">
+                    <svg style="margin-top: -3px" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather feather-help-circle">
+                        <circle cx="12" cy="12" r="10" fill="#A8865B" />
+                        <text x="13" y="16" font-size="13" text-anchor="middle">?</text>
+                    </svg>
+                    FAQs
+                </div>
+                <div class="faq_tab_right">
+                    {% block tab_sub_title %}
+                    {% endblock %}
+                </div>
+            </div>
+            {% block content %}
+            {% endblock %}
+        </div>
+        {% endif %} 
+    </div>
+</div>
+
+<script>
+    const questions = document.querySelectorAll('.faq_question');
+    questions.forEach(question => {
+        question.addEventListener('click', () => {
+            question.classList.toggle('active');
+            const answer = question.nextElementSibling;
+            if (answer.style.display === 'block') {
+                answer.style.display = 'none';
+                question.style.borderBottom = '1px solid #C8CACE';
+            } else {
+                answer.style.display = 'block';
+                question.style.borderBottom = '0';
+            }
+        });
+    });
+</script>
+{% endblock %}

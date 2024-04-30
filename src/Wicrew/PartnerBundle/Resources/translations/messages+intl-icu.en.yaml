@@ -1,0 +1,55 @@
+partner:
+    title: Partners
+    new_action: Add partner
+    tab.general: General
+    biz_name: Legal business name
+    biz_address: Address
+    biz_city: City
+    biz_province: Province / State
+    biz_country: Country
+    biz_tel: Phone number
+    group.contact_information: Contact Information
+    firstname: First name
+    lastname: Last name
+    email: Email
+    tel: Phone number
+    tel_ext: Ext.
+    group:
+        business_information: Business Information
+        services_and_status: Services and Status
+
+    transportation_types: Services
+    transportation_type:
+        options:
+            private_shuttle: Private shuttle
+            shared_shuttle: Shared shuttle
+            private_flight: Private flight
+            water_taxi_boat: Water taxi boat
+            jeep_boat_jeep: Jeep-Boat-Jeep
+            activity: Activity
+
+    type: Partner type
+    type.options:
+        none: None
+        driver: Driver
+        affiliate: Affiliate
+        supplier: Supplier
+        travel_agent: Travel agent
+        partner: Partner
+    commission: Commission
+    commission.help: 'Note: Percentage (%)'
+    notes: Notes
+
+    delete:
+        addons: This partner is in use by one or more addons and cannot be deleted.
+        addons_link: Click here to see which addons use this partner.
+
+    view_addons:
+        title: All addons used.
+        count: >-
+            {addons, plural,
+               =0    {"{partner}" is used as a supplier for no addons.}
+               one   {"{partner}" is used as a supplier for 1 addon.}
+               other {"{partner}" is used as a supplier for # addons.}
+            }
+        view_them_below: You can view each used addon below.

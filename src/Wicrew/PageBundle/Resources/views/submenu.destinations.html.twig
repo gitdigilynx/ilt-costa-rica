@@ -1,0 +1,14 @@
+<div class="submenu">
+    <div class="container">
+        <div class="row">
+            {% for i in 1..6 %}
+                <div class="col-lg-2 col-md-4 col-sm-6 col-xs-6">                    
+                    <a href="/{{ ('homepage.populartours_items.link' ~ i)|trans }}" title="" class="menu-with-image">
+                        <img loading="lazy" src="{{ absolute_url(asset('bundles/wicrewcore/images/home/popular-tour-' ~ i ~ '.jpg')) }}" srcset="{{ absolute_url(asset('bundles/wicrewcore/images/home/popular-tour-' ~ i ~ '.jpg')) }} 1x, {{ absolute_url(asset('bundles/wicrewcore/images/home/popular-tour-' ~ i ~ '@2x.jpg')) }} 2x" alt="{{ ('homepage.populartours_items.title' ~ i)|trans|striptags }}">
+                        Tours from {{ ('homepage.populartours_items.title' ~ i)|trans|raw }}
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>

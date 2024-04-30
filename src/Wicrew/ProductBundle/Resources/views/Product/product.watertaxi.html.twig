@@ -1,0 +1,172 @@
+{% extends "@WicrewProduct/Product/transportationtype.html.twig" %}
+
+{% block title %}
+    {{ 'product.water.taxi'|trans() }}
+{% endblock %}
+
+{% block testimonials %}{# {% include "@WicrewPage/testimonials.html.twig" %} #}{% endblock %}
+
+{% block mainContent %}
+    {% include "@WicrewProduct/Product/Headers/header.water_taxi.html.twig" %}
+
+    {% set transportType = getWaterTaxiTransportType() %}
+
+    <section>
+        <div class="container">
+            <div class="search-product-header">
+                <span class="fas fa-ship" style="padding-right: 2px"></span>{{ transportType.name }}
+            </div>
+        </div>
+    </section>
+
+    {% include "@WicrewProduct/Product/Search/search.private-transports.html.twig"
+            with { "transportTypes": { "0": constant('\\App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_WATER_TAXI')} } only %}
+
+    <div class="water-taxi-page other-product">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 left-panel">
+                    <div class="left-panel-inner">
+                        <div class="image-block">
+                            <img src="{{ absolute_url(asset('bundles/wicrewcore/images/water-taxi-thumbnail.jpg')) }}"
+                                 alt="{{ 'product.watertaxi'|trans() }}">
+                        </div>
+
+                        <h2>{{ 'product.watertaxi'|trans() }}</h2>
+
+                        <div class="content-block"> 
+                            {# {% for product in transportType.products %} #}
+                                <div class="water-taxi-product-info">
+                                    <h3>{{ 'product.watertaxi.departdaily'|trans() }}</h3>
+                                    <p>
+                                    {# Custom depart daily info ref#ICR-85
+                                        {{ product.departureTime|date("H:i") }} {{ 'from'|trans() }} {{ product.areaFrom }} {{ 'to'|trans() }} {{ product.areaTo }}
+                                    #}
+                                    8:30 am from Montezuma
+                                    <br>10:00 am from Herradura \ Jaco
+                                    <br>(pick-up time varies depending on hotel location)</p>
+
+                                    <h3>Duration :</h3>
+                                    <p>1-hour Boat + Transfer Time</p>
+
+                                    <h3>Includes :</h3>
+                                    <ul class="list-with-bullets">
+                                        <li>Ground transportation from your hotel.</li>
+                                        <li>1 hour boat ride on the Gulf of Nicoya.</li>
+                                        <li>Ground transportation from Herradura/Jaco to your destination.</li>
+                                        <li>If a 4x4 is required to reach the property, an additional fee will apply.</li>
+                                    </ul>
+
+{#                                    <div class="price-info-wrapper row">#}
+{#                                        <div class="activity-info col-custom col-xl-7">#}
+{#                                            <div class="price-info">#}
+{#                                                <div class="from">{{ "from"|trans }}</div>#}
+{#                                                <div class="price">{{ 'currency.symbol'|trans() }}{{ product.adultRackPrice|number_format(0, '.', ',') }}</div>#}
+{#                                                <div class="price-detail">#}
+{#                                                    <span class="currency">{{ 'currency.text.tax'|trans() }}</span>#}
+{#                                                    <span class="per-person">{{ "per.person"|trans }}</span>#}
+{#                                                </div>#}
+{#                                            </div>#}
+{#                                        </div>#}
+{#                                        <div class="col-custom col-xl-5 col-readmore">#}
+{#                                            <button type="button" id="book-watertaxi_{{ product.id }}"#}
+{#                                                    class="btn-black lg-btn" data-pid="{{ product.id }}"#}
+{#                                                    data-transportationtype="{{ transportType.id }}">{{ 'booknow'|trans() }}</button>#}
+{#                                        </div>#}
+{#                                    </div>#}
+                                </div>
+                            {# {% endfor %} #}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-8 right-panel">
+                    <h2>Save time with a view</h2>
+                    <p>Save time and enjoy traveling the beautiful picturesque way as we take you from the shores of
+                        Montezuma to Jaco Beach by water taxi. We'll be crossing the beautiful Gulf of Nicoya, where you'll
+                        probably have the chance of spotting some marine life, like dolphins, manta rays, turtles and if you
+                        are lucky even whales, especially from July to October.</p>
+                    <p>The boat ride takes only one hour and is the fastest way to get from Montezuma to Jaco or vice versa.
+                        Pickups & drop-offs are available from Jaco to Manuel Antonio, Uvita & Dominical, and from Montezuma
+                        to Mal-Pais, Santa Teresa and Tambor. Our Water Taxi Boat leaves from Montezuma beach and Herradura
+                        beach north Jaco,</p>
+                    <h3>Important Information</h3>
+                    <ul class="list-with-bullets">
+                        <li>Reservations in advance are required.</li>
+                        <li>Luggage: 20kg maximum per person, normally one small and one large backpack or suitcases.</li>
+                        <li>Surf boards and boxes have an extra cost of $10 per piece.</li>
+                        <li>Bicycles and pets are not accepted.</li>
+                        <li>During high tide and challenging weather it might be necessary to wait until the tide is more
+                            calm.
+                        </li>
+                        <li>There are some periods during the year that for safety reasons the departure location must be
+                            changed.
+                        </li>
+                    </ul>
+                    <p><img src="{{ absolute_url(asset('bundles/wicrewcore/images/water-taxi-map.jpg')) }}"
+                            alt="{{ 'product.watertaxi'|trans() }}"></p>
+                </div>
+            </div>
+
+{#           <div class="row">#}
+{#               <div class="col">#}
+{#                   <div class="water-taxi-listing-block">#}
+{#                       {% for product in transportType.products %}#}
+{#                           <div class="item-block row">#}
+{#                               <div class="col-md-3 form-col">#}
+{#                                   <p><strong>{{ 'from'|trans() }}</strong></p>#}
+{#                                   <p>{{ product.areaFrom }}</p>#}
+{#                               </div>#}
+{#                               <div class="col-md-3 to-col">#}
+{#                                   <p><strong>{{ 'to'|trans() }}</strong></p>#}
+{#                                   <p>{{ product.areaTo }}</p>#}
+{#                               </div>#}
+{#                               <div class="col-md-3 col-xl-4 price-col">#}
+{#                                   <p><strong>{{ 'rate'|trans() }}</strong></p>#}
+{#                                    <p class="price-item">{{ 'currency.symbol'|trans() }}{{ product.adultRackPrice|number_format(0, '.', ',') }} {{ 'currency.text.tax'|trans() }} {{ "per.person"|trans }}</p>#}
+{#                                </div>#}
+{#                                <div class="col-md-3 col-xl-2 button-col">#}
+{#                                    <button type="button" id="book-watertaxi_{{ product.id }}" class="btn-black lg-btn"#}
+{#                                            data-pid="{{ product.id }}"#}
+{#                                            data-transportationtype="{{ transportType.id }}">{{ 'booknow'|trans() }}</button>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                        {% endfor %}#}
+{#                    </div>#}
+                </div>
+            </div>
+        </div>
+
+    {#    <div class="water-taxi-important-info">#}
+    {#        <div class="container">#}
+    {#            <div class="row">#}
+    {#                <div class="col">#}
+    {#                    <h2>Important Information:</h2>#}
+    {#                    <ul class="list-with-bullets">#}
+    {#                        <li>Reservations in advance are required.</li>#}
+    {#                        <li>Luggage: 20kg maximum per person, normally one small and one large backpack or suitcases.#}
+    {#                        </li>#}
+    {#                        <li>Surf boards and boxes have an extra cost of $10 per piece.</li>#}
+    {#                        <li>Bicycles and pets are not accepted.</li>#}
+    {#                        <li class="margin">During high tide and challenging weather it might be necessary to wait until#}
+    {#                            the tide is more calm.#}
+    {#                        </li>#}
+    {#                        <li>There are some periods during the year that for safety reasons the departure location must#}
+    {#                            be changed.#}
+    {#                        </li>#}
+    {#                    </ul>#}
+    {#                </div>#}
+    {#            </div>#}
+    {#        </div>#}
+    {#    </div>#}
+
+        <div class="water-taxi-hero-image">
+            <img src="{{ absolute_url(asset('bundles/wicrewcore/images/water-taxi-hero-image.jpg')) }}"
+                 alt="{{ 'product.water.taxi'|trans() }}">
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {% include "@WicrewProduct/Product/product.watertaxi.js.html.twig" %}
+{% endblock %}

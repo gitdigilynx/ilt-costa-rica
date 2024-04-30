@@ -1,0 +1,47 @@
+easy_admin:
+    design:
+        menu:
+            - { css_class: 'menu--block', entity: 'Block', label: 'block.block', icon: 'th-large', permission: ROLE_ADMIN }
+    #        assets:
+    #            js:
+    #                - '/bundles/wicrewblock/javascript/custom-ckeditor-buttons.js'
+    entities:
+        Block:
+            permissions:
+                list: [ 'ROLE_ADMIN' ]
+                new: [ 'ROLE_ADMIN' ] 
+                edit: [ 'ROLE_ADMIN' ]
+                delete: [ 'ROLE_ADMIN' ]
+            label: 'block.block'
+            icon: 'file'
+            class: App\Wicrew\BlockBundle\Entity\Block
+            list:
+                title: 'block.block'
+                filters: ['identifier']
+                fields:
+                    - { property: 'identifier', label: 'block.identifier' }
+                    - { property: 'title', label: 'block.title' }
+                    - { property: 'createdAt', label: 'block.created_at' }
+                max_results: '%global.sort.pagination.default%'
+                sort: ['createdAt', '%global.sort.desc%']
+            form:
+                fields:
+                    - { type: 'tab', label: 'block.tab.general' }
+                    - { type: 'group', label: 'block.group.information' }
+                    - { property: 'identifier', label: 'block.identifier' }
+                    -   property: 'type'
+                        label: 'block.type'
+                        type: 'choice'
+                        type_options:
+                            required: true
+                            choices:
+                                block.type.option.content: !php/const App\Wicrew\BlockBundle\Entity\Block::TYPE_CONTENT
+                                block.type.option.template: !php/const App\Wicrew\BlockBundle\Entity\Block::TYPE_TEMPLATE
+                            expanded: true
+                            multiple: false
+                    - { property: 'title', label: 'block.title' }
+                    - { property: 'content', label: 'block.content', type: 'FOS\CKEditorBundle\Form\Type\CKEditorType', type_options: { config: { filebrowserBrowseRoute: 'elfinder', filebrowserBrowseRouteParameters: { instance: 'image', homeFolder: '' } } } }
+                    - { property: 'customTemplate', label: 'block.custom_template' }
+            templates:
+                new: '@WicrewBlock/Admin/new.html.twig'
+                edit: '@WicrewBlock/Admin/edit.html.twig'

@@ -1,0 +1,187 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ location.name }}{% endblock %}
+
+{% block body %}
+
+    {% set params = checkForOrderItemQueryString(app.request) %}
+    <section class="page-header">
+        <div class="container">
+            <div class="d-flex content">
+                <div class="align-self-center">
+                    <h1>{{ location.name }}</h1>
+                </div>
+            </div>
+        </div>
+        <div class="bg"
+            {% if location.image != "" %}
+                style="background-image: url('{{ app.request.getSchemeAndHttpHost() ~ vich_uploader_asset(location, 'imageFile') }}');"
+            {% else %}
+                style="background-image: url('{{ absolute_url(asset('bundles/wicrewcore/images/bg_activities.jpg')) }}');"
+            {% endif %}
+        >
+        </div>
+    </section>
+
+    <section class="breadcrumbs">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">{{ "Home"|trans }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ path("wicrew_locations", params) }}"
+                                                   title="{{ "Activities Destinations"|trans }}">{{ "Activities Destinations"|trans }}</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ location.name }}</li>
+                </ol>
+            </nav>
+        </div>
+    </section>
+
+    <section class="activity-list">
+        <div class="container">
+
+            {% block activity_wrapper %}
+                <div class="row">
+
+                    {% block activity_list_filter %}
+                        <div class="col-md-3 filter-listing">
+                            <div class="filter-title">
+                                <span class="title">{{ "Filters"|trans }}</span>
+                                <span class="reset align-self-center {{ is_filters ? 'active' : '' }}"><a
+                                            href="{{ path("wicrew_activities", params|merge({ "location": location_slug })) }}"
+                                            class="reset-filter">{{ "Reset"|trans }}</a></span>
+                            </div>
+
+                            <div class="filter-items">
+                                {% for filterName, filter in filters %}
+                                    <div class="filter-item">
+                                        <span class="filter-label">{{ filter.label }}</span>
+                                        <ul>
+                                            {% for idx, option in filter.options %}
+                                                <li>
+                                                    <div class="filter-checkbox custom-checkbox">
+                                                        <input id="{{ filterName ~ idx }}" name="{{ filterName }}"
+                                                               type="checkbox"
+                                                               value="{{ option.value }}"{% if option.isSelected %} checked="checked"{% endif %}
+                                                               data-link="{{ option.link }}"/>
+                                                        <label for="{{ filterName ~ idx }}">{{ option.label }}
+                                                            ({{ option.count }})</label>
+                                                    </div>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endblock %}
+
+                    {% block activity_list_container %}
+                        <div class="col-md-9 activity-listing">
+                            {% if pagination.getTotalItemCount > 0 %}
+                                {% for item in pagination %}
+                                    <div class="activity-item">
+                                        <div class="image-box">
+                                            <a href="/{{ item.slug }}?{{ params|url_encode }}" title="{{ item.name }}">
+                                                <div class="image">
+                                                    <div class="activity_type_tag_container">
+                                                    {% for type in item.types %}
+                                                        {% if type == 1 %}
+                                                            <div class="activity_type_tag"> Group tour </div>
+                                                        {% elseif type == 2 %}
+                                                            <div class="activity_type_tag"> Private Tour </div>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                    </div>
+                                                    {% if item.slides|length > 0 and item.slides[0].image != "" %}
+                                                        <img src="{{ app.request.getSchemeAndHttpHost() ~ vich_uploader_asset(item.slides[0], 'imageFile') }}"
+                                                             alt="{{ item.name }}"/>
+                                                    {% else %}
+                                                        <img src="{{ absolute_url(asset('bundles/wicrewcore/images/placeholder.png')) }}">
+                                                    {% endif %}
+                                                </div>
+                                                <div class="activity-title-wrapper">
+                                                    <span class="activity-title-content">{{ item.name }}</span>
+                                                </div>
+                                            </a>
+                                        </div>
+                                        <div class="trip-info">
+                                            <ul>
+                                                {% for type in item.types %}
+                                                    {% if type == 1 %}
+                                                        <li class="duration" style="background-image: url('/bundles/wicrewcore/images/users-solid.svg');">
+                                                            Group
+                                                        </li>
+                                                    {% elseif type == 2 %}
+                                                        <li class="duration" style="background-image: url('/bundles/wicrewcore/images/users-doutone.svg');">
+                                                            Private
+                                                        </li>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                <li class="duration">
+                                                    {% if item.duration == constant('App\\Wicrew\\ActivityBundle\\Entity\\Activity::DURATION_1_2_HOURS') %}
+                                                        {{ "activity.duration.option.1_2_hours"|trans }}
+                                                    {% elseif item.duration == constant('App\\Wicrew\\ActivityBundle\\Entity\\Activity::DURATION_HALF_DAY') %}
+                                                        {{ "activity.duration.option.half_day"|trans }}
+                                                    {% elseif item.duration == constant('App\\Wicrew\\ActivityBundle\\Entity\\Activity::DURATION_FULL_DAY') %}
+                                                        {{ "activity.duration.option.full_day"|trans }}
+                                                    {% endif %}
+                                                </li>
+                                                <li class="difficulty">
+                                                    {% set difficultyLabels = [] %}
+                                                    {% for level in item.difficultyLevels %}
+                                                        {% if level == constant('App\\Wicrew\\ActivityBundle\\Entity\\Activity::DIFFICULTY_EASY') %}
+                                                            {% set difficultyLabels = difficultyLabels|merge(["Easy"|trans]) %}
+                                                        {% elseif level == constant('App\\Wicrew\\ActivityBundle\\Entity\\Activity::DIFFICULTY_MODERATE') %}
+                                                            {% set difficultyLabels = difficultyLabels|merge(["Moderate"|trans]) %}
+                                                        {% elseif level == constant('App\\Wicrew\\ActivityBundle\\Entity\\Activity::DIFFICULTY_DIFFICULT') %}
+                                                            {% set difficultyLabels = difficultyLabels|merge(["Difficult"|trans]) %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                    {{ difficultyLabels|join(", ", " " ~ "and"|trans ~ " ") }}
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="price-info">
+                                            <div class="row">
+                                                <div class="col-custom col-xl-7">
+                                                    {% set priceActivity = getActivityFeeForAdultAndChild(item) %}
+                                                    <div class="from">{{ "from"|trans }}</div>
+                                                    <div class="price">{{ 'currency.symbol'|trans() }}
+                                                    {% if 1 in priceActivity.priceType %}
+                                                        {{ priceActivity["groupAdultRack"] }}                                                    
+                                                    {% else %}
+                                                        {{ priceActivity["adultRack"] }}
+                                                    {% endif %}
+
+                                                    <span class="currency">{{ getCurrencyTranslationKey() }}</span>
+                                                    </div>
+                                                    <div class="per-person">
+                                                        {{ priceActivity['priceType'] == constant('App\\Wicrew\\CoreBundle\\Entity\\IBasePriceEntity::PRICE_TYPE_FOR_THE_TRIP') ? "per.fixed"|trans : "per.person"|trans }}
+                                                    </div>
+                                                </div>
+                                                <div class="col-custom col-xl-5 col-readmore">
+                                                    <a href="/{{ item.slug }}?{{ params|url_encode }}" class="btn-black readmore"
+                                                       title="{{ "Read More"|trans }}">{{ "Read More"|trans }}</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- activity-item -->
+                                {% endfor %}
+                                <div class="navigation">
+                                    {{ knp_pagination_render(pagination) }}
+                                </div>
+                            {% else %}
+                                <p>{{ "core.no_result"|trans }}</p>
+                            {% endif %}
+                        </div>
+                    {% endblock %}
+                </div>
+            {% endblock %}
+
+        </div>
+    </section>
+
+    {# {% include "@WicrewPage/testimonials.html.twig" %} #}
+
+{% endblock %}

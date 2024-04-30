@@ -1,0 +1,29 @@
+wicrew_sale_booking:
+    resource: '@WicrewSaleBundle/Controller/BookingController.php'
+    type: annotation
+    prefix:
+
+wicrew_sale_order_frontend:
+    resource: '@WicrewSaleBundle/Controller/OrderController.php'
+    type: annotation
+    prefix:
+
+wicrew_sale_admin_order:
+    resource: '@WicrewSaleBundle/Controller/Admin/OrderController.php'
+    type: annotation
+    prefix: /admin
+
+wicrew_sale_admin_activity_management:
+    resource: '@WicrewSaleBundle/Controller/Admin/ActivityManagementController.php'
+    type: annotation
+    prefix: /admin
+
+wicrew_sale_transportation_management_frontend:
+    resource: '@WicrewSaleBundle/Controller/TransportController.php'
+    type: annotation
+    prefix:
+
+wicrew_sale_admin_transportation_management:
+    resource: '@WicrewSaleBundle/Controller/Admin/TransportationManagementController.php'
+    type: annotation
+    prefix: /admin

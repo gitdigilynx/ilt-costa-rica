@@ -1,0 +1,335 @@
+# Sale bundle
+sale.order: Orders
+sale.order.listing: Orders listing
+sale.order.id: id
+sale.order.source: Source
+sale.order.purchase.at: Purchase at
+sale.order.customer.name: Customer name
+sale.order.totalamount: Total Amount
+sale.order.servicetype: Service type
+sale.order.status: Status
+sale.order.status.pending: Pending
+sale.order.status.quote: Quote
+sale.order.status.paid: Paid
+sale.order.status.paid_cash: Paid Cash
+sale.order.status.cancelled: Cancelled
+customer.booking: Website Customer
+ilt.partners.booking: ILT Customer Service Partners
+sale.order.addnew: Add new order
+
+order.tab.general: General
+order.details: Order Details
+order.detail.id: Order ID
+order.detail.date: Order date
+order.detail.purchase.point: Purchase point
+order.customer.information: Customer Information
+order.tab.items: Order Items
+order.items.in: Items in the order
+order.items.date: Date
+order.items.area: Area
+order.items.flight.information: Flight information
+order.items.flight: Flight
+order.items.specificlocation: Specific location
+order.items.pickup: Pickup
+order.items.drop: Drop off
+order.details.price: Details
+order.details.adultqty: Adults Qty
+order.details.childrenqty: Children Qty
+order.details.basicprice: Basic price
+order.extra.hotel: Extra Hotels
+order.items.total: Total price
+order.add.items: Add an Item in the order
+order.items.select.type.add: Select ther service you want to add
+order.service.pvt.shuttles: Private shuttles
+order.service.shr.shuttles: Shared shuttles
+order.service.pvt.flight: Private flight
+order.service.jbj: Jeep boat Jeep
+order.service.watertaxi: Water taxi
+order.add.item: Add item
+sale.checkout.create.order: Created the order
+sale.checkout.order.card.payment: Credit card payment
+sale.checkout.order.add.item: Added the new item
+order.add.notes: Add notes
+order.notes.list: Notes list
+order.addnotes.success: Added the notes success
+order.items.edit: Edit this item
+order.items.delete: Delete this item
+order.items.edit.success: Edit item success
+order.histories: Order histories
+order.balance.history: Balance & History
+order.history.date: Date
+order.history.action: Action
+order.history.itemid: Item ID
+order.history.producttype: Product type
+order.history.note: Note
+order.history.payment: Payment
+order.history.additional: Additional
+order.history.refund: Refund
+order.history.employee: Employee
+order.history.status.1: Create order
+order.history.status.2: Edit order
+order.history.status.3: Cancel order
+order.history.status.4: Create item
+order.history.status.5: Edit item
+order.history.status.6: Cancel item
+order.history.status.7: Charge
+order.history.status.8: Refund
+order.canceled: Order canceled
+payment.via.stripe: Payment via Stripe
+order.history.total: Totals
+order.history.totaldue: Amount Due
+order.items.totalwithtax: Total price with tax
+order.items.activity.transportation: (Transportation)
+order.balance.makepayment: Make a Payment
+order.balance.makepayment.note: Note
+order.balance.makepayment.amount: Amount
+order.balance.makepayment.process: Process
+order.balance.makerefund: Make a Refund
+order.balance.makerefund.totalrefund: Total availiable to refund
+order.balance.makerefund.totalcharge: Total availiable tot charge
+order.balance.makepayment.charge: Charge
+order.balance.makepayment.chargeasnew: Charge as new credit card
+order.balance.makepayment.refund: Refund
+sale.order.payment.refundnotcharge: Amount Due is wrong. Please use refund not charge.
+sale.order.payment.chargenotrefund: Amount Due is wrong. Please use charge not refund.
+order.information: Order information
+order.information.payment.type: Payment type
+order.mail.sending: Mail sending
+order.mail.subject: Subject
+order.mail.type.edit: Edit
+order.mail.type.charge: Charge
+order.mail.type.refund: Refund
+order.mail.type.canceled: Canceled
+order.mail.send: Send
+order.mail.edit.subject: Edit
+order.mail.edit.body1: |
+    Hi {{ customerName }},<br />
+    <br />
+    This is to confirm that we have made the changes to your service(s) as per your request below.<br />
+    Please make sure that the following changes to reservation #{{ orderNumber }} are correct.<br />
+    <br />
+    Reservation #{{ orderNumber }}<br />
+    {{ orderDetails }}<br />
+order.mail.edit.body2: |
+    <br />
+    If you have any questions, please do not hesitate to contact us.<br />
+    <br />
+    Thank you,
+order.mail.charge.subject: Charge
+order.mail.charge.body1: |
+    Hi {{ customerName }},<br />
+    <br />
+    This is to confirm that we have processed your payment. You should see the transaction on your credit card shortly. <br />
+    Here is the details of your reservation.<br />
+    <br />
+    {{ orderDetails }}<br />
+order.mail.charge.body2: |
+    <br />
+    If you have any questions, please do not hesitate to contact us.<br />
+    <br />
+    Thank you,
+order.mail.refund.subject: Refund
+order.mail.refund.body1: |
+    Hi {{ customerName }},<br />
+    <br />
+    This is to confirm that your refund was processed and will be applied to the same credit card that was used during your booking. <br />
+    <br />
+    {{ orderDetails }}<br />
+order.mail.refund.body2: |
+    <br />
+    If you have any questions, please do not hesitate to contact us.<br />
+    <br />
+    Thank you,
+order.mail.canceled.subject: Canceled
+order.mail.canceled.body1: |
+    Hi {{ customerName }},<br />
+    <br />
+    This is to confirm that we have cancelled your service(s) as per your request below.<br />
+    <br />
+    {{ orderDetails }}<br />
+order.mail.canceled.body2: |
+    <br />
+    If you have any questions, please do not hesitate to contact us.<br />
+    <br />
+    Thank you,
+tax.title: Tax
+tax.tab.general: General
+tax.group.information: Information
+tax.label: Label
+tax.amount: Amount
+tax.created_at: Created at
+
+order_item.status: Status
+order_item.status.option.unpaid: Unpaid
+order_item.status.option.paid: Paid
+order_item.status.option.cancelled: Cancelled
+order_item.type.option.private_shuttle: Private shuttle
+order_item.type.option.shared_shuttle: Shared shuttle
+order_item.type.option.private_flight: Private flight
+order_item.type.option.private_jbj: Private JBJ
+order_item.type.option.shared_jbj: Shared JBJ
+order_item.type.option.riding_jbj: Riding JBJ
+order_item.type.option.water_taxi: Water taxi
+order_item.type.option.activity_regular: Activity regular
+order_item.type.option.activity_transportation: Activity transportation
+order_item.rack.price: Rack price
+order_item.net.price: Net price
+order_item.activity.child: Child
+order_item.confirm: Are you sure?
+order_item.remove.success: Item removed
+
+order_item.partner.assigned: Assigned
+order_item.partner.unassigned: Unassigned
+
+order.mail.assigndriver.subject: Assign a driver
+email.assigndriver.head: The order <strong>{{ orderid }}</strong> has been assing to driver <strong>{{ drivername }}</strong> from <strong>{{ fromname }}</strong>.
+email.assigndriver.ilt: ILT
+email.assigndriver.customer.head: Please make the following changes to reservation <strong>{{ orderid }}</strong> and confirm changes.
+email.assigndriver.customer.updated: Updated Service Details
+
+transportation_management.label: Transportation management
+transportation_management.tab.general: General
+transportation_management.group.information: Information
+transportation_management.status: Status
+transportation_management.driver_status: Driver Status
+transportation_management.type: Type
+transportation_management.order.id: Booking #
+transportation_management.pick_up_date: Pick up date
+transportation_management.pick_up_time: Pick up Time
+transportation_management.order.name: Passenger Name
+transportation_management.order.firstname: Passenger first Name
+transportation_management.order.lastname: Passenger last Name
+transportation_management.number_of_adult: Pax Adults
+transportation_management.number_of_kid: Pax Kids
+transportation_management.pick_up_area.name: Pick up Area
+transportation_management.pick_up_airport: Pick up airport
+transportation_management.pick_up_flight_number: Pick up flight number
+transportation_management.pick_up_airline_company: Pick up airline company
+transportation_management.pick_up_address: Pick up Location
+transportation_management.pick_up_google_place_id: Pick up Google place ID
+transportation_management.drop_area.name: Drop-Off Area
+transportation_management.drop_airport: Drop-Off airport
+transportation_management.drop_flight_number: Drop-Off flight number
+transportation_management.drop_airline_company: Drop-Off airline company
+transportation_management.drop_address: Drop-Off Location
+transportation_management.drop_google_place_id: Drop-Off Google place ID
+transportation_management.adult_rack_price: Rack Rate
+transportation_management.adult_net_price: Net Rate
+transportation_management.order.partner.biz_name: Supplier
+transportation_management.partner.biz_name: Driver
+transportation_management.partner.notes: Driver notes
+transportation_management.vehicle.name: Vehicle
+transportation_management.save.success: Updated success
+
+activity_management.label: Activity management
+activity_management.tab.general: General
+activity_management.group.information: Information
+activity_management.status: Status
+activity_management.activity.name: Name
+activity_management.order.id: Booking #
+activity_management.pick_up_date: Date
+activity_management.pick_up_time: Exact Pick up Time
+activity_management.order.name: Passenger Name
+activity_management.order.firstname: Passenger first Name
+activity_management.order.lastname: Passenger last Name
+activity_management.number_of_adult: Pax Adults
+activity_management.number_of_kid: Pax Kids
+activity_management.pick_up_area.name: Pick up Area
+activity_management.pick_up_airport: Pick up airport
+activity_management.pick_up_flight_number: Pick up flight number
+activity_management.pick_up_airline_company: Pick up airline company
+activity_management.pick_up_address: Pick up Location
+activity_management.pick_up_google_place_id: Pick up Google place ID
+activity_management.drop_area.name: Drop-Off Area
+activity_management.drop_airport: Drop-Off airport
+activity_management.drop_flight_number: Drop-Off flight number
+activity_management.drop_airline_company: Drop-Off airline company
+activity_management.drop_address: Drop-Off Location
+activity_management.drop_google_place_id: Drop-Off Google place ID
+activity_management.partner.biz_name: Supplier
+activity_management.adult_rack_price: Rack Rate
+activity_management.adult_net_price: Net Rate
+activity_management.partner.commission: Commission
+activity_management.order.status: Order Status
+
+#Frontend
+booking.back: Back
+booking.back.to.search: Back to Search
+booking.passenger.number.adults: Passenger adults
+booking.passenger.adults: Passenger adults
+booking.passenger.number.children: Passenger children
+booking.passenger.children: Passenger children
+booking.destination: Destination
+booking.pickupdate: Pick-up date
+booking.pickuptime: Pick-up time
+booking.from: From
+booking.to: To
+booking.from.flight.number: Flight number
+booking.from.flight.company: Airline company
+booking.from.dropoff: Drop off specific location
+booking.from.pickup: Pickup specific location
+booking.addons: Add Ons
+booking.addons.note: Any specific needs?
+booking.weight: Weight
+booking.luggage.weight: Luggages total weight
+booking.passenger.weight: Passenger total weight
+booking.back.to.select: Back to listing
+booking.departure: Departure location
+booking.addon.perperson: Per person
+booking.addon.pertrip: Per trip
+edit.order.item: Edit order item
+booking.back.to.orderitem: Back to orderitem
+booking.pickup.time: Pickup time
+pickup.extrafee: Pickup extra fee
+booking.please.select: Please select
+
+sale.summary: Summary
+sale.summary.total: Total
+addtocart: Proceed to Check Out
+proceed.to.check.out: Proceed to Check Out
+add.to.cart.and.continue: Add to Cart and continue
+contactus: Contact us
+sale.checkout.contact.title: Contact information
+sale.checkout.payment.title: Payment information
+sale.checkout.fname: Firstname
+sale.checkout.lname: Lastname
+sale.checkout.email: Email
+sale.checkout.country: Country
+sale.checkout.notes: Notes
+sale.checkout.notes.customer: Customer Notes
+checkout.as.quote: Checkout as quote
+sale.payment.type.creditcard: Creditcard
+sale.payment.type.cash: Cash
+sale.payment.type.cheque: Cheque
+sale.checkout.confirm.booking: Confirm Booking
+sale.summary.tax: Taxes
+sale.summary.totalprice: Total price
+sale.checkout: Proceed to Check Out
+sale.checkout.empty: Cart empty
+sale.checkout.title: Check Out
+sale.tripadvisor.reminder: Please review on TripAdvisor
+sale.tripadvisor.reminder.mail.title: Trip Advisor Reminder
+sale.tripadvisor.reminder.mail.content: <h2>How was your experience with ILT Costa Rica?</h2><p>Thank you for choosing ILT Costa Rica as your service provider in Costa Rica.</br>We hope you enjoyed our service, and had an amazing time visiting our country.</br>We’d appreciate if you can share your experience with us. It only takes a minute, and thank you for taking the time.</p><p>Click on the link below, we look forward to reading your review.</p>
+
+booking.flight.contact.subject: Private flight booking request
+booking.request.notallow: Request to booking during the night
+please.contactus.for.booking: Please contact us for booking
+sale.checkout.success: Thank you. Your order has been received.
+private.flight.mail.header: Private flight request
+cart.title: Cart
+contact.us.title: Contact us
+
+email.flight.request: Can you please let me know if you have availability for the following service(s) below.
+email.additional.note: Additional Notes
+email.please.confirm.reservation: Please confirm reservation.
+email.thankyou: Thank you,
+email.hi: Hi,
+email.allow.request: A customer made a request outside your opening hours. Please validate if you want to provide the service or not and contact the client.
+email.confirm.order: Order confirm
+email.confirm.orderhead: Thank you for booking with ILT Costa Rica.<br/>You’re all set, and reserved. Please find the details of your reservation below.
+email.tax: Tax
+email.total: Total
+email.detail.all.service: Deails of all services
+email.havequestion: If you have any questions, please do not hesitate to contact us at info@iltcostarica.com
+email.confirm.orderhead.partner: Below are the details for your upcoming job. Please confirm receipt of this email.
+email.job: Job

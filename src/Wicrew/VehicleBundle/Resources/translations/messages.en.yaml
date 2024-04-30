@@ -1,0 +1,12 @@
+# Vehicle Bundle
+transportation.vehicle: Vehicles
+transportation.vehicle.management: Vehicles management
+transportation.type: Type
+transportation.vehicle.name: Name
+vehicle.enabled: Enabled
+
+vehicle.tab.general: General Information
+vehicle.tab.vehicle: Vehicle Information
+vehicle.form.plate: Plate
+vehicle.form.name: Name
+vehicle.form.notes: Notes

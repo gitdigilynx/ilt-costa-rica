@@ -1,0 +1,49 @@
+{% if item.type is same as "private_shuttle" %}
+    {% set november1st = '2023-11-01' %}
+    {% set tax_rate = (item.pickDate|date("Y") == 2023 and item.pickDate|date("m") <= 6) ? 8.00 : 13.00 %}
+
+    {% if item.pickDate|date('Y-m-d') >= november1st and item.product.novemberFixedRackPrice != 0 %}
+        {{ ((tax_rate / 100) * item.product.novemberFixedRackPrice)|number_format(2, '.', ',') }}
+    {% elseif item.product.fixedRackPrice != 0 %}
+        {{ ((tax_rate / 100) * item.product.fixedRackPrice)|number_format(2, '.', ',') }}
+    {% else %}
+        {{ ((tax_rate / 100) * item.titleRackPrice)|number_format(2, '.', ',') }} 
+    {% endif %}
+   
+{% elseif item.type is same as "activity" or item.type is same as "activity_regular"  %}
+
+    {% set rack_total_amount = 0 %}
+
+    {% if item.activityType == "Group" %}
+        {% set rack_total_amount = rack_total_amount + ( item.adultCount * item.activity.groupAdultRackPrice ) %}
+        {% set rack_total_amount = rack_total_amount + ( item.childCount * item.activity.groupKidRackPrice ) %}
+
+    {% else %}
+        {% set rack_total_amount = rack_total_amount + ( item.adultCount * item.activity.adultRackPrice ) %}
+        {% set rack_total_amount = rack_total_amount + ( item.childCount * item.activity.childRackPrice ) %}
+
+    {% endif %}
+    {% if item.pickAddFeeRack is not null and item.pickAddFeeRack != 0.00 %}
+        {% set rack_total_amount = rack_total_amount + ( item.pickAddFeeRack ) %}
+
+    {% endif %}
+    {% if item.dropAddFeeRack is not null and item.dropAddFeeRack != 0.00 %}
+        {% set rack_total_amount = rack_total_amount + ( item.dropAddFeeRack ) %}
+    {% endif %}
+
+    {{  ( ("13.00" / 100) * rack_total_amount )|number_format(2, '.', ',') }}
+{% elseif item.type is same as "shared_jbj" %}
+    {{  ( ("13.00" / 100) * ((item.adultCount * item.adultRackPrice) + (item.childCount * item.childRackPrice)) )|number_format(2, '.', ',') }}
+
+{% else %}
+    {% set november1st = '2023-11-01' %}
+    {% if item.pickDate|date('Y-m-d') >= november1st %}
+        {% if item.product.novemberFixedRackPrice != 0  %}
+            {{ (("13.00" / 100) * item.product.novemberFixedRackPrice)|number_format(2, '.', ',') }}
+        {% else %}
+            {{ (("13.00" / 100) * item.titleRackPrice)|number_format(2, '.', ',') }} 
+        {% endif %}
+    {% else %}
+        {{ (("13.00" / 100) * item.titleRackPrice)|number_format(2, '.', ',') }} 
+    {% endif %}
+{% endif %}

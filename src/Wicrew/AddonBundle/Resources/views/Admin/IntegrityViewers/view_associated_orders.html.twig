@@ -1,0 +1,61 @@
+{% extends "easy_admin/admin.base_layout.html.twig" %}
+
+{% block page_title %}
+    {{ 'addon.associated_orders.title'|trans({ 'id': addon.id }) }}
+{% endblock %}
+
+{% block main %}
+    <div class="view_orders">
+        <h4>{{ 'addon.associated_orders.count'|trans({ 'addon': addon.label, 'orderCount': addon.products|length }) }}</h4>
+
+        {% if orders|length > 0 %}
+            <h6>{{ 'addon.associated_orders.view_them_below'|trans() }}</h6>
+            <table>
+                <tbody>
+                {% for orderHasAddon in orders %}
+                    <tr>
+                        <td>
+                            <strong>{{ '%s %s - %s (Order number #%s)'|format(
+                                    orderHasAddon.orderItem.order.firstname,
+                                    orderHasAddon.orderItem.order.lastname,
+                                    orderHasAddon.orderItem.product.transportationType.name,
+                                    orderHasAddon.orderItem.order.id
+                                ) }}</strong>
+                        </td>
+                        <td>
+                            <strong> - <a href="{{ path('easyadmin',
+                                    {
+                                        entity: 'Order',
+                                        action: 'edit',
+                                        id: orderHasAddon.orderItem.order.id
+                                    }) }}">{{ 'action.edit'|trans() }}</a>
+                            </strong>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
+        <div class="button-action">
+            <a class="btn btn-primary action-new" title="" href="{{ path('easyadmin',
+                {
+                    entity: 'Addon',
+                    action: 'list'
+                }) }}" target="_self">Back to listing</a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block head_stylesheets %}
+    {{ parent() }}
+    <style>
+        .view_orders {
+            padding: 40px;
+        }
+
+        .button-action {
+            padding-top: 20px;
+        }
+    </style>
+{% endblock %}

@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <title>{% block title %}{% endblock %}</title>
+        <!-- {# Prevent Auto zoom on input focus  #} -->
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+        <!-- Primary Meta Tags -->
+        <meta name="title" content="{% block meta_title %}{% endblock %}">
+        <meta name="description" content="{% block meta_description %}{% endblock %}">
+        <meta name="keywords" content="{% block meta_keywords %}{% endblock %}">
+
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="">
+        <meta property="og:url" content="">
+        <meta property="og:title" content="">
+        <meta property="og:description" content="">
+        <meta property="og:image" content="">
+
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image">
+        <meta property="twitter:url" content="">
+        <meta property="twitter:title" content="">
+        <meta property="twitter:description" content="">
+        <meta property="twitter:image" content="">
+
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ absolute_url(asset('bundles/wicrewcore/images/favicon/apple-touch-icon.png')) }}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ absolute_url(asset('bundles/wicrewcore/images/favicon/favicon-32x32.png')) }}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{{ absolute_url(asset('bundles/wicrewcore/images/favicon/favicon-16x16.png')) }}">
+        <link rel="manifest" href="{{ absolute_url(asset('bundles/wicrewcore/images/favicon/site.webmanifest')) }}">
+        <link rel="mask-icon" href="{{ absolute_url(asset('bundles/wicrewcore/images/favicon/safari-pinned-tab.svg')) }}" color="#070d1c">
+        <meta name="msapplication-TileColor" content="#070d1c">
+        <meta name="theme-color" content="#070d1c">
+
+        {% set assets_version = '49823748923' %}
+
+        <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700&amp;display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Covered+By+Your+Grace&amp;display=swap" rel="stylesheet">
+
+        <link rel="stylesheet" href="{{ absolute_url(asset('bundles/wicrewcore/javascript/slick/slick.css')) }}?v={{ assets_version }}" />
+        <link rel="stylesheet" href="{{ absolute_url(asset('bundles/wicrewcore/javascript/slick/slick-theme.css')) }}?v={{ assets_version }}" />
+        <link rel="stylesheet" href="{{ absolute_url(asset('bundles/wicrewcore/stylesheet/style.min.css')) }}?v={{ assets_version }}" />
+        <link rel="stylesheet" href="{{ absolute_url(asset('bundles/wicrewcore/stylesheet/style.css')) }}?v={{ assets_version }}" />
+        <link rel="stylesheet" href="{{ absolute_url(asset('bundles/wicrewcore/stylesheet/jquery-ui.css')) }}?v={{ assets_version }}" />
+        <link rel="stylesheet" href="{{ absolute_url(asset('bundles/wicrewcore/stylesheet/jquery.timepicker.min.css')) }}?v={{ assets_version }}" />
+        <link rel="stylesheet" href="{{ absolute_url(asset('bundles/wicrewcore/stylesheet/scss/v4-shims.min.css')) }}?v={{ assets_version }}" />
+        {% block stylesheets %}{% endblock %}   
+        
+
+        <script src="{{ absolute_url(asset('bundles/wicrewcore/javascript/jquery-3.4.1.min.js')) }}?v={{ assets_version }}" ></script>
+        <script src="{{ absolute_url(asset('bundles/wicrewcore/javascript/jquery-ui.js')) }}?v={{ assets_version }}" ></script>
+        <script src="{{ absolute_url(asset('bundles/wicrewcore/javascript/core.js')) }}?v={{ assets_version }}" ></script>
+        <script src="{{ absolute_url(asset('bundles/wicrewcore/javascript/jquery.mask.min.js')) }}?v={{ assets_version }}"></script>
+        {# @see https://jquerymodal.com/ #}
+        <script src="{{ absolute_url(asset('bundles/wicrewcore/javascript/jquery.modal.min.js')) }}?v={{ assets_version }}"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+
+        {# @see https://atomiks.github.io/tippyjs/v6/getting-started/ #}
+        <script src="{{ absolute_url(asset('bundles/wicrewcore/javascript/popper.min.js')) }}?v={{ assets_version }}"></script>
+        <script src="{{ absolute_url(asset('bundles/wicrewcore/javascript/tippy-bundle.umd.min.js')) }}?v={{ assets_version }}"></script>
+
+        {# lodash #}
+        <script src="{{ absolute_url(asset('bundles/wicrewcore/javascript/lodash/lodash.js')) }}?v={{ assets_version }}"></script>
+        <script src="{{ absolute_url(asset('bundles/wicrewcore/javascript/moment.min.js')) }}?v={{ assets_version }}"></script>
+
+        <script type="text/javascript">
+            var validateErrorMsg = {
+                error: '{{ 'core.error'|trans() }}',
+                required: '{{ 'core.add.dest.empty_error'|trans() }}',
+                filetype: '{{ 'core.form.validate.filetype'|trans() }}',
+                filesize: '{{ 'core.form.validate.filesize'|trans() }}',
+                filewidth: '{{ 'core.form.validate.filewidth'|trans() }}',
+                fileheight: '{{ 'core.form.validate.fileheight'|trans() }}',
+                minlength: '{{ 'core.form.validate.minlength'|trans() }}',
+                maxlength: '{{ 'core.form.validate.maxlength'|trans() }}',
+                isnumber: '{{ 'core.form.validate.isnumber'|trans() }}',
+                isfloat: '{{ 'core.form.validate.isfloat'|trans() }}',
+                morethanzero: '{{ 'core.form.validate.morethanzero'|trans() }}'
+            };
+            var stripeKey = '{{ getSystemConfigValue('stripe/api/key') }}';
+        </script>
+        {# <script src="https://cdnjs.cloudflare.com/ajax/libs/eonasdan-bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js">
+        </script> #}
+         
+        <!-- Tempus Dominus JavaScript -->
+        <script src="{{ absolute_url(asset('bundles/wicrewcore/javascript/getdatepicker/tempus-dominus.js')) }}?v={{ assets_version }}" ></script>
+
+        <!-- Tempus Dominus Styles -->
+        <link href="{{ absolute_url(asset('bundles/wicrewcore/stylesheet/getdatepicker/tempus-dominus.css')) }}?v={{ assets_version }}" rel="stylesheet" >
+    
+        {# Chatra {literal}  #}
+        <script>
+            (function(d, w, c) {
+                w.ChatraID = 'nGBKp4RJh4AmHE8sx';
+                var s = d.createElement('script');
+                w[c] = w[c] || function() {
+                    (w[c].q = w[c].q || []).push(arguments);
+                };
+                s.async = true;
+                s.src = 'https://call.chatra.io/chatra.js';
+                if (d.head) d.head.appendChild(s);
+            })(document, window, 'Chatra');
+        </script>
+        {# <!-- /Chatra {/literal} #}
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.2/js/bootstrap.bundle.min.js" integrity="sha512-igl8WEUuas9k5dtnhKqyyld6TzzRjvMqLC79jkgT3z02FvJyHAuUtyemm/P/jYSne1xwFI06ezQxEwweaiV7VA==" crossorigin="anonymous" referrerpolicy="no-referrer" defer="defer"></script>
+        
+        <link href="https://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
+
+        <script src="{{ absolute_url(asset('bundles/wicrewcore/javascript/jquery.dl_timepicker.min.js')) }}?v={{ assets_version }}"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.4/dayjs.min.js" integrity="sha512-Ot7ArUEhJDU0cwoBNNnWe487kjL5wAOsIYig8llY/l0P2TUFwgsAHVmrZMHsT8NGo+HwkjTJsNErS6QqIkBxDw==" crossorigin="anonymous" referrerpolicy="no-referrer" defer="defer"></script>
+
+        <!-- Google Tag Manager -->
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-MHL47NZ');</script>
+        <!-- End Google Tag Manager -->
+
+
+        <!-- Meta Pixel Code -->
+        <script>
+            !function(f,b,e,v,n,t,s)
+            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+            n.queue=[];t=b.createElement(e);t.async=!0;
+            t.src=v;s=b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t,s)}(window, document,'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+            fbq('init', '149096194863394');
+            fbq('track', 'PageView');
+        </script>
+        <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=149096194863394&ev=PageView&noscript=1" /></noscript>
+        <!-- End Meta Pixel Code -->
+
+    </head>
+    <body class="page-{{ app.request.get('_route') }}">
+        
+        <!-- Google Tag Manager (noscript) -->
+        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MHL47NZ"
+        height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+        <!-- End Google Tag Manager (noscript) -->
+
+        {% block header %}
+        <header class="header">
+            <div class="container-fluid">
+                <div class="container">
+                    <div class="nav-left">
+                        <div class="hamburger-menu mobile-menu">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <div class="logo">
+                            <a href="{{ url('homepage') }}" title="">
+                                <img src="{{ absolute_url(asset('bundles/wicrewcore/images/ilt-costa-rica-logo.png')) }}" srcset="{{ absolute_url(asset('bundles/wicrewcore/images/ilt-costa-rica-logo.png')) }} 1x, {{ absolute_url(asset('bundles/wicrewcore/images/ilt-costa-rica-logo@2x.png')) }} 2x" alt="">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="nav-right">
+                        <ul class="top-menu">
+                            <li class="phone">
+                                {% include "@WicrewPage/tel.html.twig" %} for assistance
+                            </li>
+                            <li class="whatsapp-dl" style="opacity: 1;">
+                                <a href="https://api.whatsapp.com/send?phone=50670787854" target="_blank">
+                                    <img style="height: 32px;" class="desktop" src="/bundles/wicrewcore/images/whatsapp-button.png" />
+                                    <img class="d-none whatsapp-mobile" src="/bundles/wicrewcore/images/whatsapp-icon.png" />
+                                    
+                                </a>
+                            </li>
+                            <li class="visible-xs">
+                                <a href="{{ getParameterValue('trip_advisor_link') }}" title="TripAdvisor" target="_blank">
+                                    <img src="{{ absolute_url(asset('bundles/wicrewcore/images/tripadvisor.svg')) }}" alt="Top Rated on TripAdvisor" class="icon-menu">
+                                </a>
+                            </li>
+                            <li class="visible-xs">
+                                <a href="{{ url('sale_cart') }}" title="{{ 'page.header.cart'|trans }}" class="cart-top">
+                                    {% set cartCount = getSession('cart')|length %}
+                                    {% if cartCount > 0 %}
+                                        <span class="badge has-item">{{ cartCount }}</span>
+                                    {% endif %}
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="navigation-wrapper">
+                            <ul class="header-navigation main-navigation">
+                                <li class="menu-destination level0 menu-haschild">
+                                    <a href="#">Activities</a>
+                                    {% include "@WicrewPage/submenu.destinations.html.twig" %}
+                                </li>
+                                <li class="menu-transportation level0 menu-haschild">
+                                    <a href="#">Transportations</a>
+                                    {% include "@WicrewPage/submenu.transportations.html.twig" %}
+                                </li>
+                               
+                            </ul>
+                            <ul class="header-navigation right-navigation">
+                                <li class="menu-contact level0">
+                                    <a href="{{ absolute_url(asset('sale/contact')) }}" title="">Contact</a>
+                                </li>
+                                <li class="menu-cart level0">
+                                    <a href="{{ url('sale_cart') }}" title="{{ 'page.header.cart'|trans }}">
+                                        {% set cartCount = getSession('cart')|length %}
+                                        {% if cartCount > 0 %}
+                                            <span class="badge has-item">{{ cartCount }}</span>
+                                        {% endif %}
+                                        {{ 'page.header.cart'|trans }}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        {% endblock %}
+
+        {% block body %}{% endblock %}
+
+        {% block footer %}
+        <footer class="footer">
+            <div class="footer-nav">
+                <div class="container">
+                    <div class="divider">
+                        <div class="logo">
+                            <a href="{{ url('homepage') }}" title="">
+                                <img loading="lazy" src="{{ absolute_url(asset('bundles/wicrewcore/images/ilt-costa-rica-logo.png')) }}" srcset="{{ absolute_url(asset('bundles/wicrewcore/images/ilt-costa-rica-logo.png')) }} 1x, {{ absolute_url(asset('bundles/wicrewcore/images/ilt-costa-rica-logo@2x.png')) }} 2x" alt="">
+                            </a>
+                            <br /><br />
+                            {% include "@WicrewPage/tel.html.twig" %}
+                        </div>
+                        <div class="linkers">
+                            <div class="linkers-col">
+                                <h3 class="menu-title" data-target=".menu-transportation">{{ 'product.transportation'|trans() }}</h3>
+                                {% include "@WicrewPage/products.list.html.twig" %}
+                            </div>
+                            <div class="linkers-col">
+                                <h3 class="menu-title" data-target=".menu-activities">{{ 'activities.title'|trans() }}</h3>
+                                {% include "@WicrewPage/activities.list.html.twig" %}
+                            </div>
+                            <div class="linkers-col">
+                                <h4 class="menu-title" data-target=".menu-company">Company</h4>
+                                <ul class="menu-items menu-company">
+                                    <li><a href="{{ absolute_url(asset('about-us')) }}" title="">About Us</a></li>
+                                    <li><a href="{{ getParameterValue('trip_advisor_link') }}" title="">{{ 'page.base.customers_saying'|trans }}</a></li>
+                                    <li><a href="{{ absolute_url(asset('sale/contact')) }}" title="">Contact Us</a></li>
+                                    <li><a href="/faq" title="">FAQs</a></li>
+                                </ul>
+                            </div>
+
+                            {# <a href="{{ getParameterValue('trip_advisor_link') }}" title="TripAdvisor" target="_blank"><img src="{{ absolute_url(asset('bundles/wicrewcore/images/tripadvisor_icon.png')) }}" alt="Top Rated on TripAdvisor"></a> #}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-of-footer">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-7 copyright">
+                            <span>© All Rights Reserved to ILT Costa Rica</span>
+                            <a href="{{ absolute_url(asset('reservations-policy')) }}" title="{{ 'page.footer.tos'|trans }}">{{ "page.footer.tos"|trans }}</a>
+                            <a href="#" title="{{ 'page.footer.site_map'|trans }}">{{ "page.footer.site_map"|trans }}</a>
+                        </div>
+                        <div class="col-lg-5 designed-by">
+                            <span>Designed and Programmed by</span>
+                            <a href="https://www.walterinteractive.com/" title="Walter Interactive" target="_blank">
+                                <img src="{{ absolute_url(asset('bundles/wicrewcore/images/walter-interactive-logo.svg')) }}" alt="{{ 'page.footer.wi'|trans }}">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        {% endblock %}
+
+        <script src="{{ absolute_url(asset('bundles/wicrewcore/javascript/slick/slick.min.js')) }}" ></script>
+        <script src="{{ absolute_url(asset('bundles/wicrewcore/javascript/global.js')) }}?v={{ assets_version }}" ></script>
+
+        {% block javascripts %}
+        {% endblock %}
+
+        <script type="text/javascript">
+            function submitPOSTRequest(path, parameters) {
+                let form = $('<form></form>');
+
+                form.attr("method", "post");
+                form.attr("action", path);
+
+                $.each(parameters, function(key, value) {
+                    if (typeof(value) == "object") {
+                        $.each(value, function(subKey, subValue) {
+                            let field = $('<input />');
+                            field.attr("type", "hidden");
+                            field.attr("name", key + '[]');
+                            field.attr("value", subValue);
+                            form.append(field);
+                        });
+                    } else {
+                        let field = $('<input />');
+                        field.attr("type", "hidden");
+                        field.attr("name", key);
+                        field.attr("value", value);
+                        form.append(field);
+                    }
+                });
+                $(document.body).append(form);
+                form.submit();
+            }
+
+            function redirectToBookingPage(data) {
+                if (data['referrer'] === undefined) {
+                    data['referrer'] = window.location.href;
+                }
+                submitPOSTRequest("{{ url('start_booking') }}", data);
+            }
+        </script>
+    </body>
+</html>
+
+<style>
+li.area_address {
+    list-style-type: none;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 30ch;
+    margin-bottom: 5px;
+}
+
+li.area_address:before {
+    display: none;
+}
+@media screen and (max-width: 767px) {
+	.hamburger-menu.mobile-menu {
+		position: relative;
+		top: 50%;
+		transform: translateY(-50%);
+		display: flex;
+		gap: 10px;
+	}
+
+	.header .nav-left div.logo {
+		margin: 0px;
+		height: 50px;
+		position: absolute;
+		top: -8px;
+		left: 50px;
+	}
+
+	.header .nav-left div.logo img {
+		max-width: 100%;
+		max-height: 100%;
+		top: 0px;
+	}
+
+	.header .nav-left div.logo a {
+		display: block;
+		height: 100%;
+	}
+
+	.container .nav-left {
+		display: flex;
+		flex-direction: row;
+		gap: 20px;
+		align-items: center;
+	}
+
+	.container .nav-left > div {
+		height: 34px;
+	}
+
+	header.header>.container-fluid>.container {
+		padding-top: 0px;
+		padding-bottom: 0px;
+	}
+
+    .nav-right ul.top-menu li.phone a:before{
+        content: none;
+    }
+    .nav-right ul.top-menu li.phone a i {
+        display: flex;
+        font-size: 12px;
+        width: 100%;
+        height: 100%;
+        align-items: center;
+        border: 1px solid #fff;
+        border-radius: 100%;
+        padding: 4px;
+        margin-right: 10px;
+    }
+
+    .nav-right .top-menu li.whatsapp-dl {
+        margin-left: 7px;
+    }
+    .nav-right .top-menu li.whatsapp-dl img.desktop {
+        display: none;
+    }
+
+    .nav-right .top-menu li.whatsapp-dl img.d-none.whatsapp-mobile {
+        display: block !important;
+        object-fit: contain;
+        padding: 4px;
+    }
+    .nav-right .top-menu li.phone {
+        height: 24px;
+        width: 24px;
+    }
+
+    .nav-right .top-menu li.phone * {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.bs-popover-auto[x-placement^=top],
+.bs-popover-top {
+    margin-bottom: 0.5rem;
+}
+
+.timepicker-popover.popover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1060;
+    display: block;
+    max-width: 276px;
+    font-family: Lato, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: left;
+    text-align: start;
+    text-decoration: none;
+    text-shadow: none;
+    text-transform: none;
+    letter-spacing: normal;
+    word-break: normal;
+    white-space: normal;
+    word-spacing: normal;
+    line-break: auto;
+    font-size: .825rem;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0, 0, 0, .2);
+    border-radius: 0.3rem;
+}
+
+.timepicker-popover .fade {
+    /* transition: opacity .15s linear; */
+}
+
+.timepicker-popover.bs-popover-auto[x-placement^=top]>.arrow,
+.timepicker-popover.bs-popover-top>.arrow {
+    bottom: calc(-0.5rem - 1px);
+}
+
+.popover .arrow {
+    position: absolute;
+    display: block;
+    width: 1rem;
+    height: 0.5rem;
+    margin: 0 0.3rem;
+}
+
+.bs-popover-auto[x-placement^=top]>.arrow::before,
+.bs-popover-top>.arrow::before {
+    bottom: 0;
+    border-width: 0.5rem 0.5rem 0;
+    border-top-color: rgba(0, 0, 0, .25);
+}
+
+.popover .arrow::after,
+.popover .arrow::before {
+    position: absolute;
+    display: block;
+    content: "";
+    border-color: transparent;
+    border-style: solid;
+}
+
+.popover-header {
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0;
+    font-size: .9375rem;
+    background-color: #f7f7f7;
+    border-bottom: 1px solid #ebebeb;
+    border-top-left-radius: calc(0.3rem - 1px);
+    border-top-right-radius: calc(0.3rem - 1px);
+}
+
+.timepicker-popover .h3,
+.timepicker-popover h3 {
+    font-size: 16px;
+}
+
+.timepicker-popover .h1,
+.timepicker-popover .h2,
+.timepicker-popover .h3,
+.timepicker-popover .h4,
+.timepicker-popover .h5,
+.timepicker-popover .h6,
+.timepicker-popover h1,
+.timepicker-popover h2,
+.timepicker-popover h3,
+.timepicker-popover h4,
+.timepicker-popover h5,
+.timepicker-popover h6 {
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+
+.timepicker-popover button.close {
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+}
+
+
+.timepicker-popover .close {
+    text-decoration: none;
+    /* opacity: .4; */
+}
+
+.timepicker-popover .mt-n1,
+.timepicker-popover .my-n1 {
+    margin-top: -0.25rem !important;
+}
+
+.timepicker-popover .close {
+    float: right;
+    font-size: 1.40625rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-shadow: none;
+    /* opacity: .5; */
+}
+.timepicker-popover .border-bottom {
+    border-bottom: 1px solid #dee2e6 !important;
+}
+
+.timepicker-popover .popover-body {
+    padding: 0.5rem 0.75rem;
+    color: #212529;
+}
+
+.timepicker-popover .d-none {
+    display: none !important;
+}
+
+.timepicker-popover .align-items-center {
+    -ms-flex-align: center !important;
+    align-items: center !important;
+}
+
+.timepicker-popover .justify-content-center {
+    -ms-flex-pack: center !important;
+    justify-content: center !important;
+}
+
+.timepicker-popover .d-flex {
+    display: -ms-flexbox !important;
+    display: flex !important;
+}
+
+.timepicker-popover .btn-group,
+.timepicker-popover .btn-group-vertical {
+    position: relative;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+    vertical-align: middle;
+}
+
+.timepicker-popover .ml-auto,
+.timepicker-popover .mx-auto {
+    margin-left: auto !important;
+}
+
+.timepicker-popover .mr-auto,
+.timepicker-popover .mx-auto {
+    margin-right: auto !important;
+}
+
+.timepicker-popover .mb-1,
+.timepicker-popover .my-1 {
+    margin-bottom: 0.25rem !important;
+}
+
+.timepicker-popover .w-auto {
+    width: auto !important;
+}
+
+.timepicker-popover .table {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: #212529;
+}
+
+
+.timepicker-popover .table .thead-light th {
+    color: #7b8a8b;
+    background-color: #ecf0f1;
+    border-color: #dee2e6;
+}
+
+.timepicker-popover .table-borderless tbody+tbody,
+.timepicker-popover .table-borderless td,
+.timepicker-popover .table-borderless th,
+.timepicker-popover .table-borderless thead th {
+    border: 0;
+}
+
+.timepicker-popover .table thead th {
+    vertical-align: bottom;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.timepicker-popover .timepicker-table td,
+.timepicker-popover .timepicker-table th {
+    padding: 0;
+}
+
+.timepicker-popover .table-sm td,
+.timepicker-popover .table-sm th {
+    padding: 0.3rem;
+}
+
+.timepicker-popover .table td,
+.timepicker-popover .table th {
+    padding: 0.75rem;
+    vertical-align: top;
+    border-top: 1px solid #dee2e6;
+}
+
+.timepicker-popover .pb-1,
+.timepicker-popover .py-1 {
+    padding-bottom: 0.25rem !important;
+}
+
+.timepicker-popover .pt-1,
+.timepicker-popover .py-1 {
+    padding-top: 0.25rem !important;
+}
+
+.timepicker-popover th {
+    text-align: inherit;
+    text-align: -webkit-match-parent;
+}
+
+.timepicker-popover .ml-auto,
+.timepicker-popover .mx-auto {
+    margin-left: auto !important;
+}
+
+.timepicker-popover .mr-auto,
+.timepicker-popover .mx-auto {
+    margin-right: auto !important;
+}
+
+.timepicker-popover .border-light {
+    border-color: #ecf0f1 !important;
+}
+
+.timepicker-popover .form-control {
+    display: block;
+    width: 100%;
+    height: calc(1.5em + 0.75rem + 2px);
+    padding: 0.375rem 0.75rem;
+    font-size: .9375rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #070d1c;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.timepicker-popover .btn {
+    display: inline-block;
+    font-weight: 400;
+    color: #212529;
+    text-align: center;
+    vertical-align: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-color: transparent;
+    border: 1px solid transparent;
+    padding: 0.375rem 0.75rem;
+    font-size: .9375rem;
+    line-height: 1.5;
+    border-radius: 0.25rem;
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.timepicker-popover [type=button],
+.timepicker-popover [type=reset],
+.timepicker-popover [type=submit],
+.timepicker-popover button {
+    -webkit-appearance: button;
+}
+
+.timepicker-popover .justify-content-between {
+    -ms-flex-pack: justify !important;
+    justify-content: space-between !important;
+}
+
+.timepicker-popover .invisible {
+    visibility: hidden !important;
+}
+
+
+.timepicker-popover .btn:not(:disabled):not(.disabled) {
+    cursor: pointer;
+}
+
+.timepicker-popover .btn-secondary,
+.timepicker-popover .btn-secondary:hover,
+.timepicker-popover .btn-warning,
+.timepicker-popover .btn-warning:hover {
+    color: #fff;
+}
+
+.timepicker-popover .ml-1,
+.timepicker-popover .mx-1 {
+    margin-left: 0.25rem !important;
+}
+
+.timepicker-popover .mr-1,
+.timepicker-popover .mx-1 {
+    margin-right: 0.25rem !important;
+}
+
+.timepicker-popover .btn-secondary {
+    color: #fff;
+    background-color: #95a5a6;
+    border-color: #95a5a6;
+}
+
+.timepicker-popover button,
+.timepicker-popover select {
+    text-transform: none;
+}
+
+.timepicker-popover button,
+.timepicker-popover input {
+    overflow: visible;
+}
+
+.timepicker-popover button,
+.timepicker-popover input,
+.timepicker-popover optgroup,
+.timepicker-popover select,
+.timepicker-popover textarea {
+    margin: 0;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+.timepicker-popover .btn-primary {
+    color: #fff;
+    background-color: #2c3e50;
+    border-color: #2c3e50;
+}
+
+.timepicker-popover .btn.btn-secondary:hover {
+    color: #fff;
+    background-color: #809395;
+    border-color: #798d8f;
+    text-decoration: none;
+
+}
+
+.timepicker-popover .btn-primary:hover {
+    color: #fff;
+    background-color: #1e2b37;
+    border-color: #1a252f;
+    text-decoration: none;
+
+}
+
+.timepicker-popover button.close.mt-n1 {
+    display: none;
+}
+
+.timepicker-popover a.btn.chevron-btn {
+    color: #2e6eb2;
+}
+
+.timepicker-popover a.btn.chevron-btn:hover {
+    opacity: 1;
+    background-color: rgba(51,51,51,0);
+    color: #6da1d9;
+    
+}
+
+.newWebsiteNoticeBarContainer {
+    position: fixed;
+    top: 0;
+    z-index: 9999;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #00000061 0% 0% no-repeat padding-box;
+}
+
+.newWebsiteNoticeBar {
+    filter: drop-shadow(5px 5px 10px #000);
+    border-radius: 15px;
+    width: 760px;
+    height: 482px;
+    background: #FFFFFF 0% 0% no-repeat padding-box;
+    box-shadow: 0px 3px 6px #00000029;
+}
+
+.newWebsiteNoticeBarHeader {
+    padding: 0px;
+    padding-top: 25px;
+    padding-bottom: 12px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.content-textContainer p a {
+    color: #AE8554;
+}
+
+
+p.newWebsiteNotice {
+    font-family: "Poppins",sans-serif;
+    color: unset;
+    font-weight: 500;
+    letter-spacing: 1.4px;
+    font-size: 14px;
+    line-height: 21px;
+}
+
+.newWebsiteNoticeBarHeader button {
+    outline: none;
+    border: none;
+    background: none;
+    font-size: 16px;
+}
+
+.newWebsiteNoticeBarContentImage {
+    padding: 0;
+}
+
+.newWebsiteNoticeBarContentImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.content-logoContainer {
+    width: 131px;
+    height: 84px;
+    margin-bottom: 38.78px;
+}
+
+.content-logoContainer img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.content-headingContainer {
+    font: normal normal 300 38px/44px Poppins;
+    letter-spacing: 0px;
+    color: #000000;
+    margin-bottom: 22px;
+}
+
+.content-textContainer p {
+    font: normal normal normal 16px/25px Poppins;
+    letter-spacing: 0px;
+    color: #000000;
+}
+
+.newWebsiteNoticeBarContent {
+    margin-left: 50px;
+}
+@media screen and (max-width: 768px){
+    .newWebsiteNoticeBar.row {
+        width: 90%;
+        height: 70%;
+    }
+    
+    .col-md-4.newWebsiteNoticeBarContentImage {
+        max-width: 100%;
+        width: 100%;
+        flex: 100%;
+        max-height: 25%;
+    
+    }
+    
+    .newWebsiteNoticeBar.row .col-md-8 {max-width: 100%;width: 100%;flex: 100%;}
+
+    .newWebsiteNoticeBarHeader {
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+
+    .newWebsiteNoticeBarContent {
+        margin-left: 0px;
+    }
+
+    .content-logoContainer {
+        margin-bottom: 22px;
+        width: 100px;
+        height: auto;
+    }
+
+    .content-headingContainer {
+        font-size: 28px;
+    }
+
+    .content-textContainer p {
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .content-textContainer p br {
+        display: none;
+    }
+    .newWebsiteNoticeBarContentImage img {
+        border-radius: 15px 15px 0px 0px;
+    }
+    .newWebsiteNoticeBarHeader {
+        position: absolute;
+        right: 8px;
+        top: 3px;
+    }
+}
+
+.trip-info .location, 
+.trip-info .pickuptime, 
+.trip-info .duration, 
+.trip-info .difficulty, 
+.trip-info .notecustomer, 
+.trip-info .min-age {
+    background-position: left center;
+}
+
+.activity_type_tag_container {
+    background: #FFFFFF 0% 0% no-repeat padding-box;
+    border-radius: 0px 0px 8px 0px;
+    opacity: 1;
+    position: absolute;
+    padding-right: 10px;
+}
+
+.activity_type_tag {
+    font-style: normal;
+    font-weight: normal;
+    font-size: 9px;
+    line-height: 13px;
+    font-family: 'Poppins';
+    color: #080D1B;
+    margin: 5px 0px;
+}
+</style>
+<script>
+    // This is code to add children areas.  
+    let url_last_segment    = location.href.substring(location.href.lastIndexOf('/') + 1);
+    url_last_segment        = decodeURI(url_last_segment);
+    let isHomePage          = 0;
+    
+    if (url_last_segment.indexOf('transportTypes[0]=1') > -1) {
+        url_last_segment = 'private-shuttles';
+    }else if (url_last_segment.indexOf('transportTypes[0]=8') > -1) {
+        url_last_segment = 'private-flight';
+    } else if (url_last_segment.indexOf('transportTypes[0]=6') > -1) {
+        url_last_segment = 'water-taxi';
+    } else if (url_last_segment.indexOf('private-shuttles') > -1) {
+        url_last_segment = 'private-shuttles';
+    } else if (url_last_segment.indexOf('private-flight') > -1) {
+        url_last_segment = 'private-flight';
+    } else if (url_last_segment.indexOf('water-taxi') > -1) {
+        url_last_segment = 'water-taxi';
+    } 
+    if( url_last_segment === '' ){ url_last_segment = 'private-shuttles'; isHomePage = 1; } 
+    if( url_last_segment === 'private-shuttles' || url_last_segment === 'private-flight' || url_last_segment === 'water-taxi'){  
+        $( document ).ready(function() {
+            let selectToChange = $("select.search-from");
+            if(isHomePage == 1){
+                selectToChange = $("div#first-search select.search-from");
+            }
+            //jquery script for on change of from field. 
+            selectToChange.change(function(){
+    
+                $( "select option" ).each(function( index ) {   
+                    $(this).removeClass("selected");
+                });
+    
+                if(selectToChange.hasClass("stop-change")){return;}
+                let parentContainer     = $(this).parents(".vehicle-search, .vehicle-search-multi");
+                var selected_val        = $(this).val();
+            
+                
+                if(selected_val != ""){
+                    parentContainer.find(".input-box.toField span.select2.select2-container").hide();
+                    
+                    $.ajax({
+                        url:'{{ url("get_to_areas_options") }}',
+                        type: "GET",
+                        dataType: "json",
+                        data: {
+                            "selected_value": selected_val,
+                            "transportation_type": url_last_segment,
+    
+                        },
+                        async: true,
+                        success: function (data) {
+                            let response = jQuery.parseJSON( data );
+                            // console.log(response);
+                            if(response.status == "OK"){
+                                
+                                let optionsToPut = response.areas_to;
+    
+                                parentContainer.find("select.search-to").html("");
+                            
+                                $.each( optionsToPut, function( key, value ) {
+                                
+                                    if(key != selected_val){
+                                        if (~key.indexOf("-")){
+                                            parentContainer.find("select.search-to").append("<option class='child' data-child='"+ key.substr(key.indexOf("?") + 1) +"' value='"+ key.substring(0, key.indexOf("-")) +"'>"+value+"</option>");
+                                        }else{
+                                            parentContainer.find("select.search-to").append("<option value='"+key+"'>"+value+"</option>");
+                                        }
+                                    }
+                                });
+                                
+                                var sel_to1 = parentContainer.find('.search-to');
+                                
+                                var selected_to1 = sel_to1.val(); // cache selected value, before reordering
+                                var opts_list_to1 = sel_to1.find('option');
+                                opts_list_to1.sort(function(a, b) { return $(a).text() > $(b).text() ? 1 : -1; });
+                                sel_to1.html('').append(opts_list_to1);
+                                
+                                // MOVING LIBERIA AIRPORT ON TOP
+                                if ( sel_to1.find('option').length > 1 ){
+                                    if( sel_to1.find('option[value="2"]').length > 0 ){
+        
+                                        let $el_to_liberia1 = sel_to1.find('option[value="2"]');
+                                        sel_to1.find('option[value="2"]').remove();
+                                        sel_to1.find('option:eq(0)').before($el_to_liberia1); 
+                                    }   
+                                }
+                                // MOVING LIBERIA AIRPORT ON TOP
+    
+                                // MOVING SAN JOSE AIRPORT ON TOP
+                                if ( sel_to1.find('option').length > 1 ){
+                                    if( sel_to1.find('option[value="1"]').length > 0 ){
+        
+                                        let $el_to1 = sel_to1.find('option[value="1"]');
+                                        sel_to1.find('option[value="1"]').remove();
+                                        sel_to1.find('option:eq(0)').before($el_to1);    
+                                    }
+                                }
+                                // MOVING SAN JOSE AIRPORT ON TOP
+    
+                                sel_to1.val(selected_to1); // set cached selected value
+    
+                                parentContainer.find("select.search-to").prepend("<option selected='selected'>Please Select</option>");
+        
+                                if( url_last_segment === 'private-shuttles' ){
+                                    $.ajax({
+                                        url:'{{ url("get_sub_areas") }}',
+                                        dataType: 'json',
+                                        method: 'POST',
+                                        async: true,
+                                        success: function(response) {
+                                            if(response.status == 'ok'){
+                                                var parentDropdown = parentContainer.find("select.search-to");
+                                                response.area_children.forEach(function(childArea) {
+                                                    var existingSubAreaOption = parentDropdown.find('option[value="' + parentId + '-' + childArea.id + '"]');
+                                                    if (!existingSubAreaOption.length) {
+                                                        var parentId        = childArea.parent_id;
+                                                        var parentOption    = parentDropdown.find('option[value="' + parentId + '"]');
+                                                        var subOption       = $('<option value="' + parentId + '-' + childArea.id + '">&nbsp;&nbsp;&nbsp;&nbsp;' + childArea.name + '</option>');
+                                                        
+                                                        parentOption.after(subOption);
+                                                    }
+                                                });
+                                            }else{
+                                                console.error('ERROR:', response.message);    
+                                            }
+                                        }, error: function(xhr, status, error) {
+                                            console.error('Error:', error);
+                                        }
+                                    });
+                                }
+                                $(".input-box span.select2.select2-container").show();
+                            }else{
+                                alert(response.error_message);
+                            }                   
+                            return;
+                        }
+                    });
+                }
+            
+            });
+    
+            let selected_pickArea = $('div#only-search select.search-from').val();
+            $.ajax({
+                url:'{{ url("get_areas_availability") }}',
+                type: "GET",
+                dataType: "json",
+                data: {
+                    "transportation_type": url_last_segment,
+                    "selected_pickArea": selected_pickArea,
+                },
+                async: true,
+                success: function (data) {
+                    let response = jQuery.parseJSON( data );
+                    console.log(response);
+                    if(response.status == "OK"){
+    
+                        $(".vehicle-search, .vehicle-search-multi").each(function (index, element) {
+                            
+                            let area_from_arr = $.map(response.areas_from, function(value, index){
+                                return [value];
+                            });
+                            let area_to_arr = $.map(response.areas_to, function(value, index){
+                                return [value];
+                            });
+                            if(isHomePage == 1){
+                                $("div#first-search select.search-from > option").each(function() {
+                                
+                                    if( $.inArray( jQuery( this ).text().toLowerCase(), area_from_arr ) === -1 ){
+                                        $( this ).remove();
+                                    }
+                                });
+        
+                                $("div#first-search select.search-to > option").each(function() {
+                                    if( $.inArray( jQuery( this ).text().toLowerCase(), area_to_arr ) === -1  ){
+                                        $( this ).remove();
+                                    }
+                                });
+                                
+                            }else{
+                                $(this).find("select.search-from > option").each(function() {
+                                
+                                    if( $.inArray( jQuery( this ).text().toLowerCase(), area_from_arr ) === -1 ){
+                                        $( this ).remove();
+                                    }
+                                });
+        
+                                $(this).find("select.search-to > option").each(function() {
+                                    if( $.inArray( jQuery( this ).text().toLowerCase(), area_to_arr ) === -1  ){
+                                        $( this ).remove();
+                                    }
+                                });
+                                
+                            }
+                            
+                            if(isHomePage == 1){
+                                var sel_from = $('div#first-search .search-from');
+                            }else{
+                                var sel_from = $(this).find('.search-from');    
+                            }
+                            
+                            var selected_from = sel_from.val(); // cache selected value, before reordering
+                            var opts_list_from = sel_from.find('option');
+                            opts_list_from.sort(function(a, b) { return $(a).text() > $(b).text() ? 1 : -1; });
+                            sel_from.html('').append(opts_list_from);
+        
+                            // MOVING LIBERIA AIRPORT ON TOP
+                            if ( sel_from.find('option').length > 1 ){
+                                if( sel_from.find('option[value="2"]').length > 0 ){
+            
+                                    let $el_from_liberia = sel_from.find('option[value="2"]');
+                                    sel_from.find('option[value="2"]').remove();
+                                    sel_from.find('option:eq(0)').before($el_from_liberia);    
+                                }
+                            }
+                            // MOVING LIBERIA AIRPORT ON TOP
+        
+                            // MOVING SAN JOSE AIRPORT ON TOP
+                            if ( sel_from.find('option').length > 1 ){
+                                if( sel_from.find('option[value="1"]').length > 0 ){
+            
+                                    let $el_from = sel_from.find('option[value="1"]');
+                                    sel_from.find('option[value="1"]').remove();
+                                    sel_from.find('option:eq(0)').before($el_from);   
+                                } 
+                            }
+                            // MOVING SAN JOSE AIRPORT ON TOP
+        
+                            sel_from.val(selected_from); // set cached selected value
+        
+                            if(isHomePage == 1){
+                                var sel_to = $('div#first-search .search-to');
+                            }else{
+                                var sel_to = $(this).find('.search-to');
+                            }
+                            
+                            var selected_to = sel_to.val(); // cache selected value, before reordering
+                            var opts_list_to = sel_to.find('option');
+                            opts_list_to.sort(function(a, b) { return $(a).text() > $(b).text() ? 1 : -1; });
+                            sel_to.html('').append(opts_list_to);
+                            
+                            // MOVING LIBERIA AIRPORT ON TOP
+                            if ( sel_to.find('option').length > 1 ){
+                                if( sel_to.find('option[value="2"]').length > 0 ){
+            
+                                    let $el_to_liberia = sel_to.find('option[value="2"]');
+                                    sel_to.find('option[value="2"]').remove();
+                                    sel_to.find('option:eq(0)').before($el_to_liberia); 
+                                }   
+                            }
+                            // MOVING LIBERIA AIRPORT ON TOP
+        
+                            // MOVING SAN JOSE AIRPORT ON TOP
+                            if ( sel_to.find('option').length > 1 ){
+                                if( sel_to.find('option[value="1"]').length > 0 ){
+            
+                                    let $el_to = sel_to.find('option[value="1"]');
+                                    sel_to.find('option[value="1"]').remove();
+                                    sel_to.find('option:eq(0)').before($el_to);    
+                                }
+                            }
+                            // MOVING SAN JOSE AIRPORT ON TOP
+                            
+                            sel_to.val(selected_to); // set cached selected value
+        
+                            if(isHomePage == 1){
+                                $("div#first-search select.search-from, div#first-search select.search-to").prepend("<option selected='selected'>Please Select</option>");
+                            }else{
+                                $(this).find("select.search-from, select.search-to").prepend("<option selected='selected'>Please Select</option>");
+                            }
+                         
+        
+                            $(this).find("select.search-from").show();
+                            $(this).find("select.search-to").show();
+                            // CONVERTING NORMAL SELECT INTO SELECT AND SEARCH WIDGET 
+                            $( "select" ).each(function( index ) {   
+                                $(this).select2({
+                                    placeholder: "Please select",
+                                    width: '100%',
+                                });
+                                let valToSet = $(this).find("option.selected").val();
+                                $(this).val(valToSet);
+                            });
+                            // CONVERTING NORMAL SELECT INTO SELECT AND SEARCH WIDGET 
+                        });
+    
+                        if ( url_last_segment === 'private-shuttles' ){
+                            load_child_areas();
+                        }       
+                    }else{
+                        alert(response.error_message);
+                    }                   
+                    return;
+                }
+            });
+    
+            // FOR PRIVATE FLIGHT
+            if(isHomePage == 1){
+    
+                $.ajax({
+                    url:'{{ url("get_areas_availability") }}',
+                    type: "GET",
+                    dataType: "json",
+                    data: {
+                        "transportation_type": "private-flight",
+                    },
+                    async: true,
+                    success: function (data) {
+                        let response = jQuery.parseJSON( data );
+                        if(response.status == "OK"){
+    
+                            let area_from_arr = $.map(response.areas_from, function(value, index){
+                                return [value];
+                            });
+                            let area_to_arr = $.map(response.areas_to, function(value, index){
+                                return [value];
+                            });
+                            $("div#seconds-search select.search-from > option").each(function() {
+                            
+                                if( $.inArray( jQuery( this ).text().toLowerCase(), area_from_arr ) === -1 ){
+                                    $( this ).remove();
+                                }
+                            });
+    
+                            $("div#seconds-search select.search-to > option").each(function() {
+                                if( $.inArray( jQuery( this ).text().toLowerCase(), area_to_arr ) === -1  ){
+                                    $( this ).remove();
+                                }
+                            });
+                            
+                        
+                            
+                            var sel_from = $('div#seconds-search .search-from');
+                            
+                            var selected_from = sel_from.val(); // cache selected value, before reordering
+                            var opts_list_from = sel_from.find('option');
+                            opts_list_from.sort(function(a, b) { return $(a).text() > $(b).text() ? 1 : -1; });
+                            sel_from.html('').append(opts_list_from);
+    
+                            // MOVING LIBERIA AIRPORT ON TOP
+                            if ( sel_from.find('option').length > 1 ){
+                                if( sel_from.find('option[value="2"]').length > 0 ){
+        
+                                    let $el_from_liberia = sel_from.find('option[value="2"]');
+                                    sel_from.find('option[value="2"]').remove();
+                                    sel_from.find('option:eq(0)').before($el_from_liberia);    
+                                }
+                            }
+                            // MOVING LIBERIA AIRPORT ON TOP
+    
+                            // MOVING SAN JOSE AIRPORT ON TOP
+                            if ( sel_from.find('option').length > 1 ){
+                                if( sel_from.find('option[value="1"]').length > 0 ){
+        
+                                    let $el_from = sel_from.find('option[value="1"]');
+                                    sel_from.find('option[value="1"]').remove();
+                                    sel_from.find('option:eq(0)').before($el_from);   
+                                } 
+                            }
+                            // MOVING SAN JOSE AIRPORT ON TOP
+    
+                            sel_from.val(selected_from); // set cached selected value
+    
+                            var sel_to = $('div#seconds-search .search-to');
+                            
+                            
+                            var selected_to = sel_to.val(); // cache selected value, before reordering
+                            var opts_list_to = sel_to.find('option');
+                            opts_list_to.sort(function(a, b) { return $(a).text() > $(b).text() ? 1 : -1; });
+                            sel_to.html('').append(opts_list_to);
+                            
+                            // MOVING LIBERIA AIRPORT ON TOP
+                            if ( sel_to.find('option').length > 1 ){
+                                if( sel_to.find('option[value="2"]').length > 0 ){
+    
+                                    let $el_to_liberia = sel_to.find('option[value="2"]');
+                                    sel_to.find('option[value="2"]').remove();
+                                    sel_to.find('option:eq(0)').before($el_to_liberia); 
+                                }   
+                            }
+                            // MOVING LIBERIA AIRPORT ON TOP
+    
+                            // MOVING SAN JOSE AIRPORT ON TOP
+                            if ( sel_to.find('option').length > 1 ){
+                                if( sel_to.find('option[value="1"]').length > 0 ){
+        
+                                    let $el_to = sel_to.find('option[value="1"]');
+                                    sel_to.find('option[value="1"]').remove();
+                                    sel_to.find('option:eq(0)').before($el_to);    
+                                }
+                            }
+                            // MOVING SAN JOSE AIRPORT ON TOP
+                            
+                            sel_to.val(selected_to); // set cached selected value
+                            $("div#seconds-search select.search-from, div#seconds-search select.search-to").prepend("<option selected='selected'>Please Select</option>");
+                            
+    
+                            $("select.search-from").show();
+                            $("select.search-to").show();
+                            // CONVERTING NORMAL SELECT INTO SELECT AND SEARCH WIDGET 
+                            $( "select" ).each(function( index ) {   
+                                $(this).select2({
+                                    placeholder: "Please select",
+                                    width: '100%',
+                                });
+                                let valToSet = $(this).find("option.selected").val();
+                                $(this).val(valToSet);
+                            });
+    
+    
+                            // CONVERTING NORMAL SELECT INTO SELECT AND SEARCH WIDGET 
+                        
+                        }else{
+                            alert(response.error_message);
+                        }                   
+                        return;
+                    }
+                });
+    
+    
+                // CHANGE FUNCTION FOR PRIVATE FLIGH TAB 
+                let url_last_segmentFlight = 'private-flight';
+                selectToChangeFlight = $("div#seconds-search select.search-from");
+    
+                //jquery script for on change of from field. 
+                selectToChangeFlight.change(function(){
+                    let parentContainer     = $(this).parents(".vehicle-search, .vehicle-search-multi");
+                    var selected_val        = $(this).val();
+    
+                    $( "select option" ).each(function( index ) {   
+                        $(this).removeClass("selected");
+                    });
+    
+                        
+                    if(selected_val != ""){
+                        parentContainer.find(".input-box.toField span.select2.select2-container").hide();
+                        //now sending this selected value to ajax page for options for `TO` field.
+                        $.ajax({
+                            url:'{{ url("get_to_areas_options") }}',
+                            type: "GET",
+                            dataType: "json",
+                            data: {
+                                "selected_value": selected_val,
+                                "transportation_type": url_last_segmentFlight,
+    
+                            },
+                            async: true,
+                            success: function (data) {
+                                let response = jQuery.parseJSON( data );
+                                // console.log(response);
+                                if(response.status == "OK"){
+                                    
+                                    let optionsToPut = response.areas_to;
+                                    parentContainer.find("select.search-to").html("");
+                                    $.each( optionsToPut, function( key, value ) {
+                                        if(key != selected_val){
+                                            parentContainer.find("select.search-to").append("<option value='"+key+"'>"+value+"</option>");
+                                        }
+                                    });
+                                    var sel_to1 = parentContainer.find('.search-to');
+                                    // var sel_to1 = $('.search-to');
+                                    var selected_to1 = sel_to1.val(); // cache selected value, before reordering
+                                    var opts_list_to1 = sel_to1.find('option');
+                                    opts_list_to1.sort(function(a, b) { return $(a).text() > $(b).text() ? 1 : -1; });
+                                    sel_to1.html('').append(opts_list_to1);
+                                    
+                                    // MOVING LIBERIA AIRPORT ON TOP
+                                    if ( sel_to1.find('option').length > 1 ){
+                                        if( sel_to1.find('option[value="2"]').length > 0 ){
+        
+                                            let $el_to_liberia1 = sel_to1.find('option[value="2"]');
+                                            sel_to1.find('option[value="2"]').remove();
+                                            sel_to1.find('option:eq(0)').before($el_to_liberia1); 
+                                        }   
+                                    }
+                                    // MOVING LIBERIA AIRPORT ON TOP
+    
+                                    // MOVING SAN JOSE AIRPORT ON TOP
+                                    if ( sel_to1.find('option').length > 1 ){
+                                        if( sel_to1.find('option[value="1"]').length > 0 ){
+    
+                                            let $el_to1 = sel_to1.find('option[value="1"]');
+                                            sel_to1.find('option[value="1"]').remove();
+                                            sel_to1.find('option:eq(0)').before($el_to1);    
+                                        }
+                                    }
+                                    // MOVING SAN JOSE AIRPORT ON TOP
+    
+                                    sel_to1.val(selected_to1); // set cached selected value
+    
+                                    parentContainer.find("select.search-to").prepend("<option selected='selected'>Please Select</option>");
+                                    
+                                    $(".input-box span.select2.select2-container").show();
+                                    
+                                }else{
+                                    alert(response.error_message);
+                                }                   
+                                return;
+                            }
+                        });
+                    }
+                });
+    
+            } 
+            // FOR PRIVATE FLIGHT
+            let destination_selected = $("select.search-to");
+            if(isHomePage == 1){
+                destination_selected = $("div#first-search select.search-to");
+            }
+            //jquery script for on change of from field. 
+            destination_selected.change(function(){
+                let selected_to_name = $(this).find(':selected').text();
+                $(this).parents(".vehicle-search, .vehicle-search-multi").find('.selected_to_name').val(selected_to_name);
+            });
+        });
+    }
+
+    if ( url_last_segment === 'private-shuttles' ){
+        var disableSelects_sh = setInterval(function () {
+            $('select.search-from, select.search-to').prop('disabled', true);
+            $('select.search-from, select.search-to').parents('.input-box').css('pointer-events', 'none');
+        }, 500);
+    }    
+    
+    function load_child_areas(){
+        // THIS CODE IS TO ADD SUB CITIES
+        $.ajax({
+            url:'{{ url("get_sub_areas") }}',
+            dataType: 'json',
+            method: 'POST',
+            async: true,
+            success: function(response) {
+                if(response.status == 'ok'){
+                    if( isHomePage ){ 
+                        var parentDropdownFrom = $('div#first-search .vehicle-search select.search-from');
+                        var parentDropdownTo = $('div#first-search .vehicle-search select.search-to');
+                    }else{
+                        var parentDropdownFrom = $('.vehicle-search select.search-from');
+                        var parentDropdownTo = $('.vehicle-search select.search-to');
+                    }
+                    response.area_children.forEach(function(childArea) {
+
+                        // Check if the sub-option already exists
+                        var existingSubAreaOptionFrom = parentDropdownFrom.find('option[value="' + parentId + '-' + childArea.id + '"]');
+                        if (!existingSubAreaOptionFrom.length) {
+                        
+                            var parentId        = childArea.parent_id;
+                            var parentOption    = parentDropdownFrom.find('option[value="' + parentId + '"]');
+                            var subOption       = $('<option value="' + parentId + '-' + childArea.id + '">&nbsp;&nbsp;&nbsp;&nbsp;' + childArea.name + '</option>');
+                            
+                            parentOption.after(subOption);
+                        }
+
+                        // Check if the sub-option already exists
+                        var existingSubAreaOptionTo = parentDropdownTo.find('option[value="' + parentId + '-' + childArea.id + '"]');
+                        if (!existingSubAreaOptionTo.length) {
+                        
+                            var parentId        = childArea.parent_id;
+                            var parentOption    = parentDropdownTo.find('option[value="' + parentId + '"]');
+                            var subOption       = $('<option value="' + parentId + '-' + childArea.id + '">&nbsp;&nbsp;&nbsp;&nbsp;' + childArea.name + '</option>');
+                            
+                            parentOption.after(subOption);
+                        }
+                    });
+                }else{
+                    console.error('ERROR:', response.message);    
+                }
+                clearInterval(disableSelects_sh);
+                $('select.search-from, select.search-to').prop('disabled', false);
+                $('select.search-from, select.search-to').parents('.input-box').css('pointer-events', 'all');
+            }, error: function(xhr, status, error) {
+                console.error('Error:', error);
+            }
+        });
+    }
+</script>

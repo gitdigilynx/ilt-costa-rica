@@ -1,0 +1,33 @@
+{% extends "base_thankyou.html.twig" %}
+
+{% block title %}{{ 'sale.checkout.success'|trans() }}{% endblock %}
+
+{% block body %}
+
+    <section class="page-header" style="height: 674px;">
+        <div class="container">
+            <div class="d-flex content">
+                <div class="align-self-center">
+                    <h1>{{ 'sale.checkout.title.success'|trans() }}</h1>
+                    <h2>{{ 'sale.checkout.success'|trans() }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="bg"
+             style="background-image: url('{{ absolute_url(asset('bundles/wicrewcore/images/home-cover.jpg')) }}');"></div>
+    </section>
+
+{% endblock %}
+
+{% block footer %}
+    <style>
+        .footer .footer-nav { 
+        margin-top: 0px;
+    }
+    </style>
+    
+    <script>
+        // gtag('event', 'booking_completed', {} );
+    </script>
+    {{parent()}}
+{% endblock %}

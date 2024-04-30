@@ -1,0 +1,1 @@
+NOTE: The commands inside the scripts are relative to the root directory of the repo. So do `bash auto-scripts/script.bash` and not `cd auto-scripts; bash script.bash`.

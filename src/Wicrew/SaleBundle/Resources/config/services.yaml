@@ -1,0 +1,5 @@
+services:
+    wicrew.order.utils:
+        class: App\Wicrew\SaleBundle\Service\OrderService
+        arguments: ["@wicrew.core.utils"]
+        public: true

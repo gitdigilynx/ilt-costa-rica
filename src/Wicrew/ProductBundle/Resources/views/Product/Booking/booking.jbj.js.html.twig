@@ -1,0 +1,61 @@
+<script type="text/javascript">
+    function changeAreaElements(selectElement, areaID) {
+        let options = selectElement.find("option");
+        options.each(function () {
+            const optionValueSet = JSON.parse($(this).val());
+            if (optionValueSet["id"] === areaID) {
+                $(this).prop("selected", true);
+                selectElement.trigger("change");
+            }
+        });
+    }
+
+    function hideAreaElements(selectElement) {
+        let areaSection = selectElement.parents(".col-block").find(".area-type-section");
+        areaSection.addClass("hidden");
+        let areaElements = areaSection.find("input");
+        areaElements.each(function () {
+            $(this).val("");
+        });
+
+        let airportSection = selectElement.parents(".col-block").find(".airport-type-section");
+        airportSection.addClass("hidden");
+        let airportElements = airportSection.find("input");
+        airportElements.each(function () {
+            $(this).val("");
+        });
+    }
+
+    // $(document).on("ready", function () {
+    $(".area-row-block").each(function () {
+        $(this).hide();
+    })
+
+    $("#departure-at").on("change", function () {
+        let productIDElement = $('input[name="{{ postDataSection }}[id]"]');
+        let areaFromSelectElement = $("#areas_select_from_1");
+        let areaToSelectElement = $("#areas_select_to_1");
+
+        let optionSelected = $(this).children("option:selected");
+        if (optionSelected.val() === "") {
+            productIDElement.val("");
+            updateSummaryOfBookingNumber_{{ bookingNumber }}();
+            hideAreaElements(areaFromSelectElement);
+            hideAreaElements(areaToSelectElement);
+            return;
+        }
+        const valueSet = JSON.parse(optionSelected.val());
+
+        const areaFromID = valueSet["fromID"];
+        const areaToID = valueSet["toID"];
+
+        changeAreaElements(areaFromSelectElement, areaFromID);
+        changeAreaElements(areaToSelectElement, areaToID);
+
+        const productID = valueSet["productID"];
+        productIDElement.val(productID);
+
+        updateSummaryOfBookingNumber_{{ bookingNumber }}();
+    });
+    // });
+</script>

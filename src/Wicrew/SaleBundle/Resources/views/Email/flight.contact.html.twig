@@ -1,0 +1,46 @@
+{# @controller App\Wicrew\SaleBundle\Controller\BookingController::contactUsAction #}
+{% extends "@WicrewCore/Email/main.email.html.twig" %}
+
+{% block titlemail %}
+    {{ 'private.flight.mail.header'|trans() }}
+{% endblock %}
+
+{% block mailcontent %}
+    <div style="margin-bottom: 10px;"><strong>Reference: <span style="color:red">#RJ{{ order.id }}</span></strong></div>
+    <div class="contact-content">
+        <div class="header-information">
+            <div>{{ 'email.flight.request'|trans() }}</div>
+        </div>
+        <div class="contact-information">
+            <div><strong>{{ contact.firstName }} {{ contact.lastName }}</strong></div>
+            <div>{{ contact.email }}</div>
+            <div style="margin-bottom: 10px;">{{ contact.tel }}</div>
+            <div style="font-weight:bold;text-decoration:underline;">{{ 'email.additional.note'|trans() }}: </div>
+            {# <div>{{ contact.notes }}</div> #}
+        </div>
+        <ul class="list-content" style="padding:0px;margin-left:0px;margin-top:20px;margin-bottom: 10px;">
+            {% for summary in summaries %}
+                {# @var summary \App\Wicrew\SaleBundle\Service\Summary\ProductSummary #}
+                <li style="margin-left:0px;">
+                    <h3>{{ 'from'|trans() }} {{ summary.areaFrom.name }} {{ 'to'|trans() }} {{ summary.areaTo.name }} {{ summary.pickUpDate|date("d M Y") }}
+                    </h3>
+                    <div><strong>{% if summary.isConnectingFlight %}{{ 'booking.pickuptime.flight.to'|trans() }}{% else %}{{ 'booking.preferred.flight.time'|trans() }}{% endif %}:</strong> {{ summary.pickUpTime|date("H:i") }}</div>
+                    {% if summary.isConnectingFlight %}
+                        <div><strong>{{ 'order.items.flight.information'|trans() }}:</strong> {{ summary.pickAirlineCompany }}</div>
+                        <div><strong>{{ 'order.items.flight'|trans() }}:</strong> {{ summary.pickFlightNumber }}</div>
+                    {% endif %}
+                    <div><strong>Luggage Total Weight</strong>: {{ summary.luggageWeight }} Lbs</div>
+                    <div><strong>Passenger Total Weight</strong>: {{ summary.passengerWeight }} Lbs</div>
+                    <div><strong>Adults:</strong> {{ summary.adultCount }}</div>
+                    {% if summary.childCount > 0 %}
+                        <div><strong>Children:</strong> {{ summary.childCount }}</div> 
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul> 
+        <div class="footer-information" style="margin-top:20px;">
+            <div>{{ 'email.please.confirm.reservation'|trans() }}</div>
+            <div>{{ 'email.thankyou'|trans() }}</div> 
+        </div>
+    </div>
+{% endblock %}

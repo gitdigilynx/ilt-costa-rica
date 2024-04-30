@@ -1,0 +1,9 @@
+services:
+    wicrew.ehicle.filter.vehicletype:
+        class: App\Wicrew\VehicleBundle\Form\Filter\VehicleType
+        arguments: ["@wicrew.core.utils"]
+        public: true
+#    wicrew.vehicletype.utils:
+#        class: App\Wicrew\VehicleBundle\Service\VehicleService
+#        arguments: ["@wicrew.core.utils"]
+#        public: true           

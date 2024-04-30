@@ -1,0 +1,259 @@
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        let addonTypeSelector = jQuery("#addon_type");
+        let optionsForm = jQuery("#addon_options");
+
+        function anyAddonOptions() {
+            let rowData = optionsForm.find(".row-data");
+            return rowData.children().length > 0;
+        }
+
+        $("form").on('submit', function () {
+            let addonType = addonTypeSelector.val();
+            if (anyAddonOptions() && addonType === "{{ constant('App\\Wicrew\\AddonBundle\\Entity\\Addon::TYPE_CHECKBOX') }}") {
+                return confirm("{{ 'addon.option.removal_confirm'|trans() }}");
+            }
+
+            return true;
+        });
+
+        /*
+        the addon field option will be filled automatically by looking for the value of the following input field : addon_adultrackprice, addon_adultnetprice, addon_childrackprice, addon_childnetprice, addon_extratransportation, addon_rackprice, addon_netprice
+
+        so only use field option that has one of the following label :
+        'addon_adult', 'addon_child', 'addon_extra_transportation', 'extra_price'
+        */
+        const TYPE_ADDON = "{{ constant('App\\Wicrew\\AddonBundle\\Entity\\Addon::FORM_TYPE_ADDON') }}";
+        const TYPE_EXTRA = "{{ constant('App\\Wicrew\\AddonBundle\\Entity\\Addon::FORM_TYPE_EXTRA') }}";
+        const type = (FORM_TYPE == TYPE_ADDON) ? 'addon' : 'extra';
+        const used_addon_options = ['addon_adult', 'addon_child', 'addon_extra_transportation', 'extra_price'];
+        const per_person_addon_options = ['addon_adult', 'addon_child', 'extra_price'];
+        const PER_PERSON = "{{ constant('App\\Wicrew\\CoreBundle\\Entity\\IBasePriceEntity::PRICE_TYPE_PER_PERSON') }}";
+        const FIXED_PRICE = "{{ constant('App\\Wicrew\\CoreBundle\\Entity\\IBasePriceEntity::PRICE_TYPE_FOR_THE_TRIP') }}";
+        const MULTI_CHECKBOX = "{{ constant('App\\Wicrew\\AddonBundle\\Entity\\Addon::TYPE_MULTI_CHECKBOX') }}";
+
+        //remove_unused_addon_options();
+        create_addon_option_if_not_created();
+        init_addon_form();
+        handle_addon_fields();
+
+        function init_addon_form() {
+            $('#'+type+'_type').val(MULTI_CHECKBOX);
+            $('#'+type+'_type, #'+type+'_priceType').closest('.col-12').hide();
+            $('#'+type+'_options').parent().hide();
+        }
+
+        function handle_addon_fields() {
+            update_addon_fields();
+            handle_custom_addon_fields();
+            handle_addon_form_type();
+        }
+
+        function handle_addon_form_type() {
+            update_fields_by_form_type();
+            $('#'+type+'_form_type').on('change', function () {
+                update_fields_by_form_type();
+            });
+        }
+
+        function update_fields_by_form_type() {
+            if (FORM_TYPE == TYPE_EXTRA)  {
+                $('#'+type+'_adultRackPrice, #'+type+'_adultNetPrice, #'+type+'_childRackPrice, #'+type+'_childNetPrice, #'+type+'_extraTransportation').closest('.col-12').hide();
+                $('#'+type+'_rackPrice, #'+type+'_netPrice').closest('.col-12').show();
+            } else {
+                $('#'+type+'_adultRackPrice, #'+type+'_adultNetPrice, #'+type+'_childRackPrice, #'+type+'_childNetPrice, #'+type+'_extraTransportation').closest('.col-12').show();
+                $('#'+type+'_rackPrice, #'+type+'_netPrice').closest('.col-12').hide();
+            }
+        }
+
+        function update_addon_fields() {
+            let addon_already_created = get_addon_already_created_index();
+            // update adult rack price, etc
+            // adult rack price
+            let addon_adultrackprice_index = addon_already_created.addon_adult;
+            let addon_adultrackprice_value = $('#'+type+'_options_'+addon_adultrackprice_index+'_rackPrice').val();
+            $('#'+type+'_adulTrackPrice').val(addon_adultrackprice_value);
+            // adult net price
+            let addon_adultnetprice_index = addon_already_created.addon_adult;
+            let addon_adultnetprice_value = $('#'+type+'_options_'+addon_adultnetprice_index+'_netPrice').val();
+            $('#'+type+'_adultNetPrice').val(addon_adultnetprice_value);
+            // child rack price
+            let addon_childrackprice_index = addon_already_created.addon_child;
+            let addon_childrackprice_value = $('#'+type+'_options_'+addon_childrackprice_index+'_rackPrice').val();
+            $('#'+type+'_childRackPrice').val(addon_childrackprice_value);
+            // child net price
+            let addon_childnetprice_index = addon_already_created.addon_child;
+            let addon_childnetprice_value = $('#'+type+'_options_'+addon_childnetprice_index+'_netPrice').val();
+            $('#'+type+'_childNetPrice').val(addon_childnetprice_value);
+            // extra transportation
+            let addon_extratransportation_index = addon_already_created.addon_extra_transportation;
+            let addon_extratransportation_value = $('#'+type+'_options_'+addon_extratransportation_index+'_rackPrice').val();
+            $('#'+type+'_extraTransportation').val(addon_extratransportation_value);
+            // rack price
+            let addon_rackprice_index = addon_already_created.extra_price;
+            let addon_rackprice_value = $('#'+type+'_options_'+addon_rackprice_index+'_rackPrice').val();
+            $('#'+type+'_rackPrice').val(addon_rackprice_value);
+            // net price
+            let addon_netprice_index = addon_already_created.extra_price;
+            let addon_netprice_value = $('#'+type+'_options_'+addon_netprice_index+'_netPrice').val();
+            $('#'+type+'_netPrice').val(addon_netprice_value);
+
+            // update price type
+            $('#'+type+'_options_'+addon_adultrackprice_index+'_priceType').val(PER_PERSON);
+            $('#'+type+'_options_'+addon_childrackprice_index+'_priceType').val(PER_PERSON);
+            $('#'+type+'_options_'+addon_extratransportation_index+'_priceType').val(FIXED_PRICE);
+            $('#'+type+'_options_'+addon_rackprice_index+'_priceType').val(PER_PERSON);
+        }
+
+        function handle_custom_addon_fields() {
+            update_custom_addon_fields();
+        }
+
+        function update_custom_addon_fields() {
+            let addon_already_created = get_addon_already_created_index();
+            // update adult rack price, etc
+            // adult rack price
+            let addon_adultrackprice_index = addon_already_created.addon_adult;
+            let addon_custom_adultrackprice_index = '#'+type+'_adultRackPrice';
+            $(addon_custom_adultrackprice_index).on('keyup', function() {
+                let addon_custom_adultrackprice_value = $(this).val();
+                addon_custom_adultrackprice_value = (addon_custom_adultrackprice_value) ? addon_custom_adultrackprice_value : '0';
+                $('#'+type+'_options_'+addon_adultrackprice_index+'_rackPrice').val(addon_custom_adultrackprice_value);
+            });
+            // adult net price
+            let addon_adultnetprice_index = addon_already_created.addon_adult;
+            let addon_custom_adultnetprice_index = '#'+type+'_adultNetPrice';
+            $(addon_custom_adultnetprice_index).on('keyup', function() {
+                let addon_custom_adultnetprice_value = $(this).val();
+                addon_custom_adultnetprice_value = (addon_custom_adultnetprice_value) ? addon_custom_adultnetprice_value : '0';
+                $('#'+type+'_options_'+addon_adultnetprice_index+'_netPrice').val(addon_custom_adultnetprice_value);
+            });
+            // child rack price
+            let addon_childrackprice_index = addon_already_created.addon_child;
+            let addon_custom_childrackprice_index = '#'+type+'_childRackPrice';
+            $(addon_custom_childrackprice_index).on('keyup', function() {
+                let addon_custom_childrackprice_value = $(this).val();
+                addon_custom_childrackprice_value = (addon_custom_childrackprice_value) ? addon_custom_childrackprice_value : '0';
+                $('#'+type+'_options_'+addon_childrackprice_index+'_rackPrice').val(addon_custom_childrackprice_value);
+            });
+            // child net price
+            let addon_childnetprice_index = addon_already_created.addon_child;
+            let addon_custom_childnetprice_index = '#'+type+'_childNetPrice';
+            $(addon_custom_childnetprice_index).on('keyup', function() {
+                let addon_custom_childnetprice_value = $(this).val();
+                addon_custom_childnetprice_value = (addon_custom_childnetprice_value) ? addon_custom_childnetprice_value : '0';
+                $('#'+type+'_options_'+addon_childnetprice_index+'_netPrice').val(addon_custom_childnetprice_value);
+            });
+            // extra transportation
+            let addon_extratransportation_index = addon_already_created.addon_extra_transportation;
+            let addon_custom_extratransportation_index = '#'+type+'_extraTransportation';
+            $(addon_custom_extratransportation_index).on('keyup', function() {
+                let addon_custom_extratransportation_value = $(this).val();
+                addon_custom_extratransportation_value = (addon_custom_extratransportation_value) ? addon_custom_extratransportation_value : '0';
+                $('#'+type+'_options_'+addon_extratransportation_index+'_rackPrice').val(addon_custom_extratransportation_value);
+            });
+            // rack price
+            let addon_rackprice_index = addon_already_created.extra_price;
+            let addon_custom_rackprice_index = '#'+type+'_rackPrice';
+            $(addon_custom_rackprice_index).on('keyup', function() {
+                let addon_custom_rackprice_value = $(this).val();
+                addon_custom_rackprice_value = (addon_custom_rackprice_value) ? addon_custom_rackprice_value : '0';
+                $('#'+type+'_options_'+addon_rackprice_index+'_rackPrice').val(addon_custom_rackprice_value);
+            });
+            // net price
+            let addon_netprice_index = addon_already_created.extra_price;
+            let addon_custom_netprice_index = '#'+type+'_netPrice';
+            $(addon_custom_netprice_index).on('keyup', function() {
+                let addon_custom_netprice_value = $(this).val();
+                addon_custom_netprice_value = (addon_custom_netprice_value) ? addon_custom_netprice_value : '0';
+                $('#'+type+'_options_'+addon_netprice_index+'_netPrice').val(addon_custom_netprice_value);
+            });
+        }
+
+        function get_addon_number() {
+            let addon_number = [];
+            $('[id^="'+type+'_options_"][id$="priceType"]').each(function() {
+                number = $(this).attr('id').replace(type+'_options_', '').replace('_priceType', '');
+                number = parseInt(number);
+                addon_number.push(number);
+            });
+            return addon_number;
+        }
+
+        function get_addon_already_created_index() {
+            let addon_number = get_addon_number();
+            let addon_already_created_index = [];
+
+            for(let k=0; k < addon_number.length; k++) {
+                let i = addon_number[k];
+                let addon_option_label = $('#'+type+'_options_'+i+'_label').val();
+                let is_used_addon_option = used_addon_options.includes(addon_option_label);
+                if (is_used_addon_option) {
+                    addon_already_created_index[addon_option_label] = i;
+                }
+            }
+
+            return addon_already_created_index;
+        }
+
+        /*
+        create the addon with the following label if not created :
+        'addon_adult', 'addon_child', 'addon_extra_transportation', 'extra_price'
+        */
+        function create_addon_option_if_not_created() {
+            let addon_already_created_index = get_addon_already_created_index();
+
+            for(let k=0; k < used_addon_options.length; k++) {
+                let label = used_addon_options[k];
+                if (typeof(addon_already_created_index[label]) === "undefined") {
+                    // create addon item
+                    $('#'+type+'_options .collection-add').click();
+
+                    // get index
+                    $addon_created_label = $('[id^="'+type+'_options_"][id$="_label"]').last();
+                    if ($addon_created_label.length == 0) continue;
+                    let addon_created_label_id = $addon_created_label.attr('id');
+                    let addon_created_index = addon_created_label_id.replace(type+'_options_', '').replace('_label', '');
+
+                    // initialize/fill label, etc.
+                    // label
+                    $('#'+type+'_options_'+addon_created_index+'_label').val(label);
+                    // rack price
+                    $('#'+type+'_options_'+addon_created_index+'_rackPrice').val('0');
+                    // net price
+                    $('#'+type+'_options_'+addon_created_index+'_netPrice').val('0');
+                    // tax
+                    let tax_id = '#'+type+'_options_'+addon_created_index+'_tax';
+
+                    let first_tax_value = $(tax_id+' option')[1].value;
+                    $(tax_id).val(first_tax_value);
+                    // price type
+                    let price_type_id = '#'+type+'_options_'+addon_created_index+'_priceType';
+                    if (per_person_addon_options.includes(label)) {
+                        $(price_type_id).val(PER_PERSON);
+                    } else {
+                        $(price_type_id).val(FIXED_PRICE);
+                    }
+                    // supplier
+                    let supplier_id = '#'+type+'_options_'+addon_created_index+'_supplier';
+                    let first_supplier_value = $(supplier_id+' option')[1].value;
+                    $(supplier_id).val(first_supplier_value);
+                }
+            }
+        }
+
+        function remove_unused_addon_options() {
+            let addon_number = get_addon_number();
+
+            for(let k=0; k < addon_number.length; k++) {
+                let i = addon_number[k];
+                let addon_option_label = $('#'+type+'_options_'+i+'_label').val();
+                let is_used_addon_option = used_addon_options.includes(addon_option_label);
+                if (!is_used_addon_option) {
+                    $('#'+type+'_options_'+i+'_position').next('.form-actions').find('a.collection-remove').click();
+                }
+
+            }
+        }
+    });
+</script>

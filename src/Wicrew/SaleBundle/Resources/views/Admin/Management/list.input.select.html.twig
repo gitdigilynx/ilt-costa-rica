@@ -1,0 +1,16 @@
+{% block input_select %}
+    <select
+        name="{{
+        entity_config['nameInputArrayWrapper'] is defined ?
+        entity_config['nameInputArrayWrapper'] ~ '[' ~ field_options['arrayWrapperIndex'] ~ ']' ~ '[' ~ field_options['property'] ~ ']'
+        : field_options['property'] }}">
+    {% if noNone is not defined %}<option value="">{{ (emptyText is defined ? emptyText : 'booking.please.select')|trans() }}</option>{% endif %}
+    {% for key, data in dataset %}
+        <option
+                value="{{ key }}"
+                {% if value is same as(key) %}selected{% endif %}>
+            {{ data }}
+        </option>
+    {% endfor %}
+</select>
+{% endblock %}

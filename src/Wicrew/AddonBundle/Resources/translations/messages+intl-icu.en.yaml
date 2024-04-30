@@ -1,0 +1,90 @@
+addon:
+    title: Addon
+    and.extra: Addon & Extra
+    tab.general: General
+    group.information: Information
+    type: Type
+    type.checkbox: Checkbox
+    type.multi_checkbox: Multi checkbox
+    type.radio: Radio
+    form_type:
+        addon: Addon
+        extra: Extra
+        label: Type
+    label: Label
+    description: Description
+    adult_rack_price: Adult Rack Price
+    adult_net_price: Adult Net Price
+    child_rack_price: Child Rack Price
+    child_net_price: Child Net Price
+    extra_transportation: Extra Transportation
+    rack_price: Rack price
+    net_price: Net price
+    discount_price: Discount %
+    tax: Tax
+    price_type: Price type
+    price_type.per_person: Per person
+    price_type.for_the_trip: For the trip
+    supplier: Supplier
+    image: Image
+    image_description: Image description
+    created_at: Created at
+    options: Options
+    form:
+        adultrackprice: Adult Rack Price
+        adultnetprice: Adult Net Price
+        childrackprice: Child Rack Price
+        childnetprice: Child Net Price
+        extratransportation: Extra Transportation
+        rackprice: Rack Price
+        netprice: Net Price
+
+    add: Add
+    remove: Remove
+    delete:
+        products: This addon is in use by one or more products and cannot be deleted.
+        products_link: Click here to see which products use this addon.
+        orders: This addon is in use by one or more orders and cannot be deleted.
+        orders_link: Click here to see which orders use this addon.
+
+    associated_products:
+        title: Products using Addon (#{id})
+        count: >-
+            {productCount, plural,
+                =0    {"{addon}" is used in no products.}
+                one   {"{addon}" is used in 1 product.}
+                other {"{addon}" is used in # products.}
+            }
+        view_them_below: You can view each used product below.
+
+    associated_orders:
+        title: Orders using Addon (#{id})
+        count: >-
+            {orderCount, plural,
+                =0    {"{addon}" is used in no orders.}
+                one   {"{addon}" is used in 1 order.}
+                other {"{addon}" is used in # orders.}
+            }
+        view_them_below: You can view each used order below.
+
+addon.option:
+    label: Label
+    rack_price: Rack price
+    net_price: Net price
+    tax: Tax
+    price_type: Price type
+    price_type.per_person: Per person
+    price_type.for_the_trip: For the trip
+    supplier: Supplier
+    removal_confirm: This addon has additional options used for multi-checkbox or radio configurations, but it was changed to a single checkbox. These additional options will be removed. Are you sure you want to continue?
+    remove: Addon options removed.
+
+extra:
+    title: Extra
+    add_by_default: Add automatically in every Private Shuttle
+
+addon_adult: Adult Price
+addon_child: Child Price
+addon_entrance_fees: Entrance fees
+addon_extra_transportation: Extra Transportation
+extra_price: Price

@@ -1,0 +1,7 @@
+{% set currencySymbol = 'currency.symbol'|trans() %}
+{% if item.order.supplier is not null %}
+    {% set commission = (item.subTotalRack * (item.order.supplier.commission / 100)) %}
+    <span style="color: var(--red)">-{{currencySymbol}}{{ commission }}({{ item.order.supplier.commission }}%)</span>
+{% else %}
+    <span class="badge badge-secondary">Null</span>
+{% endif %}

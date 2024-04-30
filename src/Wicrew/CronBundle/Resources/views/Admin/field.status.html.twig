@@ -1,0 +1,7 @@
+{% if value == constant('App\\Wicrew\\CronBundle\\Entity\\CronLog::STATUS_PROCESSING') %}
+    {{ "cronlog.status.processing"|trans() }}
+{% elseif value == constant('App\\Wicrew\\CronBundle\\Entity\\CronLog::STATUS_SUCCESS') %}
+    {{ "cronlog.status.success"|trans() }}
+{% elseif value == constant('App\\Wicrew\\CronBundle\\Entity\\CronLog::STATUS_ERROR') %}
+    {{ "cronlog.status.error"|trans() }}
+{% endif %}

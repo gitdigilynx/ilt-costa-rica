@@ -1,0 +1,14 @@
+{% extends "WicrewCoreBundle:Browsing:browsing.header.html.twig" %}
+{% set backgroundImageURL = absolute_url(asset('bundles/wicrewcore/images/header/water-taxi-cover.jpg')) %}
+
+{% block title %}
+    {{ 'product.water.taxi'|trans() }}
+{% endblock %}
+
+{% block subTitle %}
+    {% if subTitle is defined %}
+        {{ subTitle }}
+    {% else %}
+        Perfect for saving time when traveling <br>from Montezuma or Jaco
+    {% endif %}
+{% endblock %}

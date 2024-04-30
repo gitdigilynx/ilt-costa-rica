@@ -1,0 +1,19 @@
+{% set dataset = getAllAreas() %}
+{% block input_select %}
+    {% set request_url =  app.request.requesturi  %}
+    {% if 'export' in request_url %}
+        {{ value }}
+    {% else %}
+        <select class="dashboard_select pickupArea" 
+            name="pickArea_name" >
+            {# FOREACH OVER LOOP, FIRST SORT OBJECT BY PROPERTY NAME #}
+            {% for option_id, option_name in dataset|sort((a, b) => a.name <=> b.name) %} 
+                <option value="{{ option_name }}" {% if value == option_name %}selected{% endif %} >
+                    {{ option_name }}
+                </option>
+            {% endfor %}
+
+        </select>
+    {% endif %}
+{% endblock %}
+

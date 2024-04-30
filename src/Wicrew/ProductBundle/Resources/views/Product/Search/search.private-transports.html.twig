@@ -1,0 +1,790 @@
+{% if tripType is defined %}
+    {% set tripSearchType = tripType %}
+{% else %}
+    {% set tripSearchType = constant('App\\Wicrew\\ProductBundle\\Entity\\Product::TRIP_TYPE_ONE_WAY') %}
+{% endif %}
+
+{% if id is not defined %}
+    {% set id = 'only-search' %}
+{% endif %}
+
+{% set passengerMaxLimit = constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_PRIVATE_SHUTTLE") in transportTypes %}
+{% set passengerLimit = 18 %}
+
+{% if is_granted('ROLE_USER') %}    
+    {% set passengerLimit = 10000 %}
+{% endif %}
+
+{% if hidden is defined and trips is defined %}
+    <div class="container">
+        <div class="search-preview-container">
+            {% set firstTrip = trips[1] %}
+            <div class="areas-column">
+                <div>{{ getAreaTextById(firstTrip['pickArea']) }}</div>
+                <div>
+                    <span class="fa {{ (tripSearchType == constant('App\\Wicrew\\ProductBundle\\Entity\\Product::TRIP_TYPE_ROUND_TRIP')) ? 'fa-exchange-alt' : 'fa-arrow-right' }}"></span>
+                </div>
+                <div>{{ getAreaTextById(firstTrip['dropArea']) }}</div>
+            </div>
+            <div class="dates-column">
+                <div><label>{{ 'search.traveldate'|trans }}</label> <span
+                            class="fa fa-calendar-day"></span> {{ firstTrip['dateFrom'] }}</div>
+                {% if tripSearchType == constant('App\\Wicrew\\ProductBundle\\Entity\\Product::TRIP_TYPE_ROUND_TRIP') %}
+                    <div><label>{{ 'search.returning'|trans }}</label> <span
+                                class="fa fa-calendar-day"></span> {{ firstTrip['dateTo'] }}</div>
+                {% endif %}
+            </div>
+            <div class="count-column">
+                {% set trip = firstTrip %}
+                <div>
+                    <span class="fa fa-user-friends"></span>{{ block("passengerDisplay", "@WicrewProduct/Product/Search/search.passenger-drop.html.twig") }}
+                </div>
+                <input type="button" id="show-search" value="Modify">
+            </div>
+        </div>
+    </div>
+{% endif %}
+<div id="{{ id }}"
+     class="container {{ (additionalClasses is defined) ? additionalClasses|join(' ') : '' }}" {{ (hidden is defined) ? 'hidden' : '' }}>
+    <div class="search-container">
+        {% if passengerMaxLimit %}
+            <div class="passenger-limit-banner" hidden>
+                {{ 'search.passenger_limit.start'|trans }} {% include "@WicrewPage/email.html.twig" %} {{ 'search.passenger_limit.end'|trans }}
+            </div>
+        {% endif %}
+        <div class="date-availability-banner" hidden>
+            The date selected is not available. Please change the date or contact us to check for availability at {% include "@WicrewPage/email.html.twig" %}. Thank you!            
+        </div>
+
+        <div class="area-availability-banner" hidden>
+            The area(s) selected is not available. Please change the area(s) or contact us to check for availability at {% include "@WicrewPage/email.html.twig" %}. Thank you!            
+        </div>
+        <div class="lastMinute-booking-banner" hidden>
+            One or more of the bookings is last minute and we are not sure if we can make it happen. Please change the date or contact us to check for availability at {% include "@WicrewPage/email.html.twig" %}. Thank you!            
+        </div>
+        <form method="get" action="{{ url('product_search') }}">
+            <label class="cr-radio-button">
+                <input type="radio" name="tripSearchType"
+                       value="{{ constant('App\\Wicrew\\ProductBundle\\Entity\\Product::TRIP_TYPE_ONE_WAY') }}"
+                       {% if tripSearchType == constant('App\\Wicrew\\ProductBundle\\Entity\\Product::TRIP_TYPE_ONE_WAY') %}checked="checked"{% endif %}
+                >
+                <span>{{ 'one-way'|trans }}</span>
+                <span class="dot"></span>
+            </label>
+
+            {% if constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_WATER_TAXI_PRIVATE") not in transportTypes and constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_WATER_TAXI") not in transportTypes %}
+                <label class="cr-radio-button">
+                    <input type="radio" name="tripSearchType"
+                           value="{{ constant('App\\Wicrew\\ProductBundle\\Entity\\Product::TRIP_TYPE_ROUND_TRIP') }}"
+                           {% if tripSearchType == constant('App\\Wicrew\\ProductBundle\\Entity\\Product::TRIP_TYPE_ROUND_TRIP') %}checked="checked"{% endif %}
+                    >
+                    <span>{{ 'round-trip'|trans }}</span>
+                    <span class="dot"></span>
+                </label>
+            {% endif %}
+
+            {% if constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_PRIVATE_SHUTTLE") in transportTypes %}
+                <label class="cr-radio-button">
+                    <input type="radio" name="tripSearchType"
+                           value="{{ constant('App\\Wicrew\\ProductBundle\\Entity\\Product::TRIP_TYPE_MULTI_DESTINATION') }}"
+                           {% if tripSearchType == constant('App\\Wicrew\\ProductBundle\\Entity\\Product::TRIP_TYPE_MULTI_DESTINATION') %}checked="checked"{% endif %}
+                    >
+                    <span>{{ 'multi-destination'|trans }}</span>
+                    <span class="dot"></span>
+                </label>
+            {% endif %}
+
+            {% for index, transportType in transportTypes %}
+                <input type="hidden" name="transportTypes[{{ index }}]" value="{{ transportType }}">
+                <input type="hidden" name="hidden_trip_type" value="">
+            {% endfor %}
+
+            {% set areas = getAreasByProductAvailability(transportTypes) %}
+            {% if trips is defined %}
+                {% for index, trip in trips %}
+                    {% set tripCount = (tripSearchType == constant('App\\Wicrew\\ProductBundle\\Entity\\Product::TRIP_TYPE_MULTI_DESTINATION')) ? trips|length : 1 %}
+                    {% if tripSearchType == constant('App\\Wicrew\\ProductBundle\\Entity\\Product::TRIP_TYPE_MULTI_DESTINATION') or loop.index <= 1 %}
+                        {% include "@WicrewProduct/Product/Search/search.row.html.twig" with { "areas": areas, "trip": trip, "index": index, "tripCount": tripCount, "tripSearchType": tripSearchType } only %}
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                {% include "@WicrewProduct/Product/Search/search.row.html.twig" with { "areas": areas, "index": 1, "tripSearchType": tripSearchType } only %}
+            {% endif %}
+
+            <div class="vehicle-search-box vehicle-search-multi" {{ (tripSearchType != constant('App\\Wicrew\\ProductBundle\\Entity\\Product::TRIP_TYPE_MULTI_DESTINATION')) ? 'hidden' : '' }}>
+                <div class="column">
+                    <input type="button" class="new-dest" value="+ Add transportation">
+                </div>
+                <div class="column">
+                    <button type="button" class="search-btn">
+                        <img src="{{ absolute_url(asset('bundles/wicrewcore/images/search-icon.svg')) }}"/>{{ 'action.search'|trans }}
+                    </button>
+                </div>
+            </div>
+            {% if app.request.query.has('orderID') %}
+                <input type="hidden" name="orderID" value="{{ app.request.query.get('orderID') }}" />
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $( document ).ready(function() {
+        $(".dl_date_pickup").on("input", function() {
+            // This code will run whenever the "input" event is triggered
+            $(this).parents('.vehicle-search-box').find(".roundTripEnd").datepicker("option", "minDate",  $(this).val() );
+        });
+    });
+
+    window.limitIsReached = false;
+    $(function () {
+        {% if hidden is defined %}
+        $("#show-search").on("click", function () {
+            $(".search-preview-container").remove();
+            $(".search-container").parent().removeAttr("hidden");
+        });
+        {% endif %}
+
+        // HTML doesn't accept required attributes on readonly inputs, so re-add the readonly functionality through JS.
+        $(".readonly").on("keydown paste", function(e){
+            e.preventDefault();
+        });
+
+        let thisSearchContainer = $("#{{ id }}");
+
+        let dateFromObjs = thisSearchContainer.find(".form_datepicker");
+        initDatePicker(dateFromObjs);
+
+        /**
+         * @param {jQuery} searchContainer
+         **/
+        function resetSearchLayout(searchContainer) {
+            searchContainer.find(".original-dates-container .flex-spacer").attr("hidden", "hidden");
+
+            searchContainer.find(".for-round-trip").attr("hidden", "hidden");
+            searchContainer.find(".date-to-original").removeAttr("required");
+
+            searchContainer.find(".multi-destination-title").attr("hidden", "hidden");
+            searchContainer.find(".original-search-button").removeAttr("hidden");
+            let inputBoxContainer = searchContainer.find(".original-passenger-input-wrapper")
+            searchContainer.find(".original-passenger-input-box").appendTo(inputBoxContainer);
+
+            let multiSearchRows = searchContainer.find(".vehicle-search-multi");
+            multiSearchRows.attr("hidden", "hidden");
+            multiSearchRows.find(".date-from").removeAttr("required");
+        }
+
+        thisSearchContainer.find("input[name='tripSearchType']").on("change", function () {
+            $("input[name='hidden_trip_type']").val($(this).val());
+            let searchContainer = thisSearchContainer;
+            resetSearchLayout(searchContainer);
+
+            if ($(this).val() === "{{ constant('App\\Wicrew\\ProductBundle\\Entity\\Product::TRIP_TYPE_ROUND_TRIP') }}") {
+                searchContainer.find(".original-dates-container .flex-spacer").removeAttr("hidden");
+
+                searchContainer.find(".for-round-trip").removeAttr("hidden");
+                searchContainer.find(".date-to-original").attr("required", "required");
+            } else if ($(this).val() === "{{ constant('App\\Wicrew\\ProductBundle\\Entity\\Product::TRIP_TYPE_MULTI_DESTINATION') }}") {
+                searchContainer.find(".original-dates-container .flex-spacer").removeAttr("hidden");
+
+                searchContainer.find(".multi-destination-title").removeAttr("hidden");
+                searchContainer.find(".original-search-button").attr("hidden", "hidden");
+                let datesContainer = searchContainer.find(".original-dates-container");
+                searchContainer.find(".original-passenger-input-box").appendTo(datesContainer);
+
+                let multiSearchRows = searchContainer.find(".vehicle-search-multi");
+                multiSearchRows.removeAttr("hidden");
+                multiSearchRows.find(".date-from").attr("required", "required");
+            }
+        });
+
+        // Insert new row.
+        thisSearchContainer.find(".new-dest").on("click", function () {
+
+            let searchContainer = thisSearchContainer;
+            let vehicleSearchRow = searchContainer.find(".vehicle-search");
+            vehicleSearchRow.find( "select" ).select2('destroy');
+
+            let newRow = vehicleSearchRow.clone(true);
+            // newRow.find( "select" ).removeClass( "select2-hidden-accessible" );
+            // newRow.find( "span.select2.select2-container" ).remove( );
+            newRow.find(".multi-destination-title").append('<div class="remove_dest_btn"><div class="btn btn-danger remove-dest"><i class="fa fa-times" aria-hidden="true"></i></div></div>');
+            newRow.find("div.btn.btn-danger.remove-dest").click(function (e) { 
+                e.preventDefault();
+                $(this).parents(".vehicle-search-box").remove();
+                updateVehicleSearchBoxIndex();
+            });
+            newRow.removeClass("vehicle-search");
+            newRow.addClass("vehicle-search-multi");
+
+            let target = searchContainer.find(".vehicle-search-multi").last();
+            newRow.insertBefore(target);
+
+            // Remove IDs and classes that would indicate it's the first row.
+            newRow.removeAttr("data-trip-index");
+            newRow.find(".original-passenger-input-box").removeClass("original-passenger-input-box");
+            newRow.find(".original-passenger-input-wrapper").removeClass("original-passenger-input-wrapper");
+            newRow.find(".original-dates-container").removeClass("original-dates-container");
+
+            newRow.find(".date-to").removeClass("date-to-original");
+            newRow.find("#submit-search").removeAttr("id");
+            newRow.find(".original-search-button").removeClass("original-search-button");
+
+            // Remove datepicker's initializations.
+            newRow.find(".date-from").removeClass("hasDatepicker");
+            newRow.find(".date-from").removeAttr("id");
+
+            initDatePicker(newRow);
+            newRow.find(".date-from").datepicker('setDate', searchContainer.find(".dl_date_pickup:eq(-2)").val() );
+            // Update trip indices.
+            let currIndex = parseInt(vehicleSearchRow.attr("data-trip-index"));
+            let newIndex = ++currIndex;
+            let prevIndex = --currIndex;
+            let newFrom = $( 'select[name = "trip[' + prevIndex + '][dropArea]"]' ).val();
+            vehicleSearchRow.attr("data-trip-index", newIndex);
+            updateRowTripNumber(newRow, newIndex, newFrom);
+           
+
+            vehicleSearchRow.find( "select" ).select2({
+                    placeholder: "Please select",
+                    width: '100%',
+                    
+            });
+            newRow.find( "select" ).select2({
+                    placeholder: "Please select",
+                    width: '100%',
+                    
+            });
+            updateVehicleSearchBoxIndex( );            
+            newRow.find('select.search-from').val( newRow.find('select.search-from').val() );  
+            newRow.find('select.search-from').trigger('change'); // This event will fire the change event.
+        });
+
+        /**
+         * Updates the specified row's inputs with the new trip index.
+         *
+         * @param {JQuery} target
+         * @param {int} newIndex
+         */
+        function updateRowTripNumber(target, newIndex, newFrom) {
+            target.find("input[name^='trip'], select[name^='trip']").each(function () {
+                let attribute = $(this).attr("name");
+                attribute = attribute.replace(/trip\[\d]/,
+                    "trip[" + newIndex + "]"
+                );
+                $(this).attr("name", attribute);
+            });
+
+            target.find(".multi-destination-title h3").text("Ride " + newIndex);
+
+            target.find( 'select.search-from option[value = "' + newFrom + '"]' ).attr( 'selected', true );
+        }
+
+        function enableAllOptions(optionElements) {
+            optionElements.prop("disabled", false);
+        }
+
+        function disableOption(optionElements, value) {
+            optionElements.filter(function() {
+                return $(this).val() !== "" // Ignore default option.
+                    && value === $(this).val();
+            }).attr("disabled", "disabled");
+        }
+
+        thisSearchContainer.find("select").on("change", function () {
+            let parentContainer = $(this).parents(".vehicle-search, .vehicle-search-multi");
+
+            let otherAreaSelectOptions;
+            if ($(this).hasClass("search-from")) {
+                otherAreaSelectOptions = parentContainer.find(".search-to option");
+            } else {
+                otherAreaSelectOptions = parentContainer.find(".search-from option");
+            }
+
+            enableAllOptions(otherAreaSelectOptions);
+
+            let selectedValue = $(this).val();
+            if ($("input[name='hidden_trip_type']").val() != "{{ constant('App\\Wicrew\\ProductBundle\\Entity\\Product::TRIP_TYPE_MULTI_DESTINATION') }}") {
+                disableOption(otherAreaSelectOptions, selectedValue);
+            }
+        });
+
+        thisSearchContainer.find(".swapper").on("click", function () {
+            let swapBtn = $(this);
+            swapBtn.addClass("loading");
+            let parentContainer     = $(this).parents(".vehicle-search, .vehicle-search-multi");
+            let selectFrom          = parentContainer.find(".search-from");
+            let selectTo            = parentContainer.find(".search-to");
+            let _select2To          = selectTo.next();
+            _select2To.hide();
+            let selectedFromValue   = selectFrom.val();
+            let selectedFromText    = selectFrom.find( "option:selected" ).text();
+            let selectedToValue     = selectTo.val();
+            
+            
+            selectFrom.addClass("stop-change");     
+            selectFrom.val(selectedToValue).attr( 'selected', true );
+            selectFrom.select2().val(selectedToValue).trigger('change.select2');;
+            enableAllOptions(selectFrom.find("option"));
+            disableOption(selectFrom.find("option"), selectedFromValue);
+
+
+            // HERE NEED TO APPLY LOCATION FILTER 
+            //jquery script for on change of from field. 
+            var selected_val        = selectedToValue;
+            let url_last_segment    = location.href.substring(location.href.lastIndexOf('/') + 1); 
+            url_last_segment        = decodeURI(url_last_segment);
+            
+            if (url_last_segment.indexOf('edit_item') > -1) {
+                url_last_segment = $(".booking-form .left-panel h2").text().toLowerCase().replace(" ", "-").trim();    
+            } else if (url_last_segment.indexOf('transportTypes[0]=1') > -1) {
+                url_last_segment = 'private-shuttles';
+            }else if (url_last_segment.indexOf('transportTypes[0]=8') > -1) {
+                url_last_segment = 'private-flight';
+            } else if (url_last_segment.indexOf('transportTypes[0]=6') > -1) {
+                url_last_segment = 'water-taxi';
+            }else if (url_last_segment.indexOf('private-shuttles') > -1) {
+                url_last_segment = 'private-shuttles';
+            } else if (url_last_segment.indexOf('private-flight') > -1) {
+                url_last_segment = 'private-flight';
+            } else if (url_last_segment.indexOf('water-taxi') > -1) {
+                url_last_segment = 'water-taxi';
+            } 
+          
+
+            if( url_last_segment === '' ){ url_last_segment = 'private-shuttles'; isHomePage = 1; }
+            
+            let ifSecondsForm   = parentContainer.parents( "div#seconds-search" ).length;
+            if( ifSecondsForm ){
+                url_last_segment = 'private-flight';
+            }
+
+            if( url_last_segment === 'private-shuttles' || url_last_segment === 'private-flight' || url_last_segment === 'water-taxi'){
+                if(selected_val != "" && selected_val != null){
+
+                    //now sending this selected value to ajax page for options for `TO` field.
+                    $.ajax({
+                        url:'/get/to/areas/options',
+                        type: "GET",
+                        dataType: "json",
+                        data: {
+                            "selected_value": selected_val,
+                            "transportation_type": url_last_segment,
+
+                        },
+                        async: true,
+                        success: function (data) {
+                            let response = jQuery.parseJSON( data );
+                            if(response.status == "OK"){
+                                
+                                let optionsToPut = response.areas_to;
+                                
+                                parentContainer.find("select.search-to").html("");
+                            
+                                $.each( optionsToPut, function( key, value ) {
+                                    if(key != selected_val){
+                                    
+                                        parentContainer.find("select.search-to").append("<option value='"+key+"'>"+value+"</option>");
+                                    
+                                    }
+                                });
+                            
+                                var sel_to1 = parentContainer.find('select.search-to');
+                                var selected_to1 = sel_to1.val(); // cache selected value, before reordering
+                                var opts_list_to1 = sel_to1.find('option');
+                                opts_list_to1.sort(function(a, b) { return $(a).text() > $(b).text() ? 1 : -1; });
+                                sel_to1.html('').append(opts_list_to1);
+                                // sel_to1.val(selectedFromValue); // set cached selected value
+                                var exists = false; 
+                                selectTo.find('option').each(function(){
+                                    if (this.value == selectedFromValue) {
+                                        exists = true;
+                                    }
+                                });
+                                if(!exists){
+                                    selectTo.append($('<option>', {
+                                        value: selectedFromValue,
+                                        text: selectedFromText
+                                    }));
+                                }
+
+
+                                selectTo.val(selectedFromValue).attr( 'selected', true );
+                                selectTo.select2().val(selectedFromValue).trigger('change.select2');;
+                                enableAllOptions(selectTo.find("option"));
+                                disableOption(selectTo.find("option"), selectedToValue);
+
+                                swapBtn.removeClass("loading");
+                                _select2To.show();
+                                // console.log("selectedFromValue: "+ selectedFromValue);
+                                // console.log("selectedToValue: "+ selectedToValue);
+
+                            
+                            
+                            }else{
+                                alert(response.error_message);
+                            }                   
+                            return;
+                        }
+                    });
+                }
+            }
+            // HERE NEED TO APPLY LOCATION FILTER 
+
+           
+        });
+
+        thisSearchContainer.find(".search-btn").on("click", function () {
+            
+           $(".lastMinute-booking-banner").hide();
+           $(".date-availability-banner").hide();
+            let parentContainer = $(this).parents(".vehicle-search, .vehicle-search-multi");
+            let dl_date_pickup  = parentContainer.find("input.dl_date_pickup").val();
+            let dl_area_from    = parentContainer.find("select.search-from").val();
+            let dl_area_to      = parentContainer.find("select.search-to").val();
+            
+            if( dl_date_pickup == ""){
+                alert("Please select date!");
+                return;
+            }
+          
+            if( dl_area_from == ""){
+                alert("Please select from area!");
+                return;
+            }
+          
+            if( dl_area_to == ""){
+                alert("Please select destination!");
+                return;
+            }
+          
+            if( typeof dl_date_pickup === "undefined" ){
+
+                let selectedDates = [];
+                let stopSubmission = false;
+                $( "input.dl_date_pickup" ).each(function( index ) {
+                    let dl_date_pickup = $(this).val();
+                    if( dl_date_pickup != ""){
+                    
+                        const tomorrow = moment().add(1, 'day').endOf('day').format('MM/DD/YYYY');
+                
+                        if( moment( dl_date_pickup ).format('MM/DD/YYYY') == moment().format('MM/DD/YYYY') ||  moment( dl_date_pickup ).format('MM/DD/YYYY') == tomorrow ){
+                            $(".lastMinute-booking-banner").removeAttr("hidden").show();
+                            stopSubmission = true;
+                        }
+                        selectedDates.push( moment( dl_date_pickup ).format() )
+                    }
+                });  
+                if( stopSubmission ){
+                    return;
+                }
+                $.ajax({
+                    url:'/check/date/availability/multi',
+                    type: "GET",
+                    dataType: "json",
+                    data: {
+                        "selected_date": selectedDates,
+                    },
+                    async: true,
+                    success: function (data) {
+                        if( data == "not-available" ){
+                            $(".date-availability-banner").removeAttr("hidden");
+                            $(".date-availability-banner").show();
+
+                        }else{
+                            let missing = false;
+                            thisSearchContainer.find('input[name$="[adultCount]"]').each(function () {
+                                if (!missing && parseInt($(this).val().toString()) < 1) {
+                                    let parentMultiContainer = $(this).parents(".vehicle-search-multi").first();
+                                    if (parentMultiContainer.length < 1 || parentMultiContainer.attr("hidden") !== "hidden") {
+                                        missing = true
+                                    }
+                                }
+                            });
+
+                            if (missing) {
+                                alert("{{ 'search.atleast.adult'|trans }}");
+                                return;
+                            }
+
+                            thisSearchContainer.find("#submit-search").trigger("click");
+                        }
+                    }
+                });
+
+            }else{
+
+                const tomorrow = moment().add(1, 'day').endOf('day').format('MM/DD/YYYY');
+           
+                if( moment( dl_date_pickup ).format('MM/DD/YYYY') == moment().format('MM/DD/YYYY') ||  moment( dl_date_pickup ).format('MM/DD/YYYY') == tomorrow ){
+                    
+                    $(".lastMinute-booking-banner").removeAttr("hidden").show();
+                    return;
+                }
+
+                
+                $.ajax({
+                    url:'/check/date/availability',
+                    type: "GET",
+                    dataType: "json",
+                    data: {
+                        "selected_date": moment( dl_date_pickup ).format(),
+                    },
+                    async: true,
+                    success: function (data) {
+                        if( data == "not-available" ){
+                            $(".date-availability-banner").removeAttr("hidden");
+                            $(".date-availability-banner").show();
+
+                        }else{
+                            let missing = false;
+                            thisSearchContainer.find('input[name$="[adultCount]"]').each(function () {
+                                if (!missing && parseInt($(this).val().toString()) < 1) {
+                                    let parentMultiContainer = $(this).parents(".vehicle-search-multi").first();
+                                    if (parentMultiContainer.length < 1 || parentMultiContainer.attr("hidden") !== "hidden") {
+                                        missing = true
+                                    }
+                                }
+                            });
+
+                            if (missing) {
+                                alert("{{ 'search.atleast.adult'|trans }}");
+                                return;
+                            }
+
+                            $.ajax({
+                                url:'/check/areas/availability',
+                                type: "GET",
+                                dataType: "json",
+                                data: {
+                                    "selected_date": moment( dl_date_pickup ).format(),
+                                    'dl_area_from': dl_area_from,
+                                    'dl_area_to': dl_area_to,
+                                },
+                                async: true,
+                                success: function (data) {
+                                    if(data == 'not-available' ){
+                                        $(".area-availability-banner").removeAttr("hidden");
+                                        $(".area-availability-banner").show();
+            
+                                    }else{
+                                        thisSearchContainer.find("#submit-search").trigger("click");
+                                    }                             
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+
+        });
+
+        thisSearchContainer.find(".passenger-input").on("click", function (event) {
+            event.stopPropagation();
+            let passengerDropdown = $(this).siblings(".passenger-dropdown").first();
+
+            let attr = passengerDropdown.attr('hidden');
+            if (typeof attr !== typeof undefined && attr !== false) {
+                passengerDropdown.removeAttr("hidden");
+                $(this).addClass("active");
+            } else {
+                passengerDropdown.attr("hidden", "hidden");
+                $(this).removeClass("active");
+            }
+        });
+
+        $(".passenger-dropdown").on("click", function (event) {
+            // Prevent the window click event from closing the dropdown when it's clicked.
+            event.stopPropagation();
+        });
+
+        // Close the dropdown menu if the user clicks outside of it
+        $(window).on("click", function () {
+            $(".passenger-dropdown").attr("hidden", "hidden");
+            $(".passenger-input").removeClass("active");
+        });
+
+        thisSearchContainer.find(".pd-minus").on("click", function () {
+            let inputElement = $(this).siblings("input").first();
+            let displayElement = $(this).siblings(".pd-value").first();
+            let val = parseInt(inputElement.val().toString());
+            if (val > 0) {
+                val--;
+                inputElement.val(val);
+                displayElement.text(val);
+                updatePassengerSearchBox($(this));
+            }
+        });
+
+        thisSearchContainer.find(".pd-plus").on("click", function () {
+            let inputElement = $(this).siblings("input").first();
+            let displayElement = $(this).siblings(".pd-value").first();
+            let val = parseInt(inputElement.val().toString());
+            val++;
+            inputElement.val(val);
+            displayElement.text(val);
+            updatePassengerSearchBox($(this));
+        });
+
+        /**
+         * @param {JQuery} innerElement
+         */
+        function updatePassengerSearchBox(innerElement) {
+            let parent = innerElement.closest(".input-box");
+            let adultInput = parent.find('input[name$="[adultCount]"]');
+            let adultCount = parseInt(adultInput.val().toString());
+
+            let childInput = parent.find('input[name$="[childCount]"]');
+            let childCount = parseInt(childInput.val().toString());
+
+            let outputText;
+            if (adultCount === 1) {
+                outputText = adultCount.toString() + " {{ 'core.adult'|trans }}";
+            } else {
+                outputText = adultCount.toString() + " {{ 'core.adults'|trans }}";
+            }
+
+            if (childCount > 0) {
+                outputText += ", ";
+                if (childCount === 1) {
+                    outputText += childCount.toString() + " {{ 'core.child'|trans }}";
+                } else {
+                    outputText += childCount.toString() + " {{ 'core.children'|trans }}";
+                }
+            }
+
+            let textElement = parent.find(".passenger-input");
+            textElement.text(outputText);
+
+            {% if passengerMaxLimit %}
+            checkIfPassengerLimitIsReached(thisSearchContainer, (adultCount + childCount) > {{ passengerLimit }});
+            {% endif %}
+        }
+
+        {% if passengerMaxLimit %}
+            /**
+             * @param {JQuery} searchContainer
+             * @param {boolean} mustBeTrue
+             */
+            function checkIfPassengerLimitIsReached(searchContainer, mustBeTrue = false) {
+                const PASSENGER_LIMIT = {{ passengerLimit }};
+
+                let limitHit = mustBeTrue;
+                if (!limitHit) {
+                    searchContainer.find(".vehicle-search, .vehicle-multi-search").each(function () {
+                        if (limitHit) { return; }
+                        let adultInput = $(this).find('input[name$="[adultCount]"]');
+                        let adultCount = parseInt(adultInput.val().toString());
+
+                        let childInput = $(this).find('input[name$="[childCount]"]');
+                        let childCount = parseInt(childInput.val().toString());
+
+                        limitHit = (adultCount + childCount) > PASSENGER_LIMIT;
+                    });
+                }
+
+                if (limitHit) {
+                    thisSearchContainer.find(".passenger-limit-banner").removeAttr("hidden");
+                    thisSearchContainer.find("#submit-search").attr("disabled", "disabled");
+                } else {
+                    thisSearchContainer.find(".passenger-limit-banner").attr("hidden", "hidden");
+                    thisSearchContainer.find("#submit-search").removeAttr("disabled");
+                }
+                window.limitIsReached = limitHit;
+            }
+        {% endif %}
+
+        // Hack to make inputs display update to correct number on page load.
+        thisSearchContainer.find('.pd-plus').each(function () {
+            $(this).trigger("click");
+        });
+
+        thisSearchContainer.find('.pd-minus').each(function () {
+            $(this).trigger("click");
+        });
+    });
+
+
+    function updateVehicleSearchBoxIndex() {
+        $(".vehicle-search-box").each(function (index, element) {
+            let indexPlusOne = index + 1;
+            let newName = "trip[" + indexPlusOne + "][";
+            $(element).find(".multi-destination-title h3").text("Ride "+indexPlusOne);
+            $(element).find("input, select").each(function () {
+                let name = $(this).attr("name");
+                if(!name){ return true; }
+                let match = name.match(/\[([^\[]*)]$/);
+                if (match !== null) {
+                    name = match[1];
+                }
+                $(this).attr("name", newName + name + "]");
+                // console.log(newName + name + "]");
+            });
+        });
+    }
+
+
+</script>
+
+<style>
+    .date-availability-banner,
+    .area-availability-banner,
+    .lastMinute-booking-banner {
+        margin-bottom: 1em;
+        border-radius: 4px;
+        padding: 0.75rem 1.25rem;
+        color: #713e0c;
+        background-color: #f7e4d1;
+    }
+    .search-container .swapper.loading {
+        pointer-events: none;
+        background-color: #c5c7cc;
+    }
+    .remove_dest_btn {
+        position: absolute;
+        left: -35px;
+        top: 0px;
+        width: 25px;
+        height: 25px;
+    }
+
+    .multi-destination-title {
+        position: relative;
+        height: 32px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding: 0px;
+        margin: 0px;
+    }
+
+    div.btn.remove-dest {
+        width: 25px;
+        height: 25px;
+        border-radius: 100%;
+        outline: 0px;
+        border: 0px;
+        line-height: 16px;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .btn-danger {
+        color: #fff;
+        background-color: #dc3545;
+        border-color: #dc3545;
+        cursor: pointer;
+    }
+
+    .btn-danger:hover {
+        color: #fff;
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+    .multi-destination-title h3 {
+        padding: 0 !important;
+        margin: 0;
+    }
+</style>

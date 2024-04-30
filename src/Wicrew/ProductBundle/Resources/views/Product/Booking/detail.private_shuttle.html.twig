@@ -1,0 +1,512 @@
+{% extends "@WicrewProduct/Product/Booking/detail.private_shuttle.base.html.twig" %}
+
+{% set type_transportation = "private_shuttle" %}
+
+{% block bookingForm %}
+    {# @var product \App\Wicrew\ProductBundle\Entity\Product #}
+ 
+    {% set pickupDateID = 'pickup_date_' ~ bookingNumber %}
+    {% set pickupTimeID = 'pickup_time_' ~ bookingNumber %}
+    {% set adultCountID = 'passenger_number_adult_' ~ bookingNumber %}
+    {% set childCountID = 'passenger_number_children_' ~ bookingNumber %}
+
+    {% set pickUpLabelText = 'booking.pickupdate'|trans %}
+    {% set labelTextDate = 'booking.pickupdate'|trans %}
+    {% set labelTextTime = 'booking.pickuptime'|trans %}  
+    
+    {% if reverseAreas[bookingNumber] is defined %}
+        {% if reverseAreas[bookingNumber] %}
+            {% set pickAreaID = product.areaTo.id %}
+            {% set pickAreaType = product.areaTo.type %}
+            {% set dropAreaID = product.areaFrom.id %}
+            {% set dropAreaType = product.areaFrom.type %} 
+        {% else %}
+            {% set pickAreaID = product.areaFrom.id %}
+            {% set pickAreaType = product.areaFrom.type %}
+            {% set dropAreaID = product.areaTo.id %}
+            {% set dropAreaType = product.areaTo.type %}  
+        {% endif %}
+ 
+        {% if dropAreaType is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}
+            {% set labelTextDate = 'booking.pickupdate.flight.to'|trans %}
+            {% set labelTextTime = 'booking.pickuptime.flight.to'|trans %}
+        {% endif %}
+        {% if pickAreaType is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}
+            {% set labelTextDate = 'booking.pickupdate.flight'|trans %}
+            {% set labelTextTime = 'booking.pickuptime.flight'|trans %}
+        {% endif %} 
+    
+        {% set pickUpLabelText = labelTextDate %}
+        {% set alternateTitleFlightDate = labelTextDate %}
+        {% set alternateTitleFlightTime = labelTextTime %}
+    {% endif %}
+ 
+    <div class="booking-section-inner">
+        {% block idInput %}
+            <input type="hidden" name="{{ postDataSection }}[id]" value="{{ product.id }}"/>
+        {% endblock %}
+        <input type="hidden" name="{{ postDataSection }}[dl_transportationType]" value="{{ product.transportationType }}"/>
+
+        <input type="hidden" name="{{ postDataSection }}[type]" value="product"/>
+        {% block summaryTotalInputs %}
+            <input type="hidden" id="subtotal-for-{{ bookingNumber }}"
+                   value="{{ summaries[bookingNumber].subtotalPrice.rackPrice.toCents() }}"/>
+            <input type="hidden" id="taxes-for-{{ bookingNumber }}"
+                   value="{{ summaries[bookingNumber].totalTaxes.rackPrice.toCents() }}"/>
+        {% endblock %}
+        {% block headerAndInfo %}
+            <div class="booking-product-info clearfix">
+                <div class="ride-header">
+                    <div>
+                        {% if pickArea is defined %}
+                            {% set pickAreaID = pickArea.id %}
+                            {% set pickAreaType = pickArea.type %}
+                        {% else %}
+                            {% if reverseAreas[bookingNumber] %}
+                                {% set pickAreaID = product.areaTo.id %}
+                                {% set pickAreaType = product.areaTo.type %}
+                            {% else %}
+                                {% set pickAreaID = product.areaFrom.id %}
+                                {% set pickAreaType = product.areaFrom.type %}
+                            {% endif %}
+                        {% endif %}
+
+                        {% if dropArea is defined %}
+                            {% set dropAreaID = dropArea.id %}
+                            {% set dropAreaType = dropArea.type %}
+                        {% else %}
+                            {% if reverseAreas[bookingNumber] %}
+                                {% set dropAreaID = product.areaFrom.id %}
+                                {% set dropAreaType = product.areaFrom.type %}
+                            {% else %}
+                                {% set dropAreaID = product.areaTo.id %}
+                                {% set dropAreaType = product.areaTo.type %}
+                            {% endif %}
+                        {% endif %}
+                        {% set dl_childAreas = [] %}
+                        {% if selectedChidlrenAreas is defined and selectedChidlrenAreas|length > 0 %}
+                            {% set dl_childAreas = selectedChidlrenAreas %}
+                        {% endif %}
+                        {% set dateFrom = pickDates[bookingNumber]|date("F d, Y") %}
+                        {% set dateTo = pickDates[bookingNumber]|date("F d, Y") %}
+                        {% if dl_childAreas == [] %}
+                            {% include "@WicrewProduct/Product/Search/ride.header.html.twig" with { selectedChidlrenAreas: dl_childAreas, index: loop.index, pickAreaID: pickAreaID, dropAreaID: dropAreaID, dateFrom: dateFrom, dateTo: dateTo } only %} 
+                        {% else %}
+                            {% include "@WicrewProduct/Product/Search/ride.header.html.twig" with { selectedChidlrenAreas: dl_childAreas[loop.index], index: loop.index, pickAreaID: pickAreaID, dropAreaID: dropAreaID, dateFrom: dateFrom, dateTo: dateTo } only %} 
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endblock %}
+ 
+        {% set isHotelToHotel = false %}
+        {% if pickAreaType == dropAreaType and dropAreaType is not same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}
+            {% set isHotelToHotel = true %}
+        {% endif %}
+
+        {% set isAirportToHotel = false %}
+        {% if pickAreaType is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) and dropAreaType is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AREA')) %}
+            {% set isAirportToHotel = true %}
+        {% endif %}
+
+        {% set isHotelToAirport = false %}
+        {% if pickAreaType is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AREA')) and dropAreaType is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}
+            {% set isHotelToAirport = true %}
+        {% endif %}
+
+        {% set isAirportToAirport = false %}
+        {% if pickAreaType == dropAreaType and dropAreaType is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}
+            {% set isAirportToAirport = true %}
+        {% endif %}
+ 
+        <div class="row-block">
+            <div class="product-info-block" style="width: 100%;margin-bottom:15px;">
+                <div class="vehicle-type">
+                    <div class="vehicleType-id" style="display: none;"> {{ product.vehicleType.id }} </div>
+                    <div class="vehicle-name"><strong>Vehicle selected: </strong> {{ product.vehicleType.name }}</div>
+                    <div class="vehicle-name"><strong>Passengers: </strong> up to <span id="maxPassengerNumber">{{ product.vehicleType.maxPassengerNumber }}</span> {{ 'vehicle.passenger'|trans() }}</div> 
+                </div>
+            </div>
+        </div>
+        <br>
+
+        <div class="row-block">
+            <div class="col-block">
+                <div class="row-block">
+                    <div class="col-block booking-pickup-block booking-form-block input-calendar-icon black-icon floating-label-w-icon w-100">
+                        <div class="floating-label-wrap float-fixed">
+                            {% block dateBlockInclude %}
+                                {% include "@WicrewSale/Booking/Inputs/form.booking.pickup_date.html.twig" with { "pickupDate": pickDates[bookingNumber], "readonly": true, "alternateTitleFlightDate": labelTextDate } %}
+                            {% endblock %}
+                        </div>
+                    </div>
+                </div>
+                <div class="row-block">
+                    <div class="col-block booking-pickup-block booking-form-block w-100">
+                        <div class="floating-label-wrap float-fixed"> 
+                            {% block pickAreaInclude %}
+                                {% if pickArea is defined %} 
+                                    {% include "@WicrewSale/Booking/Inputs/form.booking.area.html.twig" with
+                                        {
+                                            "type": "from",
+                                            "areaObj": pickArea,
+                                            "address": pickAddress,
+                                            "googlePlaceID": pickGooglePlaceID,
+                                            "flightNumber": pickFlight,
+                                            "airlineCompany": pickAirline,
+                                            "bookingNumber": bookingNumber,
+                                            "type_transportation" : type_transportation
+                                        } %}
+                                {% else %}
+                                    {% if reverseAreas[bookingNumber] %} 
+                                        {% include "@WicrewSale/Booking/Inputs/form.booking.area.html.twig" with
+                                            {
+                                                "type": "from",
+                                                "areaObj": product.areaTo,
+                                                "bookingNumber": bookingNumber,
+                                                "type_transportation" : type_transportation
+                                            } %}
+                                    {% else %} 
+                                        {% include "@WicrewSale/Booking/Inputs/form.booking.area.html.twig" with
+                                            {
+                                                "type": "from",
+                                                "areaObj": product.areaFrom,
+                                                "bookingNumber": bookingNumber,
+                                                "type_transportation" : type_transportation
+                                            } %}
+                                    {% endif %}
+                                {% endif %}
+                            {% endblock %}
+                        </div>
+                    </div>
+                </div>
+                {% if isHotelToHotel %}
+                    {% set dropAreaType = 1 %}
+                    {% if dropArea is defined %} 
+                        {% include "@WicrewSale/Booking/Inputs/form.booking.area.html.twig" with
+                            {
+                                "type": "to",
+                                "areaObj": dropArea,
+                                "address": dropAddress,
+                                "googlePlaceID": dropGooglePlaceID,
+                                "flightNumber": dropFlight,
+                                "airlineCompany": dropAirline,
+                                "bookingNumber": bookingNumber,
+                                "type_transportation" : type_transportation,
+                                "remove_row_block": true
+                            } %}
+                    {% else %} 
+                        {% if reverseAreas[bookingNumber] %} 
+                            {% include "@WicrewSale/Booking/Inputs/form.booking.area.html.twig" with
+                                {
+                                    "type": "to",
+                                    "areaObj": product.areaFrom,
+                                    "bookingNumber": bookingNumber,
+                                    "type_transportation" : type_transportation,
+                                    "remove_row_block": true
+                                } %}
+                        {% else %} 
+                            {% include "@WicrewSale/Booking/Inputs/form.booking.area.html.twig" with
+                                {
+                                    "type": "to",
+                                    "areaObj": product.areaTo,
+                                    "bookingNumber": bookingNumber,
+                                    "type_transportation" : type_transportation,
+                                    "remove_row_block": true
+                                } %}
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+            </div>
+
+            <div class="col-block booking-time-block"> 
+                <div> 
+                    {% if not isHotelToHotel %}
+                        {% set dropAreaType = 1 %}
+                        {% block dropAreaInclude %}
+                            {% if dropArea is defined %} 
+                                {% include "@WicrewSale/Booking/Inputs/form.booking.area.html.twig" with
+                                    {
+                                        "type": "to",
+                                        "areaObj": dropArea,
+                                        "address": dropAddress,
+                                        "googlePlaceID": dropGooglePlaceID,
+                                        "flightNumber": dropFlight,
+                                        "airlineCompany": dropAirline,
+                                        "bookingNumber": bookingNumber,
+                                        "type_transportation" : type_transportation
+                                    } %}
+                            {% else %} 
+                                {% if reverseAreas[bookingNumber] %} 
+                                    {% include "@WicrewSale/Booking/Inputs/form.booking.area.html.twig" with
+                                        {
+                                            "type": "to",
+                                            "areaObj": product.areaFrom,
+                                            "bookingNumber": bookingNumber,
+                                            "type_transportation" : type_transportation
+                                        } %}
+                                {% else %} 
+                                    {% include "@WicrewSale/Booking/Inputs/form.booking.area.html.twig" with
+                                        {
+                                            "type": "to",
+                                            "areaObj": product.areaTo,
+                                            "bookingNumber": bookingNumber,
+                                            "type_transportation" : type_transportation
+                                        } %}
+                                {% endif %}
+                            {% endif %}
+                        {% endblock %}
+                    {% endif %}
+
+                    {% if isHotelToHotel %}  
+                        <div class="row-block">
+                            <div class="booking-time-block input-time-icon floating-label-w-icon">
+                                <div class="floating-label-wrap">
+                                    {% include "@WicrewSale/Booking/Inputs/form.booking.time.html.twig" with { "alternateTitleFlightTime": labelTextTime } %}
+                                </div>
+                            </div>
+                        </div> 
+                    {% endif %}
+
+                    {% if isAirportToHotel or isAirportToAirport %}
+                        {% set is_required = false %}
+                    {% else %}
+                        {% set is_required = true %}
+                    {% endif %}
+                    <div class="row-block" {% if isAirportToHotel or isAirportToAirport %}style="display:none;"{% endif %}>
+                    {% include "@WicrewSale/Booking/Inputs/form.booking.additionalFee_search.html.twig" with
+                    {
+                        "type": "from",
+                        "areaObj": product.areaTo,
+                        "bookingNumber": bookingNumber,
+                        "required": is_required
+                    }%}
+                    </div>
+
+                    {% if isHotelToAirport or isAirportToAirport %}
+                        {% set is_required = false %}
+                    {% else %}
+                        {% set is_required = true %}
+                    {% endif %}
+                    <div class="row-block" {% if isHotelToAirport or isAirportToAirport %}style="display:none;"{% endif %}>
+                    {% include "@WicrewSale/Booking/Inputs/form.booking.additionalFee_search.html.twig" with
+                    {
+                        "type": "to",
+                        "areaObj": product.areaTo,
+                        "bookingNumber": bookingNumber,
+                        "required": is_required
+                    }%}
+                    </div> 
+                </div>
+            </div>
+        </div>
+
+        <div class="row-block">
+
+
+        </div>
+
+        <div class="row-block">
+            <div class="col-block">
+                <div class="floating-label-wrap float-fixed">
+                    {% block adultBlockInclude %}
+                        {% include "@WicrewSale/Booking/Inputs/form.booking.adult.html.twig" with { "readonly": true } %}
+                    {% endblock %}
+                </div>
+            </div>
+
+            <div class="col-block">
+                <div class="floating-label-wrap float-fixed">
+                    {% block childBlockInclude %}
+                        {% include "@WicrewSale/Booking/Inputs/form.booking.child.html.twig" with { "readonly": true } %}
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+
+        <div class="ride-header">
+            {% if isHotelToHotel %}
+                <div class="mr-2">
+                </div>
+            {% endif %}
+
+            <div class="mr-2" {% if isHotelToHotel %}style="display:none;"{% endif %}>
+            {% if isHotelToAirport %}
+                {% set flight_type = 'to' %}
+            {% else %}
+                {% set flight_type = 'from' %}
+            {% endif %}
+            {% if isHotelToHotel %}
+                {% set is_required = false %}
+            {% else %}
+                {% set is_required = true %}
+            {% endif %}
+            {% if pickAirline is not defined %}{% set pickAirline = '' %}{% endif %}
+                {% include "@WicrewSale/Booking/Inputs/form.booking.airline.html.twig" with
+                    {
+                        "type": flight_type,
+                        "areaObj": product.areaTo,
+                        "bookingNumber": bookingNumber,
+                        "required": is_required, 
+                        "airlineCompany": pickAirline
+                    }%}
+            </div>
+
+            {% if isHotelToHotel %}
+                {% set is_required = false %}
+            {% else %}
+                {% set is_required = true %}
+            {% endif %}
+            <div class="mr-2" {% if isHotelToHotel %}style="display:none;"{% endif %}>
+            {% if pickFlight is not defined %}{% set pickFlight = '' %}{% endif %}
+            {% include "@WicrewSale/Booking/Inputs/form.booking.flight_number.html.twig" with
+                {
+                    "type": flight_type,
+                    "areaObj": product.areaTo,
+                    "bookingNumber": bookingNumber,
+                    "required": is_required,
+                    "flightNumber": pickFlight
+                }%}
+            </div> 
+ 
+
+            
+            {% block timeBlock %}
+                {% if not isHotelToHotel %}  
+                    <div>
+                        <div class="booking-time-block input-time-icon floating-label-w-icon">
+                            <div class="floating-label-wrap">
+                                {% block timeBlockInclude %}
+                                    {% include "@WicrewSale/Booking/Inputs/form.booking.time.html.twig" with { "alternateTitleFlightTime": labelTextTime } %}
+                                {% endblock %}
+                            </div>
+                        </div>
+                    </div> 
+                {% endif %}
+            {% endblock %}
+            
+        </div>
+
+        {% if custom_services is defined and custom_services|length > 0 %}
+            <div class="addon booking-addon-section">
+                <div class="addon-section-title">
+                    <h4>Custom Services</h4>
+                    <p>Following are the added custom services, you can also delete them from booking.</p>
+                </div>
+
+                <div id="custom_services-for-{{ bookingNumber }}" class="addon-table">
+                    {% for custom_service in custom_services %}
+                        <div class="single-customService-container" style='font-size: 16px;font-weight: 400;margin-bottom: 20px; padding: 15px; border: 1px #aaadb4 solid; display: flex; width: 100%; gap: 15px;'>
+                            <div class="single-customService-name" style='flex: 50%;'> {{custom_service.label}} </div>
+                            <div class="single-customService-price" style='flex: auto;'> {{'currency.symbol'|trans() ~ custom_service.rackPrice|number_format(2, '.', ',') }} </div>
+                            <div class="single-customService-action" style='flex: auto; text-align: end;'> <button type='button' data-bookingnumber='{{bookingNumber}}' data-loopindex='{{loop.index0}}' data-label='{{custom_service.label}}' data-id='{{custom_service.id}}' onclick="remove_custom_service(this)" style='background: transparent;border: none;color: #d10000;' class='remove_custom_service' title='Remove custom service from booking'> <i class="fas fa-times-circle"></i> </button> </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        {% block addons %}
+            {% if product.addons|length > 0 %}
+                <div class="addon booking-addon-section">
+                    <div class="addon-section-title">
+                        <h4>{{ 'booking.addons'|trans() }}</h4>
+                        <p>{{ 'booking.addons.subtitle'|trans() }}</p>
+                    </div>
+ 
+                    <div id="addons-for-{{ bookingNumber }}" class="addon-table">
+                        {% for addon in product.addons %}
+                            {% include "@WicrewAddon/Addon/addon.detail.html.twig" with { "addon": addon, "bookingNumber": bookingNumber, "type": "addon" } %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {# SHOWING ADDED ADDONS IN ORDER ITEM  #}
+            {% elseif (edit_order_item is defined) %} {# and ( orderItem_obj.addons|length > 0 ) #}
+                <div class="addon booking-addon-section">
+                    <div class="addon-section-title">
+                        <h4>{{ 'booking.addons'|trans() }}</h4>
+                        <p>{{ 'booking.addons.subtitle'|trans() }}</p>
+                    </div>
+
+                    <div id="addons-for-{{ bookingNumber }}" class="addon-table">
+                        {% for addon in all_addons %}
+                            {% include "@WicrewAddon/Addon/addon.detail.html.twig" with { "addon": addon, "bookingNumber": bookingNumber, "type": "addon" } %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+            {# SHOWING ADDED ADDONS IN ORDER ITEM  #}
+            
+           
+            {% if product.extras|length > 0 %}
+                <div class="addon booking-addon-section">
+                    <div class="addon-section-title">
+                        <h4>{{ 'booking.extras'|trans() }}</h4>
+                        <p>{{ 'booking.extras.subtitle'|trans() }}</p>
+                    </div>
+
+                    <div id="extras-for-{{ bookingNumber }}" class="addon-table">
+                        {% for extra in product.extras %}
+                            {% if extra.addByDefault == 0 %}
+                                {% include "@WicrewAddon/Addon/addon.detail.html.twig" with { "addon": extra, "bookingNumber": bookingNumber, "type": "extra" } %}
+                            {% endif %}
+                        {% endfor %}
+                        {% for extra in all_extras %}
+                            {% include "@WicrewAddon/Addon/addon.detail.html.twig" with { "addon": extra, "bookingNumber": bookingNumber, "type": "extra" } %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {# SHOWING ADDED EXTRAS IN ORDER ITEM  #}
+            {% elseif (edit_order_item is defined) %} {# and ( orderItem_obj.extras|length > 0 ) #}
+                <div class="addon booking-addon-section">
+                    <div class="addon-section-title">
+                        <h4>{{ 'booking.extras'|trans() }}</h4>
+                        <p>{{ 'booking.extras.subtitle'|trans() }}</p>
+                    </div>
+
+                    <div id="extras-for-{{ bookingNumber }}" class="addon-table">
+                        {% for extra in all_extras %}
+                            {% include "@WicrewAddon/Addon/addon.detail.html.twig" with { "addon": extra, "bookingNumber": bookingNumber, "type": "extra" } %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+            {# SHOWING ADDED EXTRAS IN ORDER ITEM  #}
+        {% endblock %} 
+        {% if loop.index == loop.last %}
+            <div class="row detail-booking-btn-block">
+                <div class="col">
+                    {% block addToCartButton %}
+                        <button type="submit" class="btn-black lg-btn">
+                            {% if submitButtonText is defined %}{{ submitButtonText }}{% else %}{{ 'proceed.to.check.out'|trans() }}{% endif %}
+                        </button>
+                    {% endblock %}
+                    {% block addToCartAndContinueButton %}
+                        {% if referrer is not null and not app.session.has('orderID') %}
+                            <button type="submit" class="add-to-cart-and-continue-btn" name="backToReferrer"
+                                    value="{{ referrer }}">{{ 'add.to.cart.and.continue'|trans() }}</button>
+                        {% endif %}
+                    {% endblock %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+    {% block perProductJS %}
+        {% include "@WicrewSale/Booking/Base/booking.summary_watcher.js.html.twig" with { "bookingNumber": bookingNumber, "idType": "productID", "bookingID": product.id } %}
+        <script> 
+      
+            $(document).ready(function(){
+                $('#{{pickupTimeID}}').timepicker( { format:'HH:mm' } );
+                let timePickerElements = $(".booking-pickup-time");
+                timePickerElements.timepicker( { format:'HH:mm' } );
+
+            });
+
+            $(function() {
+                $('.addon-option-quantity input').trigger('input'); 
+            });
+        </script>
+    {% endblock %}
+{% endblock %}
+ 

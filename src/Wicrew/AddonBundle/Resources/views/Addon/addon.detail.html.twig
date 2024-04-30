@@ -1,0 +1,125 @@
+{% set additionalClass = '' %}
+{% if addon.type == constant('\\App\\Wicrew\\AddonBundle\\Entity\\Addon::TYPE_CHECKBOX') %}
+    {% set additionalClass = 'addon-type-checkbox' %}
+{% elseif addon.type == constant('\\App\\Wicrew\\AddonBundle\\Entity\\Addon::TYPE_MULTI_CHECKBOX') %}
+    {% set additionalClass = 'addon-type-multi-checkbox' %}
+{% elseif addon.type == constant('\\App\\Wicrew\\AddonBundle\\Entity\\Addon::TYPE_RADIO') %}
+    {% set additionalClass = 'addon-type-radio' %}
+{% endif %}
+
+{% if enabledAddons[type][addon.id]['enabled'] is defined and enabledAddons[type][addon.id]['enabled'] %}
+    {% set additionalClass = additionalClass ~ ' active' %}
+{% endif %}
+
+{% set currencySymbol = 'currency.symbol'|trans() %}
+{% set currencyText = 'currency.text'|trans() %}
+
+{% set id = type ~ '_' ~ addon.id ~ '_for_' ~ bookingNumber %}
+
+{# @var addon \App\Wicrew\AddonBundle\Entity\Addon #}
+<div class="addon-group-item {{ additionalClass }}" id="{{ id }}">
+    <div class="container">
+
+        <div class="addon_img_container">
+            <img src="{{ app.request.getSchemeAndHttpHost() ~ vich_uploader_asset(addon, 'imageFile') }}"
+                    alt="{{ addon.imageDescription }}" width="{{ getParameterValue('global_image_addon_width') }}"
+                    height="{{ getParameterValue('global_image_addon_height') }}"/>
+        </div>
+        <div class="addon_label_container">
+        
+            <div class="addon_label">
+                <h3 title='{{ addon.label }}'>{{ addon.label }}</h3>
+                {% if addon.description is defined %}
+                    <div class="addon-description" title="{{ addon.description|striptags|replace({'&nbsp;':' ','&amp;':'&' }) }}">{{ addon.description|striptags|replace({'&nbsp;':' ','&amp;':'&' }) }}</div>
+                {% endif %} 
+            </div>
+
+            <div class="addon_description">
+                {% if addon.type == constant('\\App\\Wicrew\\AddonBundle\\Entity\\Addon::TYPE_CHECKBOX') %}
+                    {% set rackPrice = addon.rackPrice %}
+                    {% set discountRackPrice = addon.getRackPriceWithDiscount() %}
+
+                    <div class="addon-price-description">
+                        {% if rackPrice != discountRackPrice %}
+                            <span class="addon-discount">{{ currencySymbol }} {{ rackPrice }}</span>
+                            {% set rackPrice = discountRackPrice %}
+                        {% endif %}
+                        <span class="addon-current-price">{{ currencySymbol }} {{ rackPrice }} {{ currencyText }}</span>
+                    </div>
+
+                    <div class="ck-button" style="margin-left:48px;margin-top:13px">
+                        <label>
+                            <input type="checkbox" name="{{ postDataSection }}[{{ type }}s][{{ addon.id }}][enabled]" id="addon_{{ bookingNumber }}_{{ addon.id }}" class="updates-summary-of-{{ bookingNumber }}" value="{{ addon.id }}" {% if enabledAddons[addon.id] is defined %} checked/> <span>{{ 'addon.remove'|trans() }}</span> {% else %} /> <span>{{ 'addon.add'|trans() }}</span> {% endif %}
+                        </label>
+                    </div>
+
+                    {% if addon.priceType == constant('\\App\\Wicrew\\AddonBundle\\Entity\\Addon::PRICE_TYPE_PER_PERSON') %}
+                        <div class="addon-quantity">
+                            {% set addonQuantity = enabledAddons[addon.id] is defined ? 2 : 0 %}
+                            <input type="hidden" name="{{ postDataSection }}[{{ type }}s][{{ addon.id }}][quantity]" class="updates-summary-of-{{ bookingNumber }}" value="{{ addonQuantity }}" />
+                            <span class="pd-minus">-</span><span class="pd-value">{{ addonQuantity }}</span><span class="pd-plus" data-add-by-default="{% if attribute(addon, 'addByDefault') is defined and addon.addByDefault %}yes{% else %}no{% endif %}">+</span>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    {% if addon.type == constant('\\App\\Wicrew\\AddonBundle\\Entity\\Addon::TYPE_MULTI_CHECKBOX') %}
+                        {% set inputType = 'checkbox' %}
+                    {% elseif addon.type == constant('\\App\\Wicrew\\AddonBundle\\Entity\\Addon::TYPE_RADIO') %}
+                        {% set inputType = 'radio' %}
+                    {% endif %}
+
+                    <div class="addon-item-listing">
+                        {% for option in addon.options %}
+                            {% if (type == 'addon' and option.label in ['addon_adult', 'addon_child', 'addon_extra_transportation']) or (type == 'extra' and option.label in ['extra_price']) %} 
+                                {# @var option \App\Wicrew\AddonBundle\Entity\AddonOption #}
+                                <div class="addon-item" {% if option.label == 'addon_extra_transportation' %} style='display: none;' {% endif %} >
+                                    <div class="addon-option-info custom-checkbox-style">
+                                        {% set optionInputID = 'addonOption_' ~ bookingNumber ~ '_' ~ addon.id ~ '_' ~ option.id %}
+
+                                        {% set rackPrice = option.rackPrice %}
+                                        {% set discountRackPrice = option.getRackPriceWithDiscount() %}
+
+                                        <div class="addon-option-label">
+                                            <input type="hidden" name="{{ postDataSection }}[{{ type }}s][{{ addon.id }}][{{ option.id }}][label]" class="updates-summary-of-{{ bookingNumber }}" value="{{ option.label }}" />
+                                        </div>
+
+                                        <input type="{{ inputType }}" name="{{ postDataSection }}[{{ type }}s][{{ addon.id }}][{{ option.id }}][enabled]" id="{{ optionInputID }}" class="updates-summary-of-{{ bookingNumber }}" value="{{ option.id }}" {% if enabledAddons[type][addon.id][option.label]  is defined and enabledAddons[type][addon.id][option.label] != 0 %} checked {% endif %} />
+
+                                        <label for="{{ optionInputID }}" class="addon-price-description">
+                                            {% if rackPrice != discountRackPrice %}
+                                                <span class="addon-discount">{{ currencySymbol }} {{ rackPrice }}</span>
+                                                {% set rackPrice = discountRackPrice %}
+                                            {% endif %}
+                                            {% if option.label == 'addon_adult' %}
+                                                <div class="addon-type"><strong>{{ option.label|trans() }}</strong></div>
+                                                <div class="addon-price"><strong>{{ currencySymbol }} {{ rackPrice }} {{ currencyText }}</strong></div>
+                                            {% else %}
+                                                <div class="addon-type">{{ option.label|trans() }}</div>
+                                                <div class="addon-price">{{ currencySymbol }} {{ rackPrice }} {{ currencyText }}</div>
+                                            {% endif %}
+                                        </label>
+                                    </div>
+
+                                    {% if option.priceType == constant('\\App\\Wicrew\\AddonBundle\\Entity\\Addon::PRICE_TYPE_PER_PERSON') %}
+                                        <div class="addon-option-quantity">
+                                            {% set addonQuantity = enabledAddons[type][addon.id][option.label] is defined ? enabledAddons[type][addon.id][option.label] : 0 %}
+                                            <input type="hidden" name="{{ postDataSection }}[{{ type }}s][{{ addon.id }}][{{ option.id }}][quantity]" class="updates-summary-of-{{ bookingNumber }}" value="{{ addonQuantity }}" />
+                                            <span class="pd-minus">-</span><span class="pd-value">{{ addonQuantity }}</span><span class="pd-plus" data-add-by-default="{% if attribute(addon, 'addByDefault') is defined and addon.addByDefault %}yes{% else %}no{% endif %}">+</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <div class="ck-button"  style="margin-left:48px;margin-top:13px;display:none;">
+                        <label>
+                            <input type="checkbox" id="addon_{{ bookingNumber }}_{{ addon.id }}" name="{{ postDataSection }}[{{ type }}s][{{ addon.id }}][enabled]" value="{{ addon.id }}" class="addon-add-remove-button" {% if enabledAddons[type][addon.id]['enabled'] is defined and enabledAddons[type][addon.id]['enabled'] %} checked/> <span>{{ 'addon.remove'|trans() }}</span> {% else %} /> <span>{{ 'addon.add'|trans() }}</span> {% endif %}
+                        </label>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+    {% include "@WicrewAddon/Addon/addon.detail.js.html.twig" with { 'id': id } %}
+</div>

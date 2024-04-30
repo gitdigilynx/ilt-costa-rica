@@ -1,0 +1,39 @@
+easy_admin:
+    design:
+        menu:
+            - { entity: 'Page', label: 'page.page', icon: 'file-alt', permission: ROLE_ADMIN }
+    entities:
+        Page:
+            permissions:
+                list: [ 'ROLE_ADMIN' ]
+                new: [ 'ROLE_ADMIN' ] 
+                edit: [ 'ROLE_ADMIN' ]
+                delete: [ 'ROLE_ADMIN' ] 
+            label: 'page.page'
+            icon: 'file'
+            class: App\Wicrew\PageBundle\Entity\Page
+            list:
+                title: 'page.page'
+                fields:
+                    - { property: 'title', label: 'page.title' }
+                    - { property: 'slug', label: 'page.slug' }
+                    - { property: 'enabled', label: 'page.enabled', type: 'boolean' }
+                    - { property: 'createdAt', label: 'page.created_at' }
+                max_results: '%global.sort.pagination.default%'
+                sort: ['createdAt', '%global.sort.desc%']
+            form:
+                form_options: { attr: { novalidate: novalidate } }
+                fields:
+                    - { type: 'tab', label: 'page.tab.general' }
+                    - { type: 'group', label: 'page.group.information' }
+                    - { property: 'enabled', label: 'page.enabled' }
+                    - { property: 'hideHeader', label: 'page.hide_header' }
+                    - { property: 'title', label: 'page.title' }
+                    - { property: 'slug', label: 'page.slug', type: 'text' }
+                    - { property: 'pageTitle', label: 'page.page_title' }
+                    - { property: 'pageContent', label: 'page.content', type: 'FOS\CKEditorBundle\Form\Type\CKEditorType', type_options: { config: { filebrowserBrowseRoute: 'elfinder', filebrowserBrowseRouteParameters: { instance: 'image', homeFolder: '' } } } }
+                    - { type: 'tab', label: 'page.tab.meta_data' }
+                    - { type: 'group', label: 'page.group.meta_data' }
+                    - { property: 'metaTitle', label: 'page.meta_title' }
+                    - { property: 'metaDescription', label: 'page.meta_description' }
+                    - { property: 'metaKeywords', label: 'page.meta_keywords' }

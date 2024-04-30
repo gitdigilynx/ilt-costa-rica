@@ -1,0 +1,14 @@
+<ul class="menu-items menu-transportation">
+    <li><a href="{{ path('product_transportation', { 'type': 'private-shuttles' }) }}" title=""><i
+                    class="fas fa-shuttle-van"></i> {{ 'product.private.shuttle'|trans() }}</a></li>
+    {# hidden because of covid #}
+    {# <li><a href="{{ path('product_transportation', { 'type': 'shared-shuttles' }) }}" title=""><i
+                    class="fas fa-shuttle-van"></i> {{ 'product.share.shuttle'|trans() }}</a></li> #}
+    <li><a href="{{ path('product_transportation', { 'type': 'jeep-boat-jeep' }) }}" title=""><i
+                    class="fas fa-ship"></i> {{ 'product.jeepboatjeep'|trans() }}</a></li>
+    <li><a href="{{ path('product_transportation', { 'type': 'water-taxi' }) }}" title=""><i
+                    class="fas fa-ship"></i> {{ 'product.water.taxi'|trans() }}</a></li>
+    <li class="d-xs-none">&nbsp;</li>
+    <li><a href="{{ path('product_transportation', { 'type': 'private-flight' }) }}" title=""><i
+                    class="fas fa-plane"></i> {{ 'product.private.flights'|trans() }}</a></li>
+</ul>

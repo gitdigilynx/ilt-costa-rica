@@ -1,0 +1,10 @@
+.cms-page {
+    font-family: 'Poppins', sans-serif;
+    padding: 80px 0 40px;
+
+    p {
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+}

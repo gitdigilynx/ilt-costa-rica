@@ -1,0 +1,24 @@
+wicrew_cron_core:
+    resource: '@WicrewCronBundle/Controller/DefaultController.php'
+    type: annotation
+    prefix: /cron
+
+#wicrew_cron_backup:
+#    resource: '@WicrewCronBundle/Controller/BackupController.php'
+#    type: annotation
+#    prefix: /cron/backup
+#
+#wicrew_cron_mail:
+#    resource: '@WicrewCronBundle/Controller/MailController.php'
+#    type: annotation
+#    prefix: /cron/mail
+
+wicrew_cron_notify:
+    resource: '@WicrewCronBundle/Controller/NotifyController.php'
+    type: annotation
+    prefix: /cron/notify
+
+#wicrew_cron_report:
+#    resource: '@WicrewCronBundle/Controller/ReportController.php'
+#    type: annotation
+#    prefix: /cron/report

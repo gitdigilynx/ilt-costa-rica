@@ -1,0 +1,4 @@
+imports:
+    - { resource: "@WicrewVehicleTypeBundle/Resources/config/easy_admin.yaml" }
+    - { resource: "@WicrewVehicleTypeBundle/Resources/config/services.yaml" }
+    - { resource: "@WicrewVehicleTypeBundle/Resources/config/vich_uploader.yaml" }

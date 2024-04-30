@@ -1,0 +1,160 @@
+<h3>{{ 'order.balance.history'|trans() }}</h3>
+<table class="table datagrid">
+    <thead>
+    <tr>
+        <th class="fullWidthCol">{{ 'order.history.date'|trans() }}</th>
+        <th class="fullWidthCol">{{ 'order.history.action'|trans() }}</th>
+        <th>{{ 'order.history.itemid'|trans() }}</th>
+        <th>{{ 'order.history.producttype'|trans() }}</th>
+        <th>{{ 'order.history.note'|trans() }}</th>
+        <th>{{ 'order.history.payment'|trans() }}</th>
+        <th>{{ 'order.history.refund'|trans() }}</th>
+        <th>Amount Due</th>
+        <th>{{ 'order.history.employee'|trans() }}</th>
+        <th></th>
+    </tr>
+    </thead>
+    {% set amount_due = 0 %}
+    {% set total_amount_due = 0 %}
+
+    {% for itemhis in order.history %}
+        <tr {% if ( checkHistoryType(itemhis.type) != constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderHistory::TYPE_PAYMENT_TEXT') and ( itemhis.amount|replace({'-': ''}) == 0.00  ) ) or ('Updated an item' in itemhis.notes) %} style="display: none" {% endif %}>
+            <td class="fullWidthCol">{{ itemhis.createdAt|date("d M Y") }}</td>
+            <td class="fullWidthCol">{{ ('order.history.status.' ~ itemhis.type)|trans() }}</td>
+            <td>
+                {% if checkHistoryType(itemhis.type) == constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderHistory::TYPE_ORDER_ITEM_TEXT') %}
+                    {% if itemhis.orderItem %}{{ itemhis.orderItem.id }}{% endif %}
+                {% elseif checkHistoryType(itemhis.type) == constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderHistory::TYPE_PAYMENT_TEXT') %}
+                    {% if itemhis.stripeResponseStatus == "cash" %}
+                        Payment via Cash/Wire
+                    {% else %}
+                        {{ 'payment.via.stripe'|trans() }}
+                    {% endif %}
+                    {% if itemhis.type == constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderHistory::TYPE_CHARGED') %}
+                        {{ itemhis.stripeChargeId }}
+                    {% elseif itemhis.type == constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderHistory::TYPE_REFUNDED') %}
+                        {{ itemhis.stripeRefundId }}
+                    {% endif %}
+                {% endif %}
+            </td>
+            <td>
+                {% if checkHistoryType(itemhis.type) == constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderHistory::TYPE_ORDER_ITEM_TEXT') %}
+                    {% if itemhis.orderItem %}
+                        {% if itemhis.orderItem.activity %}
+                            {{ 'activity.title'|trans() }}
+                        {% else %}
+                            {{ itemhis.orderItem.product.transportationType.name }}
+                        {% endif %}
+                    {% endif %}
+                {% elseif checkHistoryType(itemhis.type) == constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderHistory::TYPE_PAYMENT_TEXT') %}
+                    {{ 'order.history.payment'|trans() }}
+                {% endif %}
+            </td>
+            <td>
+                {{ itemhis.notes }}{% if checkHistoryType(itemhis.type) != constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderHistory::TYPE_PAYMENT_TEXT') %}: {{ 'currency.symbol'|trans() }}{{itemhis.amount|replace({'-': ''})}}{% endif %}
+            </td>
+            <td>
+                {% if itemhis.type == constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderHistory::TYPE_CHARGED') %}
+                    {{ 'currency.symbol'|trans() }}{{ itemhis.amount }}
+                {% endif %}
+            </td>
+            <td>
+                {% if itemhis.type == constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderHistory::TYPE_REFUNDED') %}
+                    {{ 'currency.symbol'|trans() }}{{ itemhis.amount }}
+                {% endif %}
+            </td>
+
+            <td>
+                {% set toBreakIndex = loop.index0 %}
+                {% for _temp_itemhis in order.history %}
+                    {% if loop.index0 <= toBreakIndex %}
+                        {% if _temp_itemhis.type == 1 and loop.index0 == 0 %} {# Type is order created #}
+                            {% set amount_due = _temp_itemhis.amount %}
+                        {% elseif loop.index0 > 0 %}
+                            {% if _temp_itemhis.stripeChargeId is not null %}
+                                {% set amount_due = amount_due - _temp_itemhis.amount %}
+                            {% elseif _temp_itemhis.stripeRefundId is not null %}
+                                {% set amount_due = amount_due + _temp_itemhis.amount %}
+                            {% else %}
+                                {% if checkHistoryType(itemhis.type) != constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderHistory::TYPE_PAYMENT_TEXT') %}
+                                    {% set amount_due = amount_due + (_temp_itemhis.amount) %}
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+                {{ 'currency.symbol'|trans() }}{{amount_due|number_format(2, '.', ',')}}
+                {% set total_amount_due = total_amount_due + (amount_due) %}
+
+            </td>
+            <td>{% if itemhis.user is not null %}{{ itemhis.user.username }}{% endif %}</td>
+            <td> 
+                <button data-id="{{itemhis.id}}" class="btn removePaymentRow" alt="Remove payment row" onclick="removePaymentRow_func(event, this)"> <i class="fa fa-times-circle" aria-hidden="true"></i> </button>
+            </td> 
+        </tr>
+    {% endfor %}
+    <tr>
+        <td colspan="5">{{ 'order.history.total'|trans() }}</td>
+        <td>{{ 'currency.symbol'|trans() }}{{ order.getOrderHistoryTotal()['addPayment'] }}</td>
+        <td>{{ 'currency.symbol'|trans() }}{{ order.getOrderHistoryTotal()['refundPayment'] }}</td>
+        <td>{{ 'currency.symbol'|trans() }}{{ order.getOrderHistoryTotal()['totalDue'] }}</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td colspan="5">{{ 'order.history.totaldue'|trans() }}</td>
+        <td>
+            <input type="hidden" value="{{ order.getOrderHistoryTotal()['totalDue'] }}" name="dl_amountDue" />
+            {{ 'currency.symbol'|trans() }}{{ order.getOrderHistoryTotal()['totalDue'] }}
+        </td>
+        <td colspan="3"></td>
+    </tr>
+</table>
+<style>
+.order-history table  .fullWidthCol {
+    white-space: nowrap;
+}
+button.btn.removePaymentRow {
+    color: #b70000;
+    box-shadow: none !important;
+}
+
+button.btn.removePaymentRow:hover {
+    color: red;
+}
+body#easyadmin-list-HistoryLog{
+    background: #292D42 !important;
+}
+</style>
+
+<script>
+function removePaymentRow_func(e, that){
+    e.preventDefault();
+    if (confirm('Are you sure?')) {
+        let paymentHistoryItem_id = $(that).data("id");
+        if ($(that).hasClass("loading-button")) { return; }
+        $(that).addClass("loading-button");
+        $.ajax({
+            url:'/admin/order/payment_history/delete',
+            type: "POST",
+            dataType: "json",
+            data: { "id": paymentHistoryItem_id },
+            async: false,
+            success: function (data) {
+                $( "div#_easyadmin_form_design_element_17" ).load( location.href + " div#_easyadmin_form_design_element_17" );
+                if(data.status == "deleted"){
+                    alert("Record Deleted!");
+                }else{
+                    alert(data.status);
+                }
+                $(that).removeClass("loading-button");
+
+            }
+        });
+    }
+    return false;
+}
+
+{# $(document).ready(function(){
+    $('body#easyadmin-list-HistoryLog').css('background', '#292D42');
+}) #}
+</script>

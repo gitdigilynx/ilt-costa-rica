@@ -1,0 +1,19 @@
+
+
+<input type="text"
+       name="{{
+       entity_config['nameInputArrayWrapper'] is defined ?
+       entity_config['nameInputArrayWrapper'] ~ '[' ~ field_options['arrayWrapperIndex'] ~ ']' ~ '[' ~ field_options['property'] ~ ']'
+       : field_options['property'] }}"
+        style="border: none;"
+        data-itemid="{{ item.id }}"
+        placeholder="passenger name"
+        maxlength="255"
+        class="passenger_name" 
+        {% if value is not null %}
+            value="{{ value }}" 
+        {% else %}
+            value="{{ item.order.firstname ~ ' ' ~ item.order.lastname }}" 
+        {% endif %}
+
+        required >

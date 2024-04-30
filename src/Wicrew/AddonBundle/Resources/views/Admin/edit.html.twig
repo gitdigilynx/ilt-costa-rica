@@ -1,0 +1,7 @@
+{% extends "easy_admin/edit.html.twig" %}
+
+{% block main %}
+    {{ parent() }}
+
+    {% include "@WicrewAddon/Admin/submit.js.html.twig" with { "entity": entity } %}
+{% endblock %}

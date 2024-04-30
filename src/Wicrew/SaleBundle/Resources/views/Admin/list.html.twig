@@ -1,0 +1,17 @@
+{% extends "@EasyAdmin/default/list.html.twig" %}
+
+{% set _entity_config = easyadmin_entity(app.request.query.get('entity')) %}
+
+{% if easyadmin_action_is_enabled_for_list_view('list', _entity_config.name) %}
+    {% set _action = easyadmin_get_action_for_list_view('list', _entity_config.name) %}
+    {% block new_action %}
+        <div class="button-action">
+            <a class="{{ _action.css_class|default('') }}"
+               href="{{ path('product_transportation', _request_parameters|merge({ action: 'list', "type": "private-shuttles" })) }}"
+               target="{{ _action.target }}">
+                {% if _action.icon %}<i class="fa fa-{{ _action.icon }}"></i>{% endif %}
+                {{ "sale.order.addnew"|trans(_trans_parameters) }}
+            </a>
+        </div>
+    {% endblock new_action %}
+{% endif %}

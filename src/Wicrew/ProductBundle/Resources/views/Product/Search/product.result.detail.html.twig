@@ -1,0 +1,170 @@
+<!-- Modal HTML embedded directly into document -->
+{# @see https://jquerymodal.com/ #}
+<div id="priceMatchModal" class="modal">
+    <p>Price Match Guarantee</p>
+
+    <p>If you see the same service we provide offered at a lower price from a competitor, we'll match it. It's that
+        simple!</p>
+
+    <p>It's Easy To Do</p>
+
+    <ol>
+        <li> Gather your information
+            Proof of the lower price you found through emails or website.</li>
+
+        <li> Send it to us
+            Email info@iltcostarica.com</li>
+
+        <li> We'll Review
+            We'll examine your materials and get in touch as soon as we can.</li>
+
+        <li> Receive your Price Match
+            If everything checks out, we'll match it. It's that simple.</li>
+    </ol>
+</div>
+<!-- Link to open the modal -->
+
+<div class="product-result-item clearfix"> 
+    <span class="pick_date" style="display: none;">{{ dateFrom }}</span>
+    <span class="pick_area" style="display: none;">{{ product.areaFrom.id }}</span>
+    <span class="drop_area" style="display: none;">{{ product.areaTo.id }}</span>
+    <div class="transportation-type {{ (transportTypes|length < 1) ? 'transportation-type-unset' : '' }}">
+        {{ product.transportationType.name }}
+    </div>
+
+    <div class="info-blocks">
+        <div class="image-block">
+            <div class="vehicle-name"><strong>{{ product.vehicleType.name }}</strong></div>
+            <img src="{{ app.request.getSchemeAndHttpHost() ~ vich_uploader_asset(product.vehicleType, 'imageFile') }}"     
+                title="{{ product.vehicleType.name }}" style="max-height: 150px;"/>
+        </div>
+        {% if constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_PRIVATE_SHUTTLE") ==  product.transportationType.id %}
+            <div class="product-info-block">
+                <div class="vehicle-type-title"><strong>What’s included</strong></div>
+                <div class="vehicle-type">
+                    {% if product.vehicleType.maxPassengerNumber %}                    
+                    <div class="vehicle-passenger vehicle-data">Spacious {{ product.vehicleType.maxPassengerNumber }} passenger van, full A/C</div>{% endif %} 
+                    <div class="vehicle-data">Personalized Meet & Greet Service Upon Arrival</div>
+                    <div class="vehicle-data">Door-to-Door Private Service</div>
+                    <div class="vehicle-data">Complimentary Bottled Water & Free WiFi</div>
+                    <div class="vehicle-data">Price Match Guarantee</div>
+                    <div class="vehicle-data">All-Inclusive Rates. No Hidden Charges</div> 
+                    <div class="vehicle-data">Complimentary stops at your leisure</div>   
+                </div>
+            </div> 
+        {% elseif constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_AIRPLANE")  ==  product.transportationType.id  %}
+            <div class="product-info-block">
+                <div class="vehicle-type-title"><strong>What’s included</strong></div>
+                <div class="vehicle-type">
+                    {% if product.vehicleType.maxPassengerNumber %}
+                        <div class="vehicle-passenger vehicle-data">Spacious {{ product.vehicleType.maxPassengerNumber }} passenger plane</div>
+                    {% endif %} 
+                    <div class="vehicle-data">Personalized Meet & Greet Service Upon Arrival</div> 
+                    <div class="vehicle-data">Complimentary Bottled Water</div>
+                    <div class="vehicle-data">Airport Taxes & Fees</div>
+                    <div class="vehicle-data">All-Inclusive Rates. No Hidden Charges</div>    
+                </div>
+                <br>
+                <div class="vehicle-type-title"><strong>Notes</strong></div>
+                <div class="vehicle-type"> 
+                    <div class="vehicle-data"> {{ product.vehicleType.notes|raw }} </div>   
+                </div>
+            </div> 
+        {% else %}
+            <div class="product-info-block">
+                <div class="vehicle-type-title">
+                    <strong>What’s included</strong>
+                </div>
+                <div class="vehicle-type">
+                    {{product.note | raw}}
+                </div>
+            </div> 
+        {% endif %}    
+        <div class="time-block">
+            <div class="time-hours"><strong>{{ 'time'|trans() }}</strong> {{ product.durationNoTrailingZeroes }}
+                {{ 'hours'|trans() }}</div>
+        </div>
+        <div class="btn-block price-private-shuttle-block text-left">
+            {#
+                <div class="time-price-text text-left">Price</div>
+            #}
+
+
+            {% set novemberFirst = "2023-11-01" %}
+            {% if dateFrom is defined %}
+                {% set dateFrom = dateFrom|date("Y-m-d") %}
+            {% else %}
+                {% set dateFrom = 'now'|date("Y-m-d") %}
+            {% endif %}
+
+            {% if product.transportationType.privateType %}
+                {% if dateFrom >= novemberFirst %}
+                    {% if product.novemberFixedRackPrice != 0 %}
+                        {# The date is equal to or greater than November 1st, 2023 #}
+                        {% set price = '$' ~ product.novemberFixedRackPrice ~ ' ' ~ getCurrencyTranslationKey()|trans() %}
+                    {% else %}
+                        {% set price = '$' ~ product.fixedRackPrice ~ ' ' ~ getCurrencyTranslationKey()|trans() %}
+                    {% endif %}
+
+                {% else %}
+                    {# The date is earlier than November 1st, 2023 #}
+                    {% set price = '$' ~ product.fixedRackPrice ~ ' ' ~ getCurrencyTranslationKey()|trans() %}
+                {% endif %}
+                {% set per_text = 'price.currency.perride'|trans() %}
+            {% else %}
+                {% if dateFrom >= novemberFirst %}
+                    {% if product.novemberAdultRackPrice != 0 %}
+                        {# The date is equal to or greater than November 1st, 2023 #}
+                        {% set price = '$' ~ product.novemberAdultRackPrice ~ ' ' ~ getCurrencyTranslationKey()|trans() %}
+                    {% else %}
+                        {% set price = '$' ~ product.adultRackPrice ~ ' ' ~ getCurrencyTranslationKey()|trans() %}
+                    {% endif %}
+
+                {% else %}
+                    {# The date is earlier than November 1st, 2023 #}
+                    {% set price = '$' ~ product.adultRackPrice ~ ' ' ~ getCurrencyTranslationKey()|trans() %}
+                {% endif %}
+                {% set per_text = 'price.currency.perperson'|trans() %}
+            {% endif %}
+            {# <div class="time-price">{{ price }}</div> #}
+            <div class="time-price"><span class="time-price-value">{{price}}</span> {{per_text}}</div>
+            {% if onlyOneBooking %}
+                {% if product.transportationType.id == 3 %}
+                    <button type="button" class="book_jbj_{{ product.transportationType }} btn-black" data-transportationtype="{{ product.transportationType.id }}" data-areafrom="{{ product.areaFrom.id }}" data-areato="{{ product.areaTo.id }}">{{ 'booknow'|trans() }}</button>                
+                {% elseif product.transportationType.id == 4 %}
+                    <button type="button" class="book_jbj_{{ product.transportationType }} btn-black" data-prodid="{{ product.id }}" data-transportationtype="{{ product.transportationType.id }}" data-areafrom="{{ product.areaFrom.id }}" data-areato="{{ product.areaTo.id }}">{{ 'booknow'|trans() }}</button>                
+                {% else %}                    
+                    <input type="submit" data-vehicletype="{{ product.vehicleType.id }}" value="{{ 'booknow'|trans() }}" class="book-now select-vehicle btn-black"/>
+                {% endif %}
+            
+            {% endif %}
+            <div class="ck-button" {{ onlyOneBooking ? 'hidden' : '' }}>
+                <label>
+                    <input type="checkbox" name="productIDs[]" value="{{ product.id }}"
+                        data-booking-number="{{ bookingNumber }}" data-area-reversed="{{ reverseAreas }}" />
+                    <span>{{ 'vehicle.select'|trans() }}</span>
+                </label>
+            </div>   
+        </div>  
+    </div> 
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        // Booking a Jeep Boat Jeep
+        $(document).on('click', '[class^=book_jbj_]', function () {
+            let transportationType  = $(this).data('transportationtype');
+            let areaFrom            = $(this).data('areafrom');
+            let areaTo              = $(this).data('areato');
+            let prodid              = $(this).data('prodid');
+        
+            redirectToBookingPage({
+                jbjType: transportationType,
+                areaFrom: areaFrom,
+                areaTo: areaTo,
+                prod_id: prodid
+
+            });
+        });
+    })
+</script>

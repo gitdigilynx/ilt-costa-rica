@@ -1,0 +1,11 @@
+block.block: Block
+block.tab.general: General
+block.group.information: Information
+block.title: Title
+block.identifier: Identifier
+block.type: Type
+block.type.option.content: Content
+block.type.option.template: Template
+block.content: Content
+block.custom_template: Custom template
+block.created_at: Created at

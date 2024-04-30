@@ -1,0 +1,25 @@
+{% extends "@WicrewCore/Email/main.email.html.twig" %}
+
+{% block titlemail %}{{ 'order.mail.assigndriver.subject'|trans() }}{% endblock %}
+
+{% block mailcontent %}
+    <div class="contact-content">
+        <div class="header-information">
+            {% if orderItem.supplier %}
+                {% set fromName = orderItem.supplier.bizName %}
+            {% else %}
+                {% set fromName = 'email.assigndriver.ilt'|trans() %}
+            {% endif %}
+            <div>{{ 'email.hi'|trans() }} {{ driver.bizName }}</div>
+            <div>{{ ('email.assigndriver.customer.head'|trans({ "{{ orderid }}": order.id }))|raw() }}</div>
+        </div>
+        <h3>{{ 'email.assigndriver.customer.updated'|trans() }}</h3>
+        {% set orderSet = [ orderItem ] %}
+        {% include "@WicrewSale/Admin/Form/order.item.detail.html.twig" with { "orderItems": orderSet } only %}
+        <div class="footer-information">
+            <div>{{ 'email.havequestion'|trans() }}</div>
+            <div>{{ 'email.thankyou'|trans() }}</div>
+            <div><img src="{{ absolute_url(asset('bundles/wicrewcore/images/logo.png')) }}" alt=""></div>
+        </div>
+    </div>
+{% endblock %}

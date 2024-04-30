@@ -1,0 +1,22 @@
+# Vehicle Bundle
+transportation.vehicletype: Vehicle types
+transportation.vehicletype.management: Vehicle types management
+transportation.type: Type
+transportation.vehicle.name: Name
+transportation.vehicle.passenger.max: QTY passengers
+transportation.vehicle.passenger.min: min QTY passengers
+transportation.luggages.accepted: QTY Luggages (Kg)
+vehicle.aircondition: Air Conditionning
+vehicle.enabled: Enabled
+
+vehicle.tab.general: General Information
+vehicle.tab.bussinessinformation: Business Information
+vehicle.form.transportationtype: Transportation type
+vehicle.form.name: Name
+vehicle.form.passenger.max: Amount of passengers Max
+vehicle.form.passenger.min: Amount of passengers Min
+vehicle.form.luggages.accepted: Amount of accepted luggages
+vehicle.form.luggages.accepted.help: Kg
+vehicle.form.catchysentence: Catchy sentence
+vehicle.form.image: Image
+vehicle.form.notes: Notes

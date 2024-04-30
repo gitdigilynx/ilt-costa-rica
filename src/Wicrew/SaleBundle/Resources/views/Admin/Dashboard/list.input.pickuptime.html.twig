@@ -1,0 +1,11 @@
+{% if item.pickArea.type != 1 and item.dropArea.type != 1 %}
+    {% set value =  item.pickTime %}
+{% endif %}
+<input type="text"
+        name="{{ entity_config['nameInputArrayWrapper'] is defined ? entity_config['nameInputArrayWrapper'] ~ '[' ~ field_options['arrayWrapperIndex'] ~ ']' ~ '[' ~ field_options['property'] ~ ']' : field_options['property'] }}" 
+        style="border: none; width: 100%" 
+        class="form_timepicker pickupTime" 
+        {% if value is not null %}
+            value="{{ value|formatNoNull("H:i") }}" 
+        {% endif %}
+/>

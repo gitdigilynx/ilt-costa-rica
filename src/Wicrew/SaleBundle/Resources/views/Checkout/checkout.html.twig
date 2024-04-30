@@ -1,0 +1,142 @@
+{% extends "base.html.twig" %}
+
+{% block title %}
+    {{ 'sale.checkout.title'|trans() }}
+{% endblock %}
+
+{% block body %}
+
+    <section class="page-header">
+        <div class="container">
+            <div class="d-flex content">
+                <div class="align-self-center">
+                    <h2>{{ 'sale.checkout.title'|trans }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="bg" style="background-image: url('{{ absolute_url(asset('bundles/wicrewcore/images/bg-cart-checkout.jpg')) }}');"></div>
+    </section>
+    {% set orderItemsStatus = [] %}
+    {% if order is defined and order is not null %}
+    
+        {% for order_item in order.items %}
+            {% set orderItemsStatus = orderItemsStatus|merge([order_item.status]) %}
+        {% endfor %}
+        {% set firstElement = orderItemsStatus[0] %}
+    {% endif %}
+
+    {% set allSame = false %}
+    
+    {% for _orderItemsStatus in orderItemsStatus %}
+        {% if _orderItemsStatus != firstElement %}
+            {% set allSame = true %}
+        {% endif %}
+    {% endfor %}
+    
+   
+    {% if isPaid %}
+        <div style="height: 400px; display: flex; align-items: center; justify-content: center; font-size: 22px;">This order(#RJ{{order.id}}) is already paid.</div>
+    {% elseif order is defined and order is not null and order.status == 2 %}
+        <div style="height: 400px; display: flex; align-items: center; justify-content: center; font-size: 22px;">This order(#RJ{{order.id}}) has been cancelled.</div>
+    {# {% elseif allSame is defined and allSame %}
+        <div style="height: 400px; display: flex; align-items: center; justify-content: center; font-size: 22px;">This order(#RJ{{order.id}}) has been cancelled.</div> #}
+    {% elseif bookings is empty %}
+        <div>{{ 'sale.checkout.empty'|trans() }}</div>
+    {% else %}
+        <div class="checkout-form">
+            {% if isPaymentMail is defined and isPaymentMail %}
+                {% set action_form = url('sale_checkout_mailpayment') %}
+            {% else %}
+                {% set action_form = url('sale_checkout_save') %}
+            {% endif %}
+            {{ form_start(form, {'attr': {'id': 'form_checkout', 'class': 'validate-form', 'autocomplete': 'off', 'novalidate': 'novalidate' , 'action': action_form}}) }}
+            {{ form_errors(form) }}
+            {{ form_widget(form._token) }}
+            <div class="checkout-section checkout-page booking-form">
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                            <a href="{{ url('sale_cart') }}">
+                                <div class="step-back">{{ 'booking.back'|trans() }}</div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row checkout-form-section">
+                        <div class="col-md-8 left-panel">
+                            {% include "@WicrewSale/Checkout/checkout.form.html.twig" %}
+                            <div class="payment-information-section">
+                                <h2>{{ 'sale.checkout.payment.title'|trans() }}</h2>
+                                
+                                <div id="loading_container" style="display: none;">
+                                    <div id="loading"></div>
+                                    <p>Processing payment, please wait...</p>
+                                </div>
+
+                                {% if isLoggedInAdmin and not isPaymentMail %}
+                                    <div class="quote-section">
+                                        <div  style="margin-bottom: 22px;">
+                                            <input type="checkbox" id="checkout_as_quote" name="form[checkout][checkout_as_quote]"/>
+                                            <label  style="font-weight: 500;" for="checkout_as_quote">{{ 'checkout.as.quote'|trans() }} with payment button</label>
+                                        </div> 
+                                        
+                                        <div  style="margin-bottom: 22px;">
+                                            <input type="checkbox" id="checkout_as_quote_withoutPaymentLink" name="form[checkout][checkout_as_quote_withoutPaymentLink]"/>
+                                            <label  style="font-weight: 500;" for="checkout_as_quote_withoutPaymentLink">{{ 'checkout.as.quote'|trans() }} without payment button</label>
+                                        </div> 
+                                        
+                                       
+                                        <div style="margin-bottom: 22px;">
+                                            <label for="payment-type" style="font-weight: 500;">{{ 'sale.checkout.payment_type'|trans() }}</label>
+                                            <select style="background: #f5f6f8;" id="payment-type" name="form[checkout][payment_type]">
+                                                {% for key, paymentType in paymentTypes %}
+                                                    <option value="{{ key }}"
+                                                            {% if key == constant('\\App\\Wicrew\\SaleBundle\\Entity\\Order::PAYMENT_TYPE_CREDIT_CARD') %}selected="selected"{% endif %}>{{ paymentType }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                <div class="stripe-section">
+                                    <div class="row no-gutters field_name">
+                                        <div class="col-12 col-md-3"><label for="card_name">{{ 'sale.checkout.cardLabel.name'|trans() }}:</label></div>
+                                        <div class="col-12 col-md-9"><input id="card_name"></div>
+                                    </div>
+                                    <div class="row no-gutters field_card">
+                                        <div class="col-12 col-md-3"><label>{{ 'sale.checkout.cardLabel.card'|trans() }}:</label></div>
+                                        <div class="col-12 col-md-9">
+                                            <div id="card-element"></div>
+                                            <div id="card-errors" role="alert"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="booking-btn-block checkout">
+                                    <div class="text-justify">
+                                        <div>
+                                            <input type="checkbox" required="required" name="term_and_conditions"/> By clicking the {{ 'sale.checkout.confirm.booking'|trans() }} button, you are confirming that the information you have entered is accurate and that you have read and agreed to the <a href="{{ absolute_url(asset('reservations-policy')) }}" target="_blank">Terms & Conditions</a>.
+                                        </div>
+                                    </div> 
+                                    <br>
+                                    <button type="submit" id="checkout_submit_button"
+                                            class="btn-black lg-btn">{{ 'sale.checkout.confirm.booking'|trans() }}</button>
+                                </div> 
+                            </div>
+                        </div>
+                        <div class="col-md-4 right-panel">
+                        {% if isPaymentMail is defined and isPaymentMail %}
+                            {% include "@WicrewSale/Booking/Base/summary.html.twig" with { "summaries": bookings, "discountValues": discountValues, "isPaymentMail": isPaymentMail, "order": order, "itemsCustomServices": itemsCustomServices  } only %}
+                        {% else %}
+                            {% include "@WicrewSale/Booking/Base/summary.html.twig" with { "summaries": bookings, "discountValues": discountValues, "isPaymentMail": isPaymentMail } only %}
+                        {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% include "@WicrewSale/Checkout/checkout.js.html.twig" %}
+{% endblock %}

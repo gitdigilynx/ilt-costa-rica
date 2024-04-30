@@ -1,0 +1,39 @@
+#index:
+#    path: /
+#    controller: App\Controller\DefaultController::index
+
+backend:
+  resource: '../src/Controller/AdminController.php'
+  prefix: /admin
+  type: annotation
+
+faqPrivateTransportation:
+    path:       /faq/private-transportation
+    controller: App\Wicrew\CoreBundle\Controller\Controller::faqPrivateTransportationAction
+    methods:    GET|HEAD
+
+faqJeepBoatJeepService:
+    path:       /faq/jeep-boat-jeep-service
+    controller: App\Wicrew\CoreBundle\Controller\Controller::faqJeepBoatJeepServiceAction
+    methods:    GET|HEAD
+
+faqWaterTaxi:
+    path:       /faq/water-taxi
+    controller: App\Wicrew\CoreBundle\Controller\Controller::faqWaterTaxiAction
+    methods:    GET|HEAD      
+
+faqPrivateDomesticFlights:
+    path:       /faq/private-domestic-flights
+    controller: App\Wicrew\CoreBundle\Controller\Controller::faqPrivateDomesticFlightsAction
+    methods:    GET|HEAD
+
+faqActivities:
+    path:       /faq/activities
+    controller: App\Wicrew\CoreBundle\Controller\Controller::faqActivitiesAction
+    methods:    GET|HEAD
+
+pageNotFound:
+    path:  /{path}
+    controller: App\Wicrew\CoreBundle\Controller\Controller::pageNotFoundAction
+    requirements:
+        path: .*

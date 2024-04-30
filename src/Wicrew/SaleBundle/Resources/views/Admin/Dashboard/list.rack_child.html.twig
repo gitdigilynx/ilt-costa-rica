@@ -1,0 +1,11 @@
+{% if item.type is same as "private_shuttle" %}
+    --
+{% elseif item.type is same as "activity_regular"  %}
+    {% if item.activityType == "Group" %}
+        ${{ ( (item.childCount * item.activity.groupKidRackPrice) )|number_format(2, '.', ',') }}
+    {% else %}
+        ${{ ( (item.childCount * item.activity.childRackPrice) )|number_format(2, '.', ',') }}
+    {% endif %}
+{% elseif item.type is same as "shared_jbj" %}
+    ${{ ( (item.childCount * item.product.childRackPrice) )|number_format(2, '.', ',') }}
+{% endif %}

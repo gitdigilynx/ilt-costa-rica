@@ -1,0 +1,99 @@
+# Area
+area.title: Area
+area.tab.general: General
+area.type: Type
+area.type.option.airport: Airport
+area.type.option.area: Area
+area.name: Name
+areas.title: Areas
+
+# Product bundle
+product.transportation: Transportation
+product.products: Products
+product.management: Products management
+product.vehicle: Vehicle
+product.areafrom: Area from
+product.areato: Area to
+product.form.enabled: Enabled
+
+product.tab.general: General information
+product.form.transportationtype: Transportation type
+product.form.areafrom: Area from
+product.form.areato: Area to
+product.form.vehicle: Vehicle Type
+product.form.duration: Duration
+product.form.duration.help: Travelling time (hrs)
+product.form.note: Note
+product.section.pricingrates: Pricing and Rates
+product.form.rackrate: Rack Rate
+product.form.netrate: Net Rate
+product.form.rentprice: Rent price
+product.form.adultrackprice: Adult rack price
+product.form.adultnetprice: Adult net price
+product.form.kidrackprice: Kid rack price
+product.form.kidnetprice: Kid net price
+product.form.vehiclerackprice: Vehicle rack price
+product.form.vehiclenetprice: Vehicle net price
+product.form.infantrackprice: Infant rack price
+product.form.infantnetprice: Infant net price
+product.form.departuretime: Departure time
+product.form.tax: Tax
+product.tab.addons: Addons
+product.form.addons: Addons
+
+product.duplicate.successful: Product was succesfully duplicated. Please remember to save it.
+
+#Frontend
+one-way: One way
+round-trip: Roundtrip
+multi-destination: Multi destination
+product.passenger.number.adults: Adults
+product.passenger.number.children: Childrens
+product.passenger.number.infants: Infants
+product.passenger.number.children.note: Aged 12+
+product.passenger.number.infants.note: (With baby/kids seat)
+product.search: Search
+vehicle.passenger: passengers
+vehicle.luggage.weight: medium suitcases
+vehicle.aircondition: Air conditioning
+from: From
+to: To
+time: Time
+price: Price
+hours: Hours
+price.currency.perride: USD + TX PER RIDE
+price.currency.perperson: USD + TX PER PERSON
+price.currency.usd.tx: USD + TX
+booknow: Book Now
+vehicle.select: Select vehicle
+vehicle.noresult: Not found any vehicle
+rate: Rate
+per.person: Per Person
+
+product.watertaxi: Water Taxi Boat
+departure.jbj.time.note: (departure time varies depending on hotel pick-up location)
+approx: Approx
+hours.total: hours total
+product.jbj: JEEP - BOAT - JEEP
+product.jbj.jeep-boat-jeep-shared: Shared Service
+product.jbj.jeep-boat-jeep-private: Private Service
+product.jbj.jeep-boat-jeep-riding: Horseback Riding
+product.jbj.departs: Departs
+product.jbj.duration: Duration
+product.jbj.includes: Includes
+product.jbj.departs.anytime: Departs anytime
+product.jbj.freestyle: You choose the time, and we'll be there.
+product.watertaxi.departdaily: Departs daily
+product.share.shuttle: Shared Shuttles
+product.private.shuttle: Private Shuttles
+product.jeepboatjeep: Jeep-Boat-Jeep
+product.water.taxi: Water Taxi Boat
+product.private.flights: Private Flights
+product.private.head: Private <br>transportation
+product.private.head.desc: Reliable, Convenient &amp; Safe
+product.shared.head: Premium <br>shared shuttles
+product.shared.head.desc: Daily Departure. Flexible Schedule.
+product.flight.head: Private flights
+product.flight.head.desc: Memorable Experiences. Luxurious Flying.
+search.atleast.adult: Please add Adult number
+please.select.a.vehicle: Please select a vehicle

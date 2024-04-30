@@ -1,0 +1,516 @@
+easy_admin: 
+    entities:
+        Dashboard:
+            permissions: 'ROLE_EMPLOYEE'
+            disabled_actions: ['show', 'new', 'delete', 'edit']
+            title: 'Dashboard'
+            label: 'Dashboard'
+            icon: 'car'
+            class: 'App\Wicrew\SaleBundle\Entity\OrderItem'
+            controller: 'App\Controller\Admin\DashboardController'
+            templates:
+                list: '@WicrewSale/Admin/Dashboard/list.html.twig'
+            search:
+                fields: 
+                    - { property: 'orderId' }
+                    - { property: 'status' }                    
+                    - { property: 'passengerQty', type: 'App\Wicrew\SaleBundle\Form\Filter\TransportManagement\TotalPassengers', mapped: 'true' }
+                    - { property: 'dlOrder.items.pickDate' }
+                    - { property: 'confirmationStatus' }
+                    - { property: 'pickArea.name' }
+                    - { property: 'dropArea.name' }
+                    - { property: 'pickFlightNumber' }
+                    - { property: 'pickAirlineCompany' }
+                    - { property: 'supplier.bizName' }
+                    - { property: 'vehicle.vehicleType.name' }
+                    - { property: 'vehicle.name' }
+                    - { property: 'supplierCommission' }
+                    - { property: 'titleRackPrice' }
+                    - { property: 'titleNetPrice' }
+                    - { property: 'totalTax' }
+                    - { property: 'pickTime' }
+                    - { property: 'pickTimeTransport' }
+                    - { property: 'dropAddress' }
+                    - { property: 'pickAddress' }
+                    - { property: 'totalRackPrice', type: 'App\Wicrew\SaleBundle\Form\Filter\TransportManagement\TotalRackWithTax', mapped: 'true' }
+                    - { property: 'dlOrder.firstName' }
+                    - { property: 'dlOrder.lastName' }
+                    - { property: 'type' }
+
+                    - { property: 'order_status', type: 'App\Wicrew\SaleBundle\Form\Filter\ActivityManagement\OrderStatusType', mapped: 'true' }
+                    
+            list:
+                dql_filter: 'entity.status != 2 AND entity.archiveStatus != 1'
+                fields:
+                    - { property: 'type', label: 'Type', template: 'WicrewSaleBundle:Admin/Dashboard:transportation_type.html.twig' }
+                    - { property: 'status', label: 'Billing status', template: 'WicrewSaleBundle:Admin/Dashboard:list.item_status.html.twig' }
+                    - { property: 'serviceType', label: 'transport_management.label.service_type', mapped: false, template: 'WicrewSaleBundle:Admin/Dashboard:list.service_type.html.twig' }
+                    - { property: 'booking', label: 'Booking', mapped: false, template: 'WicrewSaleBundle:Admin/Dashboard:list.booking.html.twig' }
+                    - { property: 'pickDate', label: 'Pickup date', template: 'WicrewSaleBundle:Admin/Dashboard:list.input.text.html.twig' }
+                    - { property: 'pickTimeTransport', label: 'Pickup time', template: 'WicrewSaleBundle:Admin/Dashboard:list.input.pickuptime.html.twig' }
+                    - { property: 'pickTime', label: 'Arrival', template: 'WicrewSaleBundle:Admin/Dashboard:list.input.arrivaltime.html.twig' }
+                    - { type: choice, label: 'Detarture', template: 'WicrewSaleBundle:Admin/Dashboard:list.input.departuretime.html.twig' }
+                    - { property: 'passengerQty', label: 'Passenger Qty', mapped: false, template: '@WicrewSale/Admin/Dashboard/list.totalPassengerQty.html.twig' }
+                    - { property: 'pickArea.name', label: 'Pickup Area', template: '@WicrewSale/Admin/Dashboard/list.pickUpAreaName.html.twig'  }
+                    - { property: 'pickAddress', label: 'Pickup location', template: 'WicrewSaleBundle:Admin/Dashboard:list.input.google_place.html.twig' }
+                    - { property: 'dropArea.name', label: 'Drop-off Area', template: '@WicrewSale/Admin/Dashboard/list.dropOffAreaName.html.twig'  }
+                    - { property: 'dropAddress', label: 'Drop-off location', template: 'WicrewSaleBundle:Admin/Dashboard:list.input.google_place.html.twig' }
+                    - { property: 'supplier.id', label: 'Supplier', template: '@WicrewSale/Admin/Dashboard/list.supplier.html.twig' }
+                    - { property: 'vehicle.vehicleType.id', label: 'Vehicle type', template: '@WicrewSale/Admin/Dashboard/list.vehicle.type.html.twig'}
+                    - { property: 'vehicle.id', label: 'Vehicle', template: '@WicrewSale/Admin/Dashboard/list.order_vehicle.html.twig' }
+                    - { property: 'confirmationStatus', label: 'Confirmation status', mapped: false, template: '@WicrewSale/Admin/Dashboard/list.confirmation_status.html.twig' }
+                    - { property: 'passengerName', label: 'Passenger name', template: '@WicrewSale/Admin/Dashboard/list.customer_name.html.twig' }
+                    - { property: 'pickAirlineCompany', label: 'Airline', template: 'WicrewSaleBundle:Admin/Dashboard:list.input.text.html.twig' }
+                    - { property: 'pickFlightNumber', label: 'Flight', template: 'WicrewSaleBundle:Admin/Dashboard:list.input.text.html.twig' }
+                    - { property: 'supplierCommission', width: '100px', maxLength: '5', label: 'Commission (%)' } 
+                    - { property: 'adultRackPrice', label: 'Rack rate (A)', template: '@WicrewSale/Admin/Dashboard/list.rack_adult.html.twig'  }
+                    - { property: 'childRackPrice', label: 'Rack rate (C)', template: '@WicrewSale/Admin/Dashboard/list.rack_child.html.twig'  }
+                    - { property: 'totalTax', label: 'Tax', template: '@WicrewSale/Admin/Dashboard/list.item_tax.html.twig' }
+                    - { property: 'totalRackPrice', label: 'Total rack', mapped: false, template: '@WicrewSale/Admin/Dashboard/list.total_rack.html.twig' }
+                    - { property: 'titleNetPrice', label: 'Net rate', template: '@WicrewSale/Admin/Dashboard/list.item_netPrice.html.twig' }
+                    - { property: 'totalNetPrice', label: 'Total Net', mapped: false, template: '@WicrewSale/Admin/Dashboard/list.total_net.html.twig' }
+                    - { property: 'editLink', label: 'Actions', mapped: false, template: '@WicrewSale/Admin/Dashboard/list.edit_link.html.twig' }
+                filters: 
+                    -   property: 'type'
+                        type: choice
+                        choices:
+                            'Transportation': 'private_shuttle'
+                            'Activities': 'activity_regular'
+                            'Combo': 'combo'
+                    -   property: 'status'
+                        label: 'Billing Status'
+                        type: choice
+                        choices:
+                            'order_item.status.option.unpaid': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::STATUS_UNPAID
+                            'order_item.status.option.paid': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::STATUS_PAID
+                            'order_item.status.option.cancelled': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::STATUS_CANCELLED
+                    -   property: 'confirmationStatus'
+                        label: 'Confirmation Status'
+                        type: choice
+                        choices:
+                            'management.order.confirmation.unassigned': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::CONFIRMATION_STATUS_UNASSIGNED
+                            'management.order.confirmation.assigned': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::CONFIRMATION_STATUS_ASSIGNED
+                            'management.order.confirmation.approved': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::CONFIRMATION_STATUS_APPROVED
+                            'management.order.confirmation.confirmed': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::CONFIRMATION_STATUS_CONFIRMED
+                    # -   property: 'booking'
+                    #     mapped: false
+                    #     type: 'App\Wicrew\SaleBundle\Form\Filter\ActivityManagement\BookingType'
+                    - { property: 'passengerName' }
+                    - { property: 'adultCount' }
+                    - { property: 'childCount' }
+                    # -   property: 'passengerQty'
+                    #     mapped: false
+                    #     type: 'App\Wicrew\SaleBundle\Form\Filter\TransportManagement\TotalPassengers'
+                    #     label: 'Passengers Qty.'                    
+                    - { property: 'pickDate' }
+                    - { property: 'pickArea' }
+                    - { property: 'pickAddress' }
+                    - { property: 'dropArea' }
+                    - { property: 'dropAddress' }
+                    - { property: 'pickAirlineCompany' } 
+                    - { property: 'pickFlightNumber' } 
+                    - { property: 'pickTime', label: 'management.order.pickTime' }  
+                    - { property: 'pickTimeTransport', label: 'management.order.pickTimeTransport' }  
+                    -   property: 'order_supplier_id'
+                        label: 'management.order.partner.biz_name'
+                        mapped: false
+                        type: 'App\Wicrew\SaleBundle\Form\Filter\ActivityManagement\PartnerType'
+                        type_options:
+                            expanded: false
+                            multiple: false 
+                    -   property: 'order_vehicle_id'
+                        label: 'management.order.vehicle'
+                        mapped: false
+                        type: 'App\Wicrew\SaleBundle\Form\Filter\ActivityManagement\VehicleType'
+                        type_options:
+                            expanded: false
+                            multiple: false   
+                    -   property: 'supplierCommission' 
+                    - { property: 'titleRackPrice', label: 'management.rack_rate' }
+                    - { property: 'titleNetPrice', label: 'management.net_rate' }
+                    - { property: 'totalTax', label: 'management.tax_value' }
+                   
+                sort: ['orderId', 'DESC']
+
+        TransportationManagement:
+            permissions: 'ROLE_EMPLOYEE'
+            disabled_actions: ['show', 'new', 'delete', 'edit']
+            label: 'transport_management.label.title'
+            icon: 'car'
+            class: 'App\Wicrew\SaleBundle\Entity\OrderItem'
+            controller: 'App\Wicrew\SaleBundle\Controller\Admin\TransportationManagementController'
+            templates:
+                list: '@WicrewSale/Admin/TransportationManagement/list.html.twig'
+            search:
+                fields: 
+                    - { property: 'orderId' }
+                    - { property: 'status' }
+                    - { property: 'confirmationStatus' }
+                    - { property: 'pickArea.name' }
+                    - { property: 'dropArea.name' }
+                    - { property: 'pickFlightNumber' }
+                    - { property: 'pickAirlineCompany' }
+                    - { property: 'supplier.bizName' }
+                    - { property: 'vehicle.vehicleType.name' }
+                    - { property: 'vehicle.name' }
+                    - { property: 'supplierCommission' }
+                    - { property: 'titleRackPrice' }
+                    - { property: 'titleNetPrice' }
+                    - { property: 'totalTax' }
+                    - { property: 'pickTime' }
+                    - { property: 'pickTimeTransport' }
+                    - { property: 'dropAddress' }
+                    - { property: 'pickAddress' }
+                    - { property: 'totalRackPrice', type: 'App\Wicrew\SaleBundle\Form\Filter\TransportManagement\TotalRackWithTax', mapped: 'true' }
+                    - { property: 'dlOrder.firstName' }
+                    - { property: 'dlOrder.lastName' }
+                    - { property: 'order_status', type: 'App\Wicrew\SaleBundle\Form\Filter\ActivityManagement\OrderStatusType', mapped: 'true' }
+                    
+            list:
+                filters: 
+                    -   property: 'status'
+                        type: choice
+                        choices:
+                            'order_item.status.option.unpaid': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::STATUS_UNPAID
+                            'order_item.status.option.paid': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::STATUS_PAID
+                            'order_item.status.option.cancelled': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::STATUS_CANCELLED
+                    -   property: 'order_status'
+                        label: 'management.order_status'
+                        mapped: false
+                        type: 'App\Wicrew\SaleBundle\Form\Filter\ActivityManagement\OrderStatusType'
+                        type_options:
+                            expanded: false
+                            multiple: false
+                    -   property: 'booking'
+                        mapped: false
+                        type: 'App\Wicrew\SaleBundle\Form\Filter\ActivityManagement\BookingType'
+                    -   property: 'customerName'
+                        mapped: false
+                        type: 'App\Wicrew\SaleBundle\Form\Filter\ActivityManagement\CustomerNameType'
+                    - { property: 'adultCount' }
+                    - { property: 'childCount' }
+                    - { property: 'pickDate' }
+                    - { property: 'pickArea' }
+                    - { property: 'pickAddress' }
+                    - { property: 'dropArea' }
+                    - { property: 'dropAddress' }
+                    - { property: 'pickAirlineCompany' } 
+                    - { property: 'pickFlightNumber' } 
+                    - { property: 'pickTime', label: 'management.order.pickTime' }  
+                    - { property: 'pickTimeTransport', label: 'management.order.pickTimeTransport' }  
+                    -   property: 'order_supplier_id'
+                        label: 'management.order.partner.biz_name'
+                        mapped: false
+                        type: 'App\Wicrew\SaleBundle\Form\Filter\ActivityManagement\PartnerType'
+                        type_options:
+                            expanded: false
+                            multiple: false 
+                    -   property: 'order_vehicle_id'
+                        label: 'management.order.vehicle'
+                        mapped: false
+                        type: 'App\Wicrew\SaleBundle\Form\Filter\ActivityManagement\VehicleType'
+                        type_options:
+                            expanded: false
+                            multiple: false   
+                    -   property: 'send_mail'
+                        label: 'management.order.sendmail'
+                        mapped: false
+                        type: 'App\Wicrew\SaleBundle\Form\Filter\ActivityManagement\SendMailType'
+                        type_options:
+                            expanded: false
+                            multiple: false  
+                    -   property: 'supplierCommission' 
+                    - { property: 'titleRackPrice', label: 'management.rack_rate' }
+                    - { property: 'titleNetPrice', label: 'management.net_rate' }
+                    - { property: 'totalTax', label: 'management.tax_value' }
+                    -   property: 'totalRackPrice'
+                        mapped: false
+                        type: 'App\Wicrew\SaleBundle\Form\Filter\TransportManagement\TotalRackWithTax'
+                        label: 'management.total_rack'
+                    # - { property: 'subtotalRack', label: 'management.total_rack' }
+                    # - { property: 'subtotalNet', label: 'management.total_net' }
+                    -   property: 'totalNetPrice'
+                        mapped: false
+                        type: 'App\Wicrew\SaleBundle\Form\Filter\TransportManagement\TotalNetWithTax'
+                        label: 'management.total_net'
+                     
+                title: 'transport_management.label.title'
+                # dql_filter: 'entity.product IS NOT NULL AND entity.status != 3 AND orderParent.quote = 0'
+                dql_filter: 'entity.product IS NOT NULL AND entity.status != 3'
+                fields:
+                    - { property: 'status', label: 'management.status', template: 'WicrewSaleBundle:Admin/Management:list.item_status.html.twig' }
+                    # - { property: 'order.status', label: 'management.order_status', template: '@WicrewSale/Admin/field.status.html.twig' }
+                    - { property: 'confirmationStatus', label: 'management.order_status', mapped: false, template: '@WicrewSale/Admin/ActivityManagement/list.confirmation_status.html.twig' }
+                    - { property: 'booking', label: 'management.order.id', mapped: false, template: 'WicrewSaleBundle:Admin/Management:list.booking.html.twig' }
+                    - { property: 'customerName', label: 'management.order.name', mapped: false, template: '@WicrewSale/Admin/Management/list.customer_name.html.twig' }
+                    - { property: 'adultCount', label: 'management.number_of_adult' }
+                    - { property: 'childCount', label: 'management.number_of_kid' }
+                    - { property: 'pickDate', label: 'management.pick_up_date', template: 'WicrewSaleBundle:Admin/Management:list.input.text.html.twig' }
+                    - { property: 'pickArea.name', label: 'management.pick_up_area.name' }
+                    - { property: 'pickAddress', label: 'management.pick_up_address' }
+                    - { property: 'dropArea.name', label: 'management.drop_off_area.name' }
+                    - { property: 'dropAddress', label: 'management.drop_address' }
+                    - { property: 'pickAirlineCompany', label: 'transport_management.label.airline' }
+                    - { property: 'pickFlightNumber', label: 'transport_management.label.flight' }
+                    - { property: 'pickTime', label: 'management.pick_up_time', template: 'WicrewSaleBundle:Admin/Management:list.input.text.html.twig' }
+                    - { property: 'pickTimeTransport', label: 'management.pick_up_time_transport', template: 'WicrewSaleBundle:Admin/Management:list.input.text.html.twig' } 
+                    - { property: 'supplier.id', label: 'management.order.partner.biz_name', template: '@WicrewSale/Admin/Management/list.supplier.html.twig' }
+                    - { property: 'product.vehicle.type', label: 'management.order.vehicle.type', template: '@WicrewSale/Admin/TransportationManagement/list.vehicle.type.html.twig'}
+                    - { property: 'vehicle.id', label: 'transport_management.label.select_vehicle', template: '@WicrewSale/Admin/TransportationManagement/list.order_vehicle.html.twig' }
+                    # - { property: 'sendEmail', label: 'transport_management.label.email_driver', mapped: false, template: '@WicrewSale/Admin/TransportationManagement/list.order_send_email.html.twig' }
+                    - { property: 'supplierCommission', width: '100px', maxLength: '5', label: 'management.order.partner.commission', template: 'WicrewSaleBundle:Admin/Management:list.input.text.html.twig' } 
+                    - { property: 'titleRackPrice', label: 'management.rack_rate' }
+                    - { property: 'titleNetPrice', label: 'management.net_rate' }
+                    - { property: 'totalTax', label: 'management.tax' }
+                    - { property: 'totalRackPrice', label: 'management.total_rack', mapped: false, template: '@WicrewSale/Admin/TransportationManagement/list.total_rack.html.twig' }
+                    - { property: 'totalNetPrice', label: 'management.total_net', mapped: false, template: '@WicrewSale/Admin/TransportationManagement/list.total_net.html.twig' }
+                    - { property: 'editLink', label: false, mapped: false, template: '@WicrewSale/Admin/TransportationManagement/list.edit_link.html.twig' }
+            
+        ActivityManagement:
+            permissions: 'ROLE_EMPLOYEE'
+            disabled_actions: ['show', 'new', 'delete', 'edit']
+            label: 'activity_management.label'
+            icon: 'subway'
+            class: 'App\Wicrew\SaleBundle\Entity\OrderItem'
+            controller: 'App\Wicrew\SaleBundle\Controller\Admin\ActivityManagementController'
+            templates:
+                list: '@WicrewSale/Admin/ActivityManagement/list.html.twig'
+            list:
+                filters:
+                    -   property: 'status'
+                        type: choice
+                        choices:
+                            'order_item.status.option.unpaid': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::STATUS_UNPAID
+                            'order_item.status.option.paid': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::STATUS_PAID
+                            'order_item.status.option.cancelled': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::STATUS_CANCELLED
+                    -   property: 'order_status'
+                        label: 'management.order_status'
+                        mapped: false
+                        type: 'App\Wicrew\SaleBundle\Form\Filter\ActivityManagement\OrderStatusType'
+                        type_options:
+                            expanded: false
+                            multiple: false
+                    -   property: 'booking'
+                        mapped: false
+                        type: 'App\Wicrew\SaleBundle\Form\Filter\ActivityManagement\BookingType'
+                    -   property: 'type'
+                        type: choice
+                        label: 'transport_management.label.service_type'
+                        choices:
+                            'order_item.type.option.private_shuttle': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::TYPE_PRIVATE_SHUTTLE
+                            'order_item.type.option.shared_shuttle': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::TYPE_SHARED_SHUTTLE
+                            'order_item.type.option.private_flight': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::TYPE_PRIVATE_FLIGHT
+                            'order_item.type.option.private_jbj': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::TYPE_PRIVATE_JBJ
+                            'order_item.type.option.shared_jbj': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::TYPE_SHARED_JBJ
+                            'order_item.type.option.riding_jbj': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::TYPE_RIDING_JBJ
+                            'order_item.type.option.water_taxi': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::TYPE_WATER_TAXI
+                            'order_item.type.option.activity_regular': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::TYPE_ACTIVITY_REGULAR
+                            'order_item.type.option.activity_transportation': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::TYPE_ACTIVITY_TRANSPORTATION
+                    -   property: 'activity'
+                        mapped: false
+                        type: 'App\Wicrew\SaleBundle\Form\Filter\ActivityManagement\ActivityNameType'
+                    -   property: 'customerName'
+                        mapped: false
+                        type: 'App\Wicrew\SaleBundle\Form\Filter\ActivityManagement\CustomerNameType'
+                    - { property: 'adultCount' }
+                    - { property: 'childCount' }
+                    - { property: 'pickDate' }
+                    - { property: 'pickArea' }
+                    - { property: 'pickAddress' }
+                    - { property: 'dropAddress' }
+                    - { property: 'pickTime' }
+                    - { property: 'tourTime' }
+                    -   property: 'order_supplier_id'
+                        label: 'management.order.partner.biz_name'
+                        mapped: false
+                        type: 'App\Wicrew\SaleBundle\Form\Filter\ActivityManagement\PartnerType'
+                        type_options:
+                            expanded: false
+                            multiple: false
+                    -   property: 'order_supplier_email'
+                        label: 'management.supplier_email'
+                        mapped: false
+                        type: 'App\Wicrew\SaleBundle\Form\Filter\ActivityManagement\PartnerEmailType'
+                        type_options:
+                            expanded: false
+                            multiple: false
+                    -   property: confirmationStatus
+                        type: choice
+                        choices:
+                            'management.order.confirmation.unassigned': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::CONFIRMATION_STATUS_UNASSIGNED
+                            'management.order.confirmation.assigned': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::CONFIRMATION_STATUS_ASSIGNED
+                            'management.order.confirmation.approved': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::CONFIRMATION_STATUS_APPROVED
+                            'management.order.confirmation.confirmed': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::CONFIRMATION_STATUS_CONFIRMED
+                    -   property: 'driver_id'
+                        label: 'management.affiliate'
+                        mapped: false
+                        type: 'App\Wicrew\SaleBundle\Form\Filter\ActivityManagement\AffiliateType'
+                        type_options:
+                            expanded: false
+                            multiple: false 
+                    -   property: 'supplierCommission'
+                        mapped: false
+                        type: 'App\Wicrew\SaleBundle\Form\Filter\ActivityManagement\SupplierCommissionType'
+                    - { property: 'adultRackPrice', label: 'management.adult_rack_price' }
+                    - { property: 'childRackPrice', label: 'management.child_rack_price' }
+                    - { property: 'adultNetPrice',  label: 'management.adult_net_price' }
+                    - { property: 'childNetPrice', label: 'management.child_net_price' }
+                    - { property: 'taxValue', label: 'management.tax_value' }
+                    - { property: 'subtotalRack', label: 'management.total_rack' }
+                    - { property: 'subtotalNet', label: 'management.total_net' }
+                title: 'activity_management.label'
+                dql_filter: 'entity.activity IS NOT NULL AND entity.status != 3'
+                fields:
+                    - { property: 'status', label: 'management.status', template: 'WicrewSaleBundle:Admin/Management:list.item_status.html.twig' }
+                    # - { property: 'order.status', label: 'management.order_status', mapped: false, template: '@WicrewSale/Admin/field.status.html.twig' }
+                    - { property: 'confirmationStatus', label: 'management.order_status', mapped: false, template: '@WicrewSale/Admin/ActivityManagement/list.confirmation_status.html.twig' }
+                    - { property: 'booking', label: 'management.order.id', mapped: false, template: 'WicrewSaleBundle:Admin/Management:list.booking.html.twig' }
+                    - { property: 'serviceType', label: 'transport_management.label.service_type', mapped: false, template: 'WicrewSaleBundle:Admin/ActivityManagement:list.service_type.html.twig' }
+                    - { property: 'activity', label: 'activity.title', mapped: false, template: 'WicrewSaleBundle:Admin/ActivityManagement:list.activity.html.twig' }
+                    - { property: 'customerName', label: 'management.order.name', mapped: false, template: '@WicrewSale/Admin/Management/list.customer_name.html.twig' }
+                    - { property: 'adultCount', label: 'management.number_of_adult' }
+                    - { property: 'childCount', label: 'management.number_of_kid' }
+                    - { property: 'pickDate', label: 'management.pick_up_date', template: 'WicrewSaleBundle:Admin/Management:list.input.text.html.twig' }
+                    - { property: 'pickArea.name', label: 'management.pick_up_area.name' }
+                    - { property: 'pickAddress', label: 'management.pick_up_address' }
+                    - { property: 'dropAddress', label: 'management.drop_address' }
+                    - { property: 'pickTime', label: 'management.pick_up_time', template: 'WicrewSaleBundle:Admin/Management:list.input.text.html.twig' }
+                    - { property: 'tourTime', label: 'management.tour_time', template: 'WicrewSaleBundle:Admin/Management:list.input.text.html.twig' }
+                    - { property: 'supplier.id', label: 'management.order.partner.biz_name', template: '@WicrewSale/Admin/Management/list.supplier.html.twig' }
+                    - { property: 'supplier.email', label: 'management.supplier_email', template: '@WicrewSale/Admin/Management/list.supplier.email.html.twig' }
+                    # - { property: 'confirmationStatus', label: 'management.order.confirmation_status', mapped: false, template: '@WicrewSale/Admin/ActivityManagement/list.confirmation_status.html.twig' }
+                    - { property: 'activity.driver.id', label: 'management.affiliate', template: '@WicrewSale/Admin/Management/list.affiliate.html.twig' }
+                    - { property: 'vehicle.id', label: 'transport_management.label.select_vehicle', template: '@WicrewSale/Admin/TransportationManagement/list.order_vehicle.html.twig' }
+                    # - { property: 'sendEmail', label: 'transport_management.label.email_driver', mapped: false, template: '@WicrewSale/Admin/TransportationManagement/list.order_send_email.html.twig' }
+                    - { property: 'supplierCommission', width: '100px', maxLength: '5', label: 'management.order.partner.commission', template: 'WicrewSaleBundle:Admin/Management:list.input.text.html.twig' }
+                    - { property: 'adultRackPrice', label: 'management.adult_rack_price', template: '@WicrewSale/Admin/ActivityManagement/field.totalprice.html.twig'   }
+                    - { property: 'childRackPrice', label: 'management.child_rack_price', template: '@WicrewSale/Admin/ActivityManagement/field.totalprice.html.twig'   }
+                    - { property: 'adultNetPrice', label: 'management.adult_net_price', template: '@WicrewSale/Admin/ActivityManagement/field.totalprice.html.twig'   }
+                    - { property: 'childNetPrice', label: 'management.child_net_price', template: '@WicrewSale/Admin/ActivityManagement/field.totalprice.html.twig'   }
+                    - { property: 'taxValue', label: 'management.tax_value' }
+                    - { property: 'subTotalRack', label: 'management.total_rack', template: '@WicrewSale/Admin/ActivityManagement/field.totalprice.html.twig'   }
+                    - { property: 'subTotalNet', label: 'management.total_net', template: '@WicrewSale/Admin/ActivityManagement/field.totalprice.html.twig'   }
+                    - { property: 'editLink', label: false, mapped: false, template: '@WicrewSale/Admin/ActivityManagement/list.edit_link.html.twig' }
+            search:
+                fields: 
+                    - { property: 'orderId' }
+                    - { property: 'status' }
+                    - { property: 'confirmationStatus' }
+                    - { property: 'pickArea.name' }
+                    - { property: 'dropArea.name' }
+                    - { property: 'supplier.bizName' }
+                    - { property: 'vehicle.name' }
+                    - { property: 'supplierCommission' }
+                    - { property: 'adultRackPrice' }
+                    - { property: 'childRackPrice' }
+                    - { property: 'adultNetPrice' }
+                    - { property: 'childNetPrice' }
+                    - { property: 'taxValue' }
+                    - { property: 'subtotalRack' }
+                    - { property: 'subtotalNet' }
+                    - { property: 'pickTime' }
+                    - { property: 'tourTime' }
+                    - { property: 'dropAddress' }
+                    - { property: 'pickAddress' }
+                    - { property: 'customerName', type: 'App\Wicrew\SaleBundle\Form\Filter\ActivityManagement\CustomerNameType', mapped: 'true' }
+                    - { property: 'order_status', type: 'App\Wicrew\SaleBundle\Form\Filter\ActivityManagement\OrderStatusType', mapped: 'true' }
+
+        
+
+        User:
+            permissions: ROLE_ADMIN
+            class: App\Entity\User 
+            list:
+                fields:
+                    - username
+                    - email
+                    - { property: enabled, type: 'boolean' }
+                    - lastLogin
+            form:
+                fields:
+                    - username
+                    - email
+                    - enabled
+                    - lastLogin
+                    # if administrators are allowed to edit users' passwords and roles, add this:
+                    - { property: 'plainPassword', type: 'text', type_options: { required: false } }
+                    - { property: 'roles', type: 'choice', type_options: { multiple: true, choices: { 'ROLE_USER': 'ROLE_USER', 'ROLE_EMPLOYEE': 'ROLE_EMPLOYEE', 'ROLE_MANAGER': 'ROLE_MANAGER', 'ROLE_ADMIN': 'ROLE_ADMIN' } } }
+
+        HistoryLog:
+            permissions: ROLE_EMPLOYEE
+            class: App\Wicrew\DateAvailability\Entity\HistoryLog 
+            disabled_actions: ['show', 'new', 'delete', 'edit']
+            title: 'History Logs'
+            label: 'History Logs'
+            icon: 'history'
+            list:
+                fields:
+                    - createdAt
+                    - user
+                    # - modifications
+                    - { property: 'modifications', template: '@WicrewSale/Admin/Dashboard/list.history_log.modifications.twig' }
+
+                sort: ['createdAt', 'DESC']
+
+        BookingBlockage:
+            permissions: ROLE_EMPLOYEE
+            class: App\Wicrew\DateAvailability\Entity\BookingBlockage 
+            disabled_actions: ['edit']
+            title: 'Booking Blockage'
+            label: 'Booking Blockage'
+            icon: 'history'
+            list:
+                fields:
+                    - id
+                    - date
+                    - timeFrom
+                    - timeTo
+                    - vehicleTypes
+                    - { property: 'vehicleTypes', label: 'Vehicle Type(s)', template: '@WicrewDateAvailability/Admin/display_arrayValues.html.twig' }
+                    - { property: 'jbjType', label: 'JBJ Type'}
+                    - { property: 'areasFrom', label: 'Area(s) From', template: '@WicrewDateAvailability/Admin/display_arrayValues.html.twig' }
+                    - { property: 'areasTo', label: 'Area(s) To', template: '@WicrewDateAvailability/Admin/display_arrayValues.html.twig' }
+                    - { property: 'activities', label: 'Activities', template: '@WicrewDateAvailability/Admin/display_arrayValues.html.twig' }
+                    - { property: 'activityType', label: 'Activity Type'}
+                sort: ['id', 'DESC']
+            form:
+                fields:
+                    - { property: 'date', type: 'text', label: 'Date' }
+                    - { property: 'timeFrom', attr: { class: 'bookingblockagefield', id: 'timeFrom-field' } }
+                    - { property: 'timeTo', attr: { class: 'bookingblockagefield', id: 'timeTo-field' } }
+                    - { property: 'vehicleTypes', type: 'entity', label: 'product.form.vehicle', type_options: { class: 'App\Wicrew\VehicleTypeBundle\Entity\VehicleType', choice_label: 'name', expanded: false, multiple: true } }
+                    -   property: 'jbjType'
+                        label: 'JBJ Type'
+                        type: 'choice'
+                        type_options:
+                            required: false
+                            choices:
+                                'Shared Service': 'Shared JBJ'
+                                'Private Service': 'Private JBJ'
+                            expanded: true
+                    - { property: 'areasFrom', type: 'entity', label: 'Areas From', type_options: { class: 'App\Wicrew\ProductBundle\Entity\Area', choice_label: 'name', expanded: false, multiple: true } }
+                    - { property: 'areasTo', type: 'entity', label: 'Areas To', type_options: { class: 'App\Wicrew\ProductBundle\Entity\Area', choice_label: 'name', expanded: false, multiple: true } }
+                    - { property: 'activities', type: 'entity', label: 'Activities', type_options: { class: 'App\Wicrew\ActivityBundle\Entity\Activity', choice_label: 'name', expanded: false, multiple: true } }
+                    -   property: 'activityType'
+                        label: 'Activity Type'
+                        type: 'choice'
+                        type_options:
+                            required: false
+                            choices:
+                                'Group': 'Group'
+                                'Private': 'Private'
+                            expanded: true
+    design: 
+        templates:
+            layout: 'easy_admin/admin.base_layout.html.twig'  
+        menu:
+            # - { entity: 'TransportationManagement', label: 'transport_management.label.title', icon: 'car', permission: 'ROLE_EMPLOYEE' }
+            # - { entity: 'ActivityManagement', label: 'activity_management.label', icon: 'subway', permission: 'ROLE_EMPLOYEE' }
+            - { entity: 'Dashboard', label: 'Dashboard', icon: 'grip-horizontal', permission: 'ROLE_EMPLOYEE' }
+            - { entity: 'BookingBlockage', label: 'Bookings Blockage', icon: 'ban', permission: 'ROLE_EMPLOYEE' }
+            - { entity: 'HistoryLog', label: 'History Logs', icon: 'history', permission: 'ROLE_EMPLOYEE' }
+            - {  css_class: 'menu--positioning', label: 'Positioning', icon: 'sort-alpha-asc', permission: 'ROLE_ADMIN', url: '/admin/positioning' }
+
+        assets:
+              js:
+                - 'jquery.bookingblockage.min.js'

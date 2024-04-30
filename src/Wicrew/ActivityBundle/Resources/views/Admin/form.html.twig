@@ -1,0 +1,19 @@
+{% form_theme form _self %}
+
+{% block _activity_custom_slides_widget %}
+    {% use "@WicrewCore/Form/collection-table-container.html.twig" %}
+    {{ block('collection_table_container') }}
+{% endblock %}
+{% block activity_slide_item_widget %}
+    {% use "@WicrewCore/Form/collection-item-container.html.twig" %}
+    {{ block('collection_item_container') }}
+{% endblock %}
+
+{% block _activity_custom_childs_widget %}
+    {% use "@WicrewCore/Form/collection-table-container.html.twig" %}
+    {{ block('collection_table_container') }}
+{% endblock %}
+{% block activity_child_item_widget %}
+    {% use "@WicrewCore/Form/collection-item-container.html.twig" %}
+    {{ block('collection_item_container') }}
+{% endblock %}

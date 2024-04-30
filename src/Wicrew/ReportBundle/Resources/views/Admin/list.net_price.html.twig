@@ -1,0 +1,5 @@
+{% if item.type == constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::TYPE_PRIVATE_SHUTTLE') %}
+    {{ item.fixedNetPrice }}<br/>({{ "report.vehicle_price"|trans }})
+{% else %}
+    {{ item.adultNetPrice }}<br/>({{ "report.adult_price"|trans }})
+{% endif %}

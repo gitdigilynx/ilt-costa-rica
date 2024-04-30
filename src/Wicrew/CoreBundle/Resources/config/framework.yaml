@@ -1,0 +1,60 @@
+framework:
+    default_locale: '%locale%'
+    translator: { fallbacks: [ 'en' ] }
+
+parameters:
+    global.user.role:
+        user.role.employee: ROLE_EMPLOYEE
+        user.role.manager: ROLE_MANAGER
+        user.role.admin: ROLE_ADMIN
+        user.role.super_admin: ROLE_SUPER_ADMIN
+
+    global.sort.pagination.default: 25
+
+    global.date.format: 'M d Y'
+
+    global.sort.asc: ASC
+    global.sort.desc: DESC
+
+    global_image_vehicletype_width: 170
+    global_image_vehicletype_height: 128
+
+    global_image_vehicletype_booking_width: 250
+
+    global_image_addon_width: 180
+    global_image_addon_height: 180
+
+    smtp_mail_host: smtp.sendgrid.net
+    smtp_mail_port: 587
+    # system_email: mark@walterinteractive.com
+    system_email: info@iltcostarica.com
+
+    trip_advisor_link: 'https://www.tripadvisor.ca/Attraction_Review-g309293-d9875168-Reviews-ILT_Costa_Rica-San_Jose_San_Jose_Metro_Province_of_San_Jose.html'
+
+    notallow.booking.start: '22:00:00'
+    notallow.booking.stop: '05:00:00'
+
+    pickup.extrafee.booking.start: '01:00:00'
+    pickup.extrafee.booking.stop: '05:00:00'
+    pickup.extrafee.booking.rate: 10
+
+    global_timezone: 'America/Costa_Rica'
+
+    api:
+        flight_stats:
+            application_id: '3abce8c8'
+            application_key: '33511680616e9ff2111130419e2b4dff'
+
+twig:
+    globals:
+        pathToWeb: "%kernel.root_dir%/../public"
+        google:
+            api:
+                place:
+                    key: AIzaSyBqdHKEGoTHOr39woeq_zQlg-sPdiJf6SE
+                    default:
+                        # Costa Rica
+                        lat: "9.9305807"
+                        lng: "-84.1647946"
+                        zoom_level: 13
+                        zoom_detail_level: 17

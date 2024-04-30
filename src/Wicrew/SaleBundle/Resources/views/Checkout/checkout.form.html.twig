@@ -1,0 +1,91 @@
+<div>
+    <h2>{{ 'sale.checkout.contact.title'|trans() }}</h2>
+
+    {% if isPaymentMail is not defined %} {% set isPaymentMail = false %} {% endif %}
+ 
+    {% if order is defined and order is not null %}<input type="hidden" name="form[checkout][oid]" value="{{ order.id }}"> {% endif %}
+
+    <div class="row-block">
+        <div class="col-block">
+            <div class="floating-label-wrap">
+                <input type="text" id="checkout_customer_firstName" required="required"
+                       name="form[checkout][contact][firstName]"
+                       value="{% if order is defined and order is not null %} {{ order.firstname }} {% endif %}"
+                       placeholder="{{ 'sale.checkout.firstName'|trans() }}" {% if isPaymentMail %}readonly{% endif %}/>
+
+                <label class="floating-label" for="checkout_customer_firstName">{{ 'sale.checkout.firstName'|trans() }}
+                    *</label>
+            </div>
+        </div>
+
+        <div class="col-block">
+            <div class="floating-label-wrap">
+                <input type="text" id="checkout_customer_lastName" required="required"
+                       name="form[checkout][contact][lastName]"
+                       value="{% if order is defined and order is not null %} {{ order.lastname }} {% endif %}"
+                       placeholder="{{ 'sale.checkout.lastName'|trans() }}" {% if isPaymentMail %}readonly{% endif %}/>
+
+                <label class="floating-label" for="checkout_customer_lastName">{{ 'sale.checkout.lastName'|trans() }}
+                    *</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row-block">
+        <div class="col-block">
+            <div class="floating-label-wrap">
+                <input type="text" id="checkout_customer_email" required="required"
+                       name="form[checkout][contact][email]"
+                       value="{% if order is defined and order is not null %} {{ order.email }} {% endif %}"
+                       placeholder="{{ 'sale.checkout.email'|trans() }}" {% if isPaymentMail %}readonly{% endif %}/>
+
+                <label class="floating-label" for="checkout_customer_email">{{ 'sale.checkout.email'|trans() }}*</label>
+            </div>
+        </div>
+
+        <div class="col-block">
+            <div class="floating-label-wrap">
+                <input type="text" id="checkout_customer_country" required="required"
+                       name="form[checkout][contact][country]"
+                       value="{% if order is defined and order is not null %} {{ order.country }} {% endif %}"
+                       placeholder="{{ 'sale.checkout.country'|trans() }}" {% if isPaymentMail %}readonly{% endif %}/>
+
+                <label class="floating-label" for="checkout_customer_country">{{ 'sale.checkout.country'|trans() }}
+                    *</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row-block">
+        <div class="col-block">
+            <div class="floating-label-wrap">
+                <input type="tel" id="checkout_customer_tel"
+                        name="form[checkout][contact][tel]"
+                        value="{% if order is defined and order is not null %} {{ order.tel }} {% endif %}"
+                        placeholder="{{ 'sale.checkout.tel'|trans() }}" {% if isPaymentMail %}readonly{% endif %}/>
+
+                <label class="floating-label" for="checkout_customer_tel">{{ 'sale.checkout.tel'|trans() }}</label>
+            </div>
+        </div>
+
+        <div class="col-block">
+            <div class="floating-label-wrap">
+                <input type="tel" id="checkout_customer_whatsapp"
+                        name="form[checkout][contact][whatsapp]"
+                        value="{% if order is defined and order is not null %} {{ order.whatsapp }} {% endif %}"
+                        placeholder="{{ 'sale.checkout.whatsapp'|trans() }}" {% if isPaymentMail %}readonly{% endif %}/>
+
+                <label class="floating-label" for="checkout_customer_whatsapp">{{ 'sale.checkout.whatsapp'|trans() }}</label>
+            </div>
+        </div>
+    </div>
+
+    {# <div class="row-block margin">
+        <div class="floating-label-wrap">
+            <textarea id="checkout_customer_notes" name="form[checkout][contact][notes]"
+                      placeholder="{{ 'sale.checkout.notes'|trans() }}" {% if isPaymentMail %}readonly{% endif %} >{% if order is defined and order is not null %} {{ order.customerNotes }} {% endif %}</textarea>
+
+            <label class="floating-label" for="checkout_customer_notes">{{ 'sale.checkout.notes'|trans() }}</label>
+        </div>
+    </div> #}
+</div>

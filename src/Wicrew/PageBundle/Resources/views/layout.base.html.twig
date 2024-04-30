@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.attributes.get('_locale') }}">
+<head>
+    <meta charset="UTF-8"/>
+    <title>{% block title %}Page title{% endblock %}</title>
+    {% block stylesheets %}{% endblock %}
+    {% block page_meta_data %}{% endblock %}
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+</head>
+<body>
+{% block page_container %}
+    <h1>{% block page_title %}{% endblock %}</h1>
+    {% block page_content %}{% endblock %}
+{% endblock %}
+
+{% block javascripts %}{% endblock %}
+</body>
+</html>

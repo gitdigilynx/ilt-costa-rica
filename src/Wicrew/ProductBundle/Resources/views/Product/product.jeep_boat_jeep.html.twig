@@ -1,0 +1,146 @@
+{% extends "@WicrewProduct/Product/transportationtype.html.twig" %}
+
+{% block title %}
+    {{ 'product.jbj'|trans() }}
+{% endblock %}
+
+{% block testimonials %}{# {% include "@WicrewPage/testimonials.html.twig" %} #}{% endblock %}
+
+{% block mainContent %}
+    {% include "@WicrewProduct/Product/Headers/header.jeep_boat_jeep.html.twig" %}
+
+    <div class="jeep-boat-jeep-page">
+        <div class="container">
+
+            <div class="row overview">
+                <div class="col-12 text-center">
+                    <h2>Jeep - Boat - Jeep</h2>
+                    <p>The Jeep-Boat-Jeep service is the quickest & easiest way to travel between Arenal & Monteverde or
+                        vice versa. Because this area is so mountainous, there isn’t a direct route between the two places
+                        and the drive around Lake Arenal can take upwards of 5 hours.</p>
+                    <p>The trip combines comfortable door to door service with a beautiful scenic cruise across the tranquil
+                        Lake Arenal, where you will experience beautiful views of the majestic volcano and the forested
+                        Tilaran Mountain Range. You will also have the chance to see a variety of wetland birds such as king
+                        fishers, fly catchers, waders and other exotic species that abound on the lake shore.</p>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                {% for transportationType in jeepBoatJeepTypes() %}
+                    {% if transportationType.id != constant('\\App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_JEEP_BOAT_JEEP_HORSEBACK') %}
+                    {# @var transportationType \App\Wicrew\ProductBundle\Entity\TransportationType #}
+                    {% set privateFlag = transportationType.privateType %}
+                    <div class="col-12 col-sm-6 col-md-4">
+                        {% set nameType = 'product.jbj.' ~ transportationType.jBJName %}
+
+                        <div class="jbj-item">
+                            <div>
+                                <div class="jbj-image-box">
+                                    <div class="jbj-image">
+                                        {% if transportationType.id == constant('\\App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_JEEP_BOAT_JEEP_SHARED') %}
+                                            <img src="{{ absolute_url(asset('bundles/wicrewcore/images/jeep-boat-jeep/shared-service-header.jpg')) }}">
+                                        {% elseif transportationType.id == constant('\\App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_JEEP_BOAT_JEEP_PRIVATE') %}
+                                            <img src="{{ absolute_url(asset('bundles/wicrewcore/images/jeep-boat-jeep/private-service-header.jpg')) }}">
+                                        {% elseif transportationType.id == constant('\\App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_JEEP_BOAT_JEEP_HORSEBACK') %}
+                                            <img src="{{ absolute_url(asset('bundles/wicrewcore/images/jeep-boat-jeep/horseback-riding-header.jpg')) }}">
+                                        {% endif %}
+                                    </div>
+                                    <div class="jbj-item-title">{{ nameType|trans() }}</div>
+                                </div>
+
+                                <div class="jbj-trip-info jbj-text-container">
+                                    {% set duration = '' %}
+                                    {% set price = '' %}
+                                    <div>
+                                        {% if privateFlag %}
+                                            <div class="trip-info-title"><strong>{{ 'product.jbj.departs.anytime'|trans() }}
+                                                    :</strong></div>
+                                        {% else %}
+                                            <div class="trip-info-title"><strong>{{ 'product.jbj.departs'|trans() }} :</strong>
+                                            </div>
+                                        {% endif %}
+
+                                        {% if transportationType.products %}
+                                            {% for product in transportationType.products %} 
+                                                {% if duration == '' %}
+                                                    {% set duration = product.durationNoTrailingZeroes %}
+                                                {% endif %}
+                                                {% if price == '' %}
+                                                    {% if transportationType.privateType %}
+                                                        {% set price = product.fixedRackPrice %}
+                                                    {% else %}
+                                                        {% set price = product.adultRackPrice %}
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+
+                                        {% if privateFlag %}
+                                            <div>{{ 'product.jbj.freestyle'|trans() }}</div>
+                                        {% else %}
+                                            {% set texts_by_departure = [] %}
+                                            {% set texts_by_departure = getDepartureTimeTexts(transportationType.products) %}
+                                            {% for text in texts_by_departure %}
+                                            <div>{{ text }}</div>
+                                            {% endfor %}
+                                        {% endif %}
+                                         
+                                        <div class="jbj-time-note">{% if not privateFlag %}{{ 'departure.jbj.time.note'|trans() }}{% endif %}</div>
+
+                                        <div class="trip-info-title">{{ 'product.jbj.duration'|trans() }} :</div>
+                                        <p>{{ 'approx'|trans() }} {{ duration|number_format(1) }} {{ 'hours.total'|trans() }}</p>
+
+                                        <div class="trip-info-title">{{ 'product.jbj.includes'|trans() }} :</div>
+                                        {% if transportationType.id == constant('\\App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_JEEP_BOAT_JEEP_SHARED') %}
+                                            {{ getBlockContent('jbj-shared-includes')|raw() }}
+                                        {% elseif transportationType.id == constant('\\App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_JEEP_BOAT_JEEP_PRIVATE') %}
+                                            {{ getBlockContent('jbj-private-includes')|raw() }}
+                                        {% elseif transportationType.id == constant('\\App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_JEEP_BOAT_JEEP_HORSEBACK') %}
+                                            {{ getBlockContent('jbj-horse-includes')|raw() }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="jbj-price-info jbj-text-container">
+                                <div>
+                                    <div class="from">{{ "from"|trans }}</div>
+
+                                    <div class="price">{{ 'currency.symbol'|trans() }} {{ price }}<span
+                                                class="currency">{{ getCurrencyTranslationKey() }}</span></div>
+                                    {% if not privateFlag %}
+                                        <div class="per-person">{{ "per.person"|trans }}</div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <button type="button" id="book_jbj_{{ transportationType }}"
+                                            class="btn-black"
+                                            data-transportationtype="{{ transportationType.id }}">{{ 'booknow'|trans() }}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="row jeep-boat-jeep-main-content">
+                <div class="col-12">
+                    <p><strong>Important Information:</strong></p>
+                    <p>The logistics of the Jeep-Boat-Jeep (shared shuttle) involves: 20-25 min drive from downtown La
+                        Fortuna/ your hotel to the dam of Arenal Lake, 30-40 min boat ride through Lake Arenal and about 1
+                        hour and 30 min drive from Rio Chiquito to your hotel in Monteverde. Passengers should expect to
+                        carry their bags/luggage to and from the boat. Drivers will do their best to help if you have any
+                        problems with carrying heavy bags. Just let them know in advance. If any member on your party
+                        requires assistance please inform us in advance. Please note that there is an extra fee of $20 from
+                        certain hotels that are located further away and out of the main hotel zone.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="jeep-boat-jeep-hero-image">
+            <img src="{{ absolute_url(asset('bundles/wicrewcore/images/bg-jeep-boat-jeep-2.jpg')) }}"
+                 alt="{{ 'product.jbj'|trans() }}">
+        </div>
+    </div>
+{% endblock %}

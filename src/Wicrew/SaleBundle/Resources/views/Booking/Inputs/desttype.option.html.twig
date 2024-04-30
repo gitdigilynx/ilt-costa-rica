@@ -1,0 +1,65 @@
+{% if areaObj is defined %}
+    {% if displayAirportOption is not defined %} 
+        {% set displayAirportOption = areaObj.type == constant
+    ('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT') %}
+    {% endif %}
+    {% if displayHotelOption is not defined %} 
+        {% set displayHotelOption = areaObj.type == constant
+    ('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AREA') %}
+    {% endif %}
+{% else %}
+    {% if displayAirportOption is not defined %} 
+        {% set displayAirportOption = false %}
+    {% endif %}
+    {% if displayHotelOption is not defined %} 
+        {% set displayHotelOption = false %}
+    {% endif %}
+{% endif %} 
+
+{% set identifier = type ~ '_' ~ bookingNumber %}
+
+{% set temp_required = required %}
+
+{% if required %}
+    {% if displayAirportOption == false %}
+        {% set required = false %}
+    {% else %}
+        {% set required = true %}
+    {% endif %}
+{% endif %} 
+{% if type_transportation is defined and type_transportation == 'private_jbj' %}
+    {% set required = false %}
+{% endif %}   
+<div class="airport-type-section {% if displayAirportOption == false %}hidden{% endif %}">
+    <div class="row-block">
+        <div class="floating-label-wrap">
+            {% include "@WicrewSale/Booking/Inputs/_partials/input.flight_number.html.twig"%}
+        </div>
+    </div>
+
+    <div class="row-block">
+        <div class="floating-label-wrap">
+            {% include "@WicrewSale/Booking/Inputs/_partials/input.flight_company.html.twig"%}
+        </div>
+    </div>
+</div>
+
+{% set required = temp_required %}
+
+{% if required %}
+    {% if displayHotelOption == false %}
+        {% set required = false %}
+    {% else %}
+        {% set required = true %}
+    {% endif %}
+{% endif %} 
+{% if type_transportation is defined and type_transportation == 'private_jbj' %}
+    {% set required = true %}
+{% endif %}  
+<div class="area-type-section {% if displayHotelOption == false %}hidden{% endif %}">
+    <div class="row-block">
+        <div class="floating-label-wrap">
+            {% include "@WicrewSale/Booking/Inputs/_partials/input.additionalFee_search.html.twig"%}
+        </div>
+    </div>
+</div>

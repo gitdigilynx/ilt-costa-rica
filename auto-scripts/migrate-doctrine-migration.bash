@@ -1,0 +1,1 @@
+php bin/console --no-interaction doctrine:migration:migrate

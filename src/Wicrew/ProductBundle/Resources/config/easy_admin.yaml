@@ -1,0 +1,284 @@
+easy_admin:
+    entities:
+        Area:
+            permissions:
+                list: [ 'ROLE_ADMIN' ]
+                new: [ 'ROLE_ADMIN' ] 
+                edit: [ 'ROLE_ADMIN' ]
+                delete: [ 'ROLE_ADMIN' ] 
+            label: 'area.title'
+            icon: 'globe'
+            class: App\Wicrew\ProductBundle\Entity\Area
+            list:
+                title: "area.title"
+                filters:
+                    -   property: 'type'
+                        type: 'App\Wicrew\CoreBundle\Form\Filter\ChoiceType'
+                        type_options:
+                            choices:
+                                'area.type.option.airport': !php/const App\Wicrew\ProductBundle\Entity\Area::TYPE_AIRPORT
+                                'area.type.option.area': !php/const App\Wicrew\ProductBundle\Entity\Area::TYPE_AREA
+                            expanded: true
+                            multiple: true
+                    - { property: 'name' }
+                fields:
+                    - id
+                    - { property: 'type', label: 'area.type', sortable: false, template: '@WicrewProduct/Admin/Area/list.type.html.twig' }
+                    - { property: 'name', label: 'area.name' }
+                    - { property: 'hasAirport', label: 'Has Airport', sortable: false, template: '@WicrewProduct/Admin/Area/list.has.airport.twig' }
+                    - { property: 'airport', label: 'Airport', sortable: false }
+                    - { property: 'createdAt', label: 'core.created_date', format: 'M d Y' }
+                sort: ['createdAt', 'DESC']
+            form:
+                fields:
+                    # Tab #1
+                    - { type: 'tab' , label: 'area.tab.general'}
+                    - { property: 'type', type: 'choice', label: 'area.type', type_options: { required: true, choices: { 'area.type.option.airport': !php/const App\Wicrew\ProductBundle\Entity\Area::TYPE_AIRPORT, 'area.type.option.area': !php/const App\Wicrew\ProductBundle\Entity\Area::TYPE_AREA }, expanded: true, multiple: false } }
+                    - { property: 'name', label: 'area.name', type_options: { required: true } }
+                    - { property: 'hasAirport', type: 'choice', label: 'Has Airport', type_options: { required: true, choices: { 'No': !php/const App\Wicrew\ProductBundle\Entity\Area::HAS_AIRPORT_NO, 'Yes': !php/const App\Wicrew\ProductBundle\Entity\Area::HAS_AIRPORT_YES }, expanded: true, multiple: false } }
+                    - { property: 'airport', type: 'entity', label: 'Select Airport', type_options: { required: false, placeholder: 'core.option.please_select', class: 'App\Wicrew\ProductBundle\Entity\Area', choice_label: 'name', expanded: false, multiple: false } }
+        AreaChildren:
+            permissions:
+                list: [ 'ROLE_ADMIN' ]
+                new: [ 'ROLE_ADMIN' ] 
+                edit: [ 'ROLE_ADMIN' ]
+                delete: [ 'ROLE_ADMIN' ] 
+            label: 'Area Children'
+            icon: 'globe'
+            class: App\Wicrew\ProductBundle\Entity\AreaChildren
+            list:
+                title: "Area Children"
+                filters:
+                    - { property: 'name' }
+                fields:
+                    - id
+                    - { property: 'name', label: 'Location Name' }
+                    - { property: 'parentArea', label: 'Parent Area' }
+            form:
+                fields:
+                    - { property: 'name', label: 'area.name', type_options: { required: true } }
+                    - { property: 'parentArea', type: 'entity', label: 'Select Parent Area', type_options: { required: true, placeholder: 'core.option.please_select', class: 'App\Wicrew\ProductBundle\Entity\Area', choice_label: 'name', expanded: false, multiple: false } }
+
+        Product:
+            permissions:
+                list: [ 'ROLE_ADMIN' ]
+                new: [ 'ROLE_ADMIN' ]
+                duplicate: [ 'ROLE_ADMIN' ]
+                edit: [ 'ROLE_ADMIN' ]
+                # delete: [ 'ROLE_MANAGER' ]
+                archive: [ 'ROLE_ADMIN' ]
+            controller: App\Wicrew\ProductBundle\Controller\Admin\ProductController
+            label: 'product.products'
+            icon: 'file'
+            class: App\Wicrew\ProductBundle\Entity\Product  
+            list: 
+                max_results: 50
+                filters:
+                    - { property: 'id' }
+                    -   property: 'vehicleType'
+                        type: 'App\Wicrew\VehicleBundle\Form\Filter\VehicleType'
+                        type_options:
+                            expanded: true
+                            multiple: true
+                    -   property: 'transportationType'
+                        type: 'App\Wicrew\ProductBundle\Form\Filter\TransportationType'
+                        type_options:
+                            expanded: true
+                            multiple: true
+                    - { property: 'areaFrom' }
+                    - { property: 'areaTo' }
+                actions:
+                    - { name: 'edit' }
+                    - { name: 'duplicate' }
+                    - { name: 'delete' }
+                    - { name: 'archive', template: '@WicrewProduct/Admin/archive.html.twig', css_class: 'text-danger' }
+                title: "product.management"
+                fields:
+                    - id
+                    - { property: 'vehicleType.name', label: 'product.vehicle', sortable: true }
+                    - { property: 'transportationType.name', label: 'product.form.transportationtype', sortable: true }
+                    - { property: 'areaFrom.name', label: 'product.areafrom', sortable: true }
+                    - { property: 'areaTo.name', label: 'product.areato', sortable: true }
+                    - { property: 'enabled', label: 'product.form.enabled' }
+                    - { property: 'createdAt', label: 'core.created_date', format: 'M d Y' }
+                sort: ['createdAt', 'DESC']
+                dql_filter: "entity.archived = 0"
+            form:
+                form_options: { attr: { novalidate: true, class: 'validate-form' } }
+                fields:
+                    # Tab #1
+                    - { type: 'tab' , label: 'product.tab.general'}
+                    # Group
+                    - { property: 'transportationType', type: 'entity', label: 'product.form.transportationtype', type_options: { required: true, placeholder: 'core.option.please_select', class: 'App\Wicrew\ProductBundle\Entity\TransportationType', choice_label: 'name', expanded: false, multiple: false } }
+                    - { property: 'areaFrom', type: 'entity', label: 'product.form.areafrom', type_options: { required: true, placeholder: 'core.option.please_select', class: 'App\Wicrew\ProductBundle\Entity\Area', choice_label: 'name', expanded: false, multiple: false } }
+                    - { property: 'areaTo', type: 'entity', label: 'product.form.areato', type_options: { required: true, placeholder: 'core.option.please_select', class: 'App\Wicrew\ProductBundle\Entity\Area', choice_label: 'name', expanded: false, multiple: false } }
+                    - { property: 'vehicleType', type: 'entity', label: 'product.form.vehicle', type_options: { required: true, placeholder: 'core.option.please_select', class: 'App\Wicrew\VehicleTypeBundle\Entity\VehicleType', choice_label: 'name', expanded: false, multiple: false } }
+                    - { property: 'departureTime', type: 'time', css_class: 'departure-time-single', label: 'product.form.departuretime', type_options: { required: false } }
+                    - { property: 'departureTimes', type: 'collection', css_class: 'departure-times-collection hidden', type_options: { error_bubbling: false, entry_type: 'App\Wicrew\ProductBundle\Form\Type\DepartureTime', by_reference: false, entry_options: { label: false } } }
+                    - { property: 'duration', type: 'number', label: 'product.form.duration', help: 'product.form.duration.help', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'note', type: 'FOS\CKEditorBundle\Form\Type\CKEditorType', label: 'product.form.note' }
+                    - { property: 'enabled', label: 'product.form.enabled' }
+                    # - { type: 'tab' , label: 'Product Pricing'}
+                    - { type: 'group', label: 'product.section.pricingrates' }
+                    - { property: 'fixedRackPrice', type: 'number', label: 'product.form.vehiclerackprice', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'fixedNetPrice', type: 'number', label: 'product.form.vehiclenetprice', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'adultRackPrice', type: 'number', label: 'product.form.adultrackprice', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'adultNetPrice', type: 'number', label: 'product.form.adultnetprice', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'childRackPrice', type: 'number', label: 'product.form.kidrackprice', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'childNetPrice', type: 'number', label: 'product.form.kidnetprice', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'tax', type: 'entity', label: 'product.form.tax', type_options: { required: true, placeholder: 'core.option.please_select', class: 'App\Wicrew\SaleBundle\Entity\Tax', choice_label: 'label', expanded: false, multiple: false } }
+                    - { type: 'group', label: 'PRICING AND RATES (NOVEMBER)' }
+                    - { property: 'novemberFixedRackPrice', type: 'number', label: 'product.form.vehiclerackprice', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'novemberFixedNetPrice', type: 'number', label: 'product.form.vehiclenetprice', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'novemberAdultRackPrice', type: 'number', label: 'product.form.adultrackprice', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'novemberAdultNetPrice', type: 'number', label: 'product.form.adultnetprice', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'novemberChildRackPrice', type: 'number', label: 'product.form.kidrackprice', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'novemberChildNetPrice', type: 'number', label: 'product.form.kidnetprice', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'novemberTax', type: 'entity', label: 'product.form.tax', type_options: { required: true, placeholder: 'core.option.please_select', class: 'App\Wicrew\SaleBundle\Entity\Tax', choice_label: 'label', expanded: false, multiple: false } }
+                    
+                    # Tab #1
+                    - { type: 'tab' , label: 'product.tab.addons'}
+                    - { type: 'group' }
+                    - { property: 'addons', type: 'entity', label: 'product.form.addons', type_options: { class: 'App\Wicrew\AddonBundle\Entity\Addon', choice_label: 'label', expanded: true, multiple: true } }
+
+                    # Tab #2
+                    - { type: 'tab' , label: 'product.tab.extras'}
+                    - { type: 'group' }
+                    - { property: 'extras', type: 'entity', label: 'product.form.extras', type_options: { class: 'App\Wicrew\AddonBundle\Entity\Extra', choice_label: 'label', expanded: true, multiple: true } }
+
+                    # Tab #3
+                    - { type: 'tab' , label: 'product.tab.time_based_price_ranges'}
+
+                    - { type: 'group', label: 'product.section.regular_time_range', css_class: 'time-based-group-of-fields' }
+                    - { property: 'regularPickEnabled', label: 'product.form.enabled', css_class: 'group-enabler' }
+                    - { property: 'regularPickTimeStart', type: 'App\Wicrew\CoreBundle\Form\Type\TimePickerType', label: 'product.section.form.range_start', type_options: { required: false } }
+                    - { property: 'regularPickTimeEnd', type: 'App\Wicrew\CoreBundle\Form\Type\TimePickerType', label: 'product.section.form.range_end', type_options: { required: false } }
+                    - { property: 'regularPickRackPrice', type: 'number', label: 'product.form.rack_price', type_options: { required: false, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'regularPickNetPrice', type: 'number', label: 'product.form.net_price', type_options: { required: false, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'regularPickTax', type: 'entity', label: 'product.form.tax', type_options: { required: false, placeholder: 'core.option.please_select', class: 'App\Wicrew\SaleBundle\Entity\Tax', choice_label: 'label', expanded: false, multiple: false } }
+
+                    - { type: 'group', label: 'product.section.flight_pickup_time_range', css_class: 'time-based-group-of-fields' }
+                    - { property: 'flightPickEnabled', label: 'product.form.enabled', css_class: 'group-enabler' }
+                    - { property: 'flightPickTimeStart', type: 'App\Wicrew\CoreBundle\Form\Type\TimePickerType', label: 'product.section.form.range_start', type_options: { required: false } }
+                    - { property: 'flightPickTimeEnd', type: 'App\Wicrew\CoreBundle\Form\Type\TimePickerType', label: 'product.section.form.range_end', type_options: { required: false } }
+                    - { property: 'flightPickRackPrice', type: 'number', label: 'product.form.rack_price', type_options: { required: false, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'flightPickNetPrice', type: 'number', label: 'product.form.net_price', type_options: { required: false, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'flightPickTax', type: 'entity', label: 'product.form.tax', type_options: { required: false, placeholder: 'core.option.please_select', class: 'App\Wicrew\SaleBundle\Entity\Tax', choice_label: 'label', expanded: false, multiple: false } }
+
+                    - { type: 'group', label: 'product.section.flight_drop_off_time_range', css_class: 'time-based-group-of-fields' }
+                    - { property: 'flightDropEnabled', label: 'product.form.enabled', css_class: 'group-enabler'  }
+                    - { property: 'flightDropTimeStart', type: 'App\Wicrew\CoreBundle\Form\Type\TimePickerType', label: 'product.section.form.range_start', type_options: { required: false } }
+                    - { property: 'flightDropTimeEnd', type: 'App\Wicrew\CoreBundle\Form\Type\TimePickerType', label: 'product.section.form.range_end', type_options: { required: false } }
+                    - { property: 'flightDropRackPrice', type: 'number', label: 'product.form.rack_price', type_options: { required: false, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'flightDropNetPrice', type: 'number', label: 'product.form.net_price', type_options: { required: false, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'flightDropTax', type: 'entity', label: 'product.form.tax', type_options: { required: false, placeholder: 'core.option.please_select', class: 'App\Wicrew\SaleBundle\Entity\Tax', choice_label: 'label', expanded: false, multiple: false } }
+
+                actions:
+                    - { name: '-delete', icon: 'trash' }
+            templates:
+                new: '@WicrewProduct/Admin/new.html.twig'
+                edit: '@WicrewProduct/Admin/edit.html.twig'
+            search:
+                fields: ['areaFrom.name', 'areaTo.name', 'vehicleType.name']
+        ProductArchive: #same as Product entity but with unarchive action
+            permissions: ROLE_ADMIN
+            controller: App\Wicrew\ProductBundle\Controller\Admin\ProductController
+            label: 'product.products'
+            icon: 'file'
+            class: App\Wicrew\ProductBundle\Entity\Product
+            list:
+                filters:
+                    -   property: 'vehicleType'
+                        type: 'App\Wicrew\VehicleBundle\Form\Filter\VehicleType'
+                        type_options:
+                            expanded: true
+                            multiple: true
+                    -   property: 'transportationType'
+                        type: 'App\Wicrew\ProductBundle\Form\Filter\TransportationType'
+                        type_options:
+                            expanded: true
+                            multiple: true
+                    - { property: 'areaFrom' }
+                    - { property: 'areaTo' }
+                actions:
+                    - { name: 'edit' }
+                    - { name: 'unarchive' }
+                title: "product.management"
+                fields:
+                    - id
+                    - { property: 'vehicleType.name', label: 'product.vehicle', sortable: true }
+                    - { property: 'transportationType.name', label: 'product.form.transportationtype', sortable: true }
+                    - { property: 'areaFrom.name', label: 'product.areafrom', sortable: true }
+                    - { property: 'areaTo.name', label: 'product.areato', sortable: true }
+                    - { property: 'enabled', label: 'product.form.enabled' }
+                    - { property: 'createdAt', label: 'core.created_date', format: 'M d Y' }
+                sort: ['createdAt', 'DESC']
+                dql_filter: "entity.archived = 1"
+            form:
+                form_options: { attr: { novalidate: true, class: 'validate-form' } }
+                fields:
+                    # Tab #1
+                    - { type: 'tab' , label: 'product.tab.general'}
+                    # Group
+                    - { property: 'transportationType', type: 'entity', label: 'product.form.transportationtype', type_options: { required: true, placeholder: 'core.option.please_select', class: 'App\Wicrew\ProductBundle\Entity\TransportationType', choice_label: 'name', expanded: false, multiple: false } }
+                    - { property: 'areaFrom', type: 'entity', label: 'product.form.areafrom', type_options: { required: true, placeholder: 'core.option.please_select', class: 'App\Wicrew\ProductBundle\Entity\Area', choice_label: 'name', expanded: false, multiple: false } }
+                    - { property: 'areaTo', type: 'entity', label: 'product.form.areato', type_options: { required: true, placeholder: 'core.option.please_select', class: 'App\Wicrew\ProductBundle\Entity\Area', choice_label: 'name', expanded: false, multiple: false } }
+                    - { property: 'vehicleType', type: 'entity', label: 'product.form.vehicle', type_options: { required: true, placeholder: 'core.option.please_select', class: 'App\Wicrew\VehicleTypeBundle\Entity\VehicleType', choice_label: 'name', expanded: false, multiple: false } }
+                    - { property: 'departureTime', type: 'time', css_class: 'departure-time-single', label: 'product.form.departuretime', type_options: { required: false } }
+                    - { property: 'departureTimes', type: 'collection', css_class: 'departure-times-collection hidden', type_options: { error_bubbling: false, entry_type: 'App\Wicrew\ProductBundle\Form\Type\DepartureTime', by_reference: false, entry_options: { label: false } } }
+                    - { property: 'duration', type: 'number', label: 'product.form.duration', help: 'product.form.duration.help', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'note', type: 'FOS\CKEditorBundle\Form\Type\CKEditorType', label: 'product.form.note' }
+                    - { property: 'enabled', label: 'product.form.enabled' }
+                    - { type: 'group', label: 'product.section.pricingrates' }
+                    - { property: 'fixedRackPrice', type: 'number', label: 'product.form.vehiclerackprice', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'fixedNetPrice', type: 'number', label: 'product.form.vehiclenetprice', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'adultRackPrice', type: 'number', label: 'product.form.adultrackprice', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'adultNetPrice', type: 'number', label: 'product.form.adultnetprice', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'childRackPrice', type: 'number', label: 'product.form.kidrackprice', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'childNetPrice', type: 'number', label: 'product.form.kidnetprice', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'tax', type: 'entity', label: 'product.form.tax', type_options: { required: true, placeholder: 'core.option.please_select', class: 'App\Wicrew\SaleBundle\Entity\Tax', choice_label: 'label', expanded: false, multiple: false } }
+
+                    # Tab #1
+                    - { type: 'tab' , label: 'product.tab.addons'}
+                    - { type: 'group' }
+                    - { property: 'addons', type: 'entity', label: 'product.form.addons', type_options: { class: 'App\Wicrew\AddonBundle\Entity\Addon', choice_label: 'label', expanded: true, multiple: true } }
+
+                    # Tab #2
+                    - { type: 'tab' , label: 'product.tab.extras'}
+                    - { type: 'group' }
+                    - { property: 'extras', type: 'entity', label: 'product.form.extras', type_options: { class: 'App\Wicrew\AddonBundle\Entity\Extra', choice_label: 'label', expanded: true, multiple: true } }
+
+                    # Tab #3
+                    - { type: 'tab' , label: 'product.tab.time_based_price_ranges'}
+
+                    - { type: 'group', label: 'product.section.regular_time_range', css_class: 'time-based-group-of-fields' }
+                    - { property: 'regularPickEnabled', label: 'product.form.enabled', css_class: 'group-enabler' }
+                    - { property: 'regularPickTimeStart', type: 'App\Wicrew\CoreBundle\Form\Type\TimePickerType', label: 'product.section.form.range_start', type_options: { required: false } }
+                    - { property: 'regularPickTimeEnd', type: 'App\Wicrew\CoreBundle\Form\Type\TimePickerType', label: 'product.section.form.range_end', type_options: { required: false } }
+                    - { property: 'regularPickRackPrice', type: 'number', label: 'product.form.rack_price', type_options: { required: false, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'regularPickNetPrice', type: 'number', label: 'product.form.net_price', type_options: { required: false, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'regularPickTax', type: 'entity', label: 'product.form.tax', type_options: { required: false, placeholder: 'core.option.please_select', class: 'App\Wicrew\SaleBundle\Entity\Tax', choice_label: 'label', expanded: false, multiple: false } }
+
+                    - { type: 'group', label: 'product.section.flight_pickup_time_range', css_class: 'time-based-group-of-fields' }
+                    - { property: 'flightPickEnabled', label: 'product.form.enabled', css_class: 'group-enabler' }
+                    - { property: 'flightPickTimeStart', type: 'App\Wicrew\CoreBundle\Form\Type\TimePickerType', label: 'product.section.form.range_start', type_options: { required: false } }
+                    - { property: 'flightPickTimeEnd', type: 'App\Wicrew\CoreBundle\Form\Type\TimePickerType', label: 'product.section.form.range_end', type_options: { required: false } }
+                    - { property: 'flightPickRackPrice', type: 'number', label: 'product.form.rack_price', type_options: { required: false, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'flightPickNetPrice', type: 'number', label: 'product.form.net_price', type_options: { required: false, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'flightPickTax', type: 'entity', label: 'product.form.tax', type_options: { required: false, placeholder: 'core.option.please_select', class: 'App\Wicrew\SaleBundle\Entity\Tax', choice_label: 'label', expanded: false, multiple: false } }
+
+                    - { type: 'group', label: 'product.section.flight_drop_off_time_range', css_class: 'time-based-group-of-fields' }
+                    - { property: 'flightDropEnabled', label: 'product.form.enabled', css_class: 'group-enabler'  }
+                    - { property: 'flightDropTimeStart', type: 'App\Wicrew\CoreBundle\Form\Type\TimePickerType', label: 'product.section.form.range_start', type_options: { required: false } }
+                    - { property: 'flightDropTimeEnd', type: 'App\Wicrew\CoreBundle\Form\Type\TimePickerType', label: 'product.section.form.range_end', type_options: { required: false } }
+                    - { property: 'flightDropRackPrice', type: 'number', label: 'product.form.rack_price', type_options: { required: false, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'flightDropNetPrice', type: 'number', label: 'product.form.net_price', type_options: { required: false, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'flightDropTax', type: 'entity', label: 'product.form.tax', type_options: { required: false, placeholder: 'core.option.please_select', class: 'App\Wicrew\SaleBundle\Entity\Tax', choice_label: 'label', expanded: false, multiple: false } }
+
+                actions:
+                    - { name: '-delete', icon: 'trash' }
+            templates:
+                new: '@WicrewProduct/Admin/new.html.twig'
+                edit: '@WicrewProduct/Admin/edit.html.twig'
+            search:
+                fields: ['areaFrom.name', 'areaTo.name', 'vehicleType.name']

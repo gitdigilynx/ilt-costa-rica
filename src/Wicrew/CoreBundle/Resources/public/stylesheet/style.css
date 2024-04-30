@@ -1,0 +1,113 @@
+table {
+    font-size: 1em;
+}
+
+.new-section-separator {
+    border-top: 3px solid rgb(135, 135, 135);
+}
+
+.ui-draggable, .ui-droppable {
+    background-position: top;
+}
+
+.faded-horizontal-line {
+    height: 1px;
+    background-color: #E6E6E6;
+    width: inherit;
+    margin: 0 auto;
+    background-image: linear-gradient(left, #E6E6E6 2%, #00cbff 50%, #E6E6E6 98%);
+    background-image: -o-linear-gradient(left, #E6E6E6 2%, #00cbff 50%, #E6E6E6 98%);
+    background-image: -moz-linear-gradient(left, #E6E6E6 2%, #00cbff 50%, #E6E6E6 98%);
+    background-image: -webkit-linear-gradient(left, #E6E6E6 2%, #00cbff 50%, #E6E6E6 98%);
+    background-image: -ms-linear-gradient(left, #E6E6E6 2%, #00cbff 50%, #E6E6E6 98%);
+    background-image: -webkit-gradient(linear, left bottom, right bottom, color-stop(0.02, #E6E6E6), color-stop(0.5, #00cbff), color-stop(0.98, #E6E6E6));
+}
+
+.hidden {
+    display: none;
+}
+
+.text-uppercase {
+    text-transform: capitalize;
+}
+
+.form-error-message {
+    color: red;
+    text-decoration: underline;
+}
+
+.has-error {
+    border: 1px dotted red;
+    background-color: rgba(255, 255, 0, 0.5);
+}
+/*, button.btn.loading-button:hover, button.btn.loading-button:active*/
+button.btn.loading-button {
+    background: url("../images/loading.gif") no-repeat 50% 50%;
+    background-size: 23px;
+    transition: unset;
+    color: transparent !important;
+}
+
+/*
+	For some reason EasyAdmin's select input's styling breaks when one is inserted on a
+	non-main tab of an 'edit' or 'new' form, so we need to override that here.
+
+	Note that the original uses inline styling so we have to use !important.
+ */
+.form-widget .select2 {
+	width: 350px !important;
+}
+
+/* Checkbox styled to look like a button. */
+.ck-button {
+    width: 80px;
+    margin: 4px;
+    border-radius: 20px;
+    border: 2px solid #7296c3;
+    overflow: auto;
+    display: inline-block;
+}
+
+.ck-button:hover {
+    color: #727bc3;
+    background-color: rgba(16, 131, 251, 0.25);
+}
+
+.ck-button input:checked + span {
+    background-color: rgba(0, 6, 113, 0.8);
+    color: #fff;
+}
+
+.ck-button:hover input:checked + span {
+    background-color: #4d5c9f;
+}
+
+.ck-button:active {
+    background-color: rgba(9, 86, 167, 0.4);
+}
+
+.ck-button label {
+    display: inline;
+}
+
+.ck-button label span {
+    font-size: 8pt;
+    color: #727bc3;
+    text-align: center;
+    padding: 3px 0;
+    display: block;
+}
+
+.ck-button label input {
+    display: none;
+}
+
+/* Transport management email driver row. */
+.sent-email-btn-wrapper {
+    min-width: 100px;
+}
+
+/* Add driver button. */
+.action-new-driver {
+    color: orange;
+}

@@ -1,0 +1,248 @@
+@import "variables";
+
+.activity-header {
+    margin-bottom: 30px;
+}
+
+.activity-slider-block {
+    position: relative;
+
+    .slick-arrow {
+        width: 50px;
+        height: 50px;
+        background: rgba(7, 13, 28, .6);
+        border-radius: 50%;
+        top: auto;
+        left: auto;
+        bottom: 20px;
+        z-index: 2;
+        transform: none;
+        transition: background 0.5s;
+
+        @media #{$mobile} {
+            width: 30px;
+            height: 30px;
+            bottom: 10px;
+        }
+
+        &:hover {
+            background: rgba(7, 13, 28, 1);
+        }
+
+        &:before {
+            content: '';
+            display: block;
+            width: 18px;
+            height: 13px;
+            background: url('../images/arrow_right.svg') 0 0 no-repeat;
+            margin: 0 auto;
+            opacity: 1;
+
+            @media #{$mobile} {
+                width: 12px;
+                height: 9px;
+                background-size: 100% 100%;
+            }
+        }
+    }
+
+    .slick-prev {
+        right: 80px;
+
+        @media #{$mobile} {
+            right: 50px;
+        }
+
+        &:before {
+            transform: scaleX(-1);
+        }
+    }
+
+    .slick-next {
+        right: 22px;
+
+        @media #{$mobile} {
+            right: 10px;
+        }
+    }
+}
+
+.activity-info {
+    h1 {
+        color: black;
+        font-size: 25px;
+        margin-bottom: 30px;
+        line-height: 1.2em;
+
+        @media #{$ipad} {
+            font-size: 24px;
+        }
+
+        @media #{$mobile} {
+            margin-top: 30px;
+        }
+    }
+
+    .trip-info {
+        padding: 0;
+        margin-bottom: 30px;
+    }
+
+    .price-info {
+        padding: 0;
+        margin-bottom: 30px;
+
+        .row {
+            margin-left: -15px;
+            margin-right: -15px;
+        }
+
+        .from {
+            line-height: 12px;
+            margin-bottom: 10px;
+        }
+
+        .price {
+            display: inline-block;
+            font-size: 30px;
+            vertical-align: top;
+        }
+
+        .price-detail {
+            display: inline-block;
+            margin-left: 5px;
+            vertical-align: top;
+
+            span {
+                display: block;
+                line-height: 12px;
+
+                &.currency {
+                    font-weight: 600;
+                }
+            }
+        }
+    }
+
+    .price-info-col-left {
+        @media #{$ipad} {
+            margin-bottom: 20px;
+        }
+    }
+}
+
+.activity-detail {
+
+}
+
+.activity-tab-desc-block {
+    @media #{$ipad} {
+        height: 63px;
+        overflow: hidden;
+    }
+
+    ul {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+
+        @media #{$ipad} {
+            overflow-x: scroll;
+            white-space: nowrap;
+        }
+    }
+
+    li {
+        display: inline-block;
+        margin-right: 30px;
+
+        @media #{$media-lg} {
+            margin-right: 15px;
+        }
+
+        &:last-child {
+            margin-right: 0;
+        }
+    }
+
+    a {
+        display: block;
+        color: $dark-blue;
+        padding: 20px 0;
+        border-bottom: 2px solid transparent;
+
+        &:hover,
+        &.active {
+            border-bottom: 2px solid $blue;
+        }
+    }
+}
+
+.activity-detail-content-block {
+    font-size: 14px;
+    line-height: 24px;
+    letter-spacing: 0.8px;
+    background-color: $gray;
+    padding-top: 50px;
+    padding-bottom: 50px;
+
+    h2 {
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
+
+    p {
+        font-size: 14px;
+        margin-bottom: 25px;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    ul {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+
+        li {
+            margin-bottom: 0;
+
+            &:before {
+                content: '•';
+                margin-right: 10px;
+            }
+        }
+    }
+}
+
+.activity-detail-item {
+    margin-bottom: 30px;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.same-place-activities {
+    padding-top: 80px;
+    padding-bottom: 80px;
+
+    h2 {
+        font-size: 30px;
+        text-align: center;
+        margin: 0 0 30px;
+    }
+
+    .activity-listing {
+        margin-bottom: 0;
+    }
+}
+
+.other-locations {
+    h2 {
+        font-size: 30px;
+        text-align: center;
+        margin: 0 0 30px;
+    }
+}

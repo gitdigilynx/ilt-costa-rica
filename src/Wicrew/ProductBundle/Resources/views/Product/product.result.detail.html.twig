@@ -1,0 +1,44 @@
+<div class="product-result-item clearfix">
+    <div class="image-block">
+        <img src="{{ app.request.getSchemeAndHttpHost() ~ vich_uploader_asset(product.vehicleType, 'imageFile') }}" width="{{ getParameterValue('global_image_vehicletype_width') }}" height="{{ getParameterValue('global_image_vehicletype_height') }}" />
+    </div>
+    <div class="product-info-block">
+        <div class="vehicle-type">
+            <div class="vehicle-name"><strong>{{ product.vehicleType.name }}</strong></div>
+            {% if product.vehicleType.maxPassengerNumber %}<div class="vehicle-passenger vehicle-data">{{ product.vehicleType.maxPassengerNumber }} {{ 'vehicle.passenger'|trans() }}</div>{% endif %}
+            {% if product.vehicleType.maxLuggageWeight %}<div class="vehicle-luggage vehicle-data">{{ product.vehicleType.maxLuggageWeight }} {{ 'vehicle.luggage.weight'|trans() }}</div>{% endif %}
+            {% if product.vehicleType.airConditioning %}<div class="vehicle-air vehicle-data">{{ 'vehicle.aircondition'|trans() }}</div>{% endif %}
+            {% if product.vehicleType.catchySentence %}<div class="vehicle-sentence vehicle-data">{{ product.vehicleType.catchySentence }}</div>{% endif %}
+        </div>
+
+        {% if product.note is not null %}
+            <div class="product-note">
+                <div><strong>{{ 'product.form.note'|trans() }}</strong></div>
+                <div>{{ product.note }}</div>
+            </div>
+        {% endif %}
+    </div>
+    <div class="destination-block">
+        <div class="destination-from"><strong>{{ 'from'|trans() }}</strong> {{ product.areaFrom }}</div>
+        <div class="destination-to"><strong>{{ 'to'|trans() }}</strong> {{ product.areaTo }}</div>
+    </div>
+    <div class="time-block">
+        <div class="time-hours"><strong>{{ 'time'|trans() }}</strong> {{ product.duration }} {{ 'hours'|trans() }}</div>
+        {% if product.transportationType.privateType %}
+            {% set price = '$' ~ product.vehicleRackPrice ~ ' ' ~ 'price.currency.perride'|trans() %}
+        {% else %}
+            {% set price = '$' ~ product.adultRackPrice ~ ' ' ~ 'price.currency.perperson'|trans() %}
+        {% endif %}
+        <div class="time-price"><strong>{{ 'price'|trans() }}</strong> {{ price }}</div>
+    </div>
+    <div class="btn-block">
+        {% if allowToBooking %}
+            {% if tripType != constant('\\App\\Wicrew\\ProductBundle\\Entity\\Product::TRIP_TYPE_ONE_WAY') %}
+                <input type="button" value="{{ 'vehicle.select'|trans() }}" id="select_vehicle_{{ product.id }}" class="select-vehicle-required btn-black lg-btn" data-id="{{ product.id }}" />
+            {% else %}
+                <input type="button" value="{{ 'booknow'|trans() }}" id="booknow" class="select-vehicle btn-black" data-id="{{ product.id }}" />
+            {% endif %}
+        {% endif %}
+        <input type="hidden" id="date_trip" name="result[date_trip][{{ product.id }}]" value="{{ productDest.date|date("Y-m-d") }}" />
+    </div>
+</div>

@@ -1,0 +1,4 @@
+wicrew_activity:
+    resource: '@WicrewActivityBundle/Controller/ActivityController.php'
+    type: annotation
+    prefix:

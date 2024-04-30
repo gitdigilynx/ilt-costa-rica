@@ -1,0 +1,19 @@
+{% extends "@WicrewCore/Email/main.email.html.twig" %}
+
+{% block titlemail %}
+    {{ 'booking.request.notallow'|trans() }}
+{% endblock %}
+
+{% block mailcontent %}
+    <div class="contact-content">
+        <div class="header-information">
+            <div>{{ 'email.hi'|trans() }} Admin</div>
+            <div>{{ 'email.allow.request'|trans() }}</div>
+        </div>
+        <div class="contact-information">
+            <div>{{ contact.firstName }} {{ contact.lastName }}</div>
+            <div>{{ contact.email }}</div>
+            <div>{{ contact.notes }}</div>
+        </div>
+    </div>
+{% endblock %}

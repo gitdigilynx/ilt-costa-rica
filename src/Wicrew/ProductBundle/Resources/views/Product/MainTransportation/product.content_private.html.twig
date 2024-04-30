@@ -1,0 +1,215 @@
+<div class="private-transportation-page">
+    <div class="container">
+        <div class="row benefit-title">
+            <div class="col">
+                <h2>Your Benefits</h2>
+            </div>
+        </div>
+
+        <div class="row benefits">
+            <div class="col-12 col-md">
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <img src="{{ absolute_url(asset('bundles/wicrewcore/images/pricetag.svg')) }}" alt="">
+                    </div>
+                    <div class="benefit-content">
+                        <h4>All-inclusive rates</h4>
+                        <p>There are no hidden surprises with ILT. Your affordable, all-inclusive rate covers all taxes,
+                            tolls, and fees. Nothing else.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md">
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <img src="{{ absolute_url(asset('bundles/wicrewcore/images/safe.svg')) }}" alt="">
+                    </div>
+                    <div class="benefit-content">
+                        <h4>Compliance & Safety</h4>
+                        <p>Count on drivers and vehicles that are fully licensed and insured, and operate in complete
+                            compliance with local regulations.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md">
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <img src="{{ absolute_url(asset('bundles/wicrewcore/images/flexibility.svg')) }}" alt="">
+                    </div>
+                    <div class="benefit-content">
+                        <h4>Flexible & Convenient</h4>
+                        <p>Schedule your private transfers on your needs from any airport, hotel, villa or private home
+                            at any time, and we’ll be there.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md">
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <img src="{{ absolute_url(asset('bundles/wicrewcore/images/direction.svg')) }}" alt="">
+                    </div>
+                    <div class="benefit-content">
+                        <h4>Perks</h4>
+                        <p>Enjoy complimentary stops at your leisure for photographs, meals, and restroom breaks, along
+                            with Wifi on all your private transfers.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md">
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <img src="{{ absolute_url(asset('bundles/wicrewcore/images/scale-icon.svg')) }}" alt="">
+                    </div>
+                    <div class="benefit-content">
+                        <h4>Price Match Guarantee</h4>
+                        <p>If you see the same service we provide offered at a lower price from a competitor, we’ll
+                            match it. It’s that simple!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row our-fleet-title">
+            <div class="col">
+                <h2>Our Fleet</h2>
+            </div>
+        </div>
+
+        <div class="row our-fleet-block private-shuttles-fleet">
+            <div class="col-12 col-md">
+                <div class="image-block">
+                    <img src="{{ absolute_url(asset('bundles/wicrewcore/images/our-fleet/hyundai-h-1.jpg')) }}"
+                         alt="Hyundai H-1">
+                </div>
+                <div class="content-block">
+                    <h3>Hyundai H-1</h3>
+                    <ul style="padding-left: 10%;">
+                        {% set maxpassengers = getVehicleMaxPassengerByName("Hyundai H-1") %}
+                        <li>{{ maxpassengers }} passengers</li>
+                        <li>{{ maxpassengers }} suitcases</li>
+                        <li>Air conditioning</li>
+                    </ul>
+                </div>
+            </div>
+
+           <div class="col-12 col-md">
+               <div class="image-block">
+                   <img src="{{ absolute_url(asset('bundles/wicrewcore/images/our-fleet/toyota-hiace.jpg')) }}"
+                        alt="Toyota Hiace">
+               </div>
+               <div class="content-block">
+                   <h3>Toyota Hiace</h3>
+                    <ul style="padding-left: 10%;">
+                        {% set maxpassengers = getVehicleMaxPassengerByName("Toyota Hiace") %}
+                        <li>{{ maxpassengers }} passengers</li>
+                        <li>{{ maxpassengers }} suitcases</li>
+                        <li>Air conditioning</li>
+                   </ul>
+               </div>
+           </div>
+
+            <div class="col-12 col-md">
+                <div class="image-block">
+                    <img src="{{ absolute_url(asset('bundles/wicrewcore/images/our-fleet/mercedes-sprinter.jpg')) }}"
+                         alt="Mercedes Sprinter">
+                </div>
+                <div class="content-block">
+                    <h3>Mercedes Sprinter</h3>
+                    <ul style="padding-left: 10%;">
+                        {% set maxpassengers = getVehicleMaxPassengerByName("Mercedes Sprinter") %}
+                        <li>{{ maxpassengers }} passengers</li>
+                        <li>{{ maxpassengers }} suitcases</li>
+                        <li>Air conditioning</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-12 col-md">
+                <div class="image-block">
+                    <img src="{{ absolute_url(asset('bundles/wicrewcore/images/our-fleet/coaster-bus.jpg')) }}"
+                         alt="Coaster Bus">
+                </div>
+                <div class="content-block">
+                    <h3>Coaster Bus</h3>
+                    <ul style="padding-left: 10%;">
+                        {% set maxpassengers = getVehicleMaxPassengerByName("Toyota Coaster") %}
+                        <li>{{ maxpassengers }} passengers</li>
+                        <li>{{ maxpassengers }} suitcases</li>
+                        <li>Air conditioning</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-12 col-md">
+               <div class="image-block">
+                   <img src="{{ absolute_url(asset('bundles/wicrewcore/images/our-fleet/bus.png')) }}"
+                        alt="Bus">
+               </div>
+               <div class="content-block">
+                   <h3>Bus</h3>
+                    <ul style="padding-left: 10%;">
+                        {% set maxpassengers = getVehicleMaxPassengerByName("Bus") %}
+                        <li>{{ maxpassengers }} passengers</li>
+                        <li>{{ maxpassengers }} suitcases</li>
+                        <li>Air conditioning</li>
+                   </ul>
+               </div>
+           </div>
+        </div>
+    </div>
+</div>
+
+<div class="reliable-convenient-safe-block">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <img src="{{ absolute_url(asset('bundles/wicrewcore/images/reliable-convenient-safe.jpg')) }}"
+                     alt="Reliable, Convenient & Safe">
+
+                <h2>Reliable, Convenient & Safe</h2>
+                <p>Our private transfers can be scheduled at any time, from any airport, hotel, villa or private home in
+                    Costa Rica. All our vehicles are recent models, air conditioned, well-maintained and driven by
+                    reliable and punctual Costa Rican professionals, who are there to help you move safely around the
+                    country.</p>
+                <p>Transportation in Costa Rica can be tricky.</p>
+                <p>Many visitors to Costa Rica make the mistake of underestimating driving distances, driving
+                    conditions, and the amount of patience and perseverance required to navigate between destinations.
+                    Our private transfer service removes the hassle and stress of navigating on your own, while still
+                    being flexible with your travel schedule. Our private transfer service can be customized to fit
+                    whatever your travel needs may be, and also provides more opportunities to enjoy the beautiful
+                    scenery and stretch out in the roomy interior, while letting your driver plot the best course.</p>
+                <p>Additionally, we can always customize a scenic adventure for your group to attractions between travel
+                    destinations, such as a short hike in a national park, a visit to a coffee plantation, Zip lining,
+                    shopping in a traditional Costa Rican town, or admiring a waterfall. Enjoy peace of mind & ride in
+                    comfort with our trusted private premium transfer service.</p>
+                <p>Enjoy 24/7 Customer Service & All-Inclusive rates with a price match guarantee. It’s that simple!</p>
+
+                <h3>Why choose ILT Costa Rica as your private transfer service throughout Costa Rica?</h3>
+                <p>When you book transportation with us, know that you will be driven by one of our family members which
+                    is what we consider our team here at ILT Costa Rica. We treat our customers with the upmost
+                    personalized service so you enjoy our country stress free, just check our reviews on TripAdvisor and
+                    you will see what I mean.</p>
+                <h3>Shopping around for lower prices?</h3>
+                <p>We completely understand, as you should in any situation, but
+                    please keep in mind that a cost-effective travel service is not just about paying a lower price but
+                    getting the value for what you pay. Cheap is not necessarily the best option always, and many people
+                    when looking to save money focus on getting the cheapest deal, thinking this is the most effective
+                    strategy, yet what they often forget is to look at the value rather than cost, so, when you are
+                    comparing quotes for your transportation, dig deeper into the companies to ensure you are getting
+                    your money’s worth, you really do get what you pay for.</p>
+                <h3>Why are other companies cheaper?</h3>
+                <p>It is the only way other companies can compete against our unbeatable
+                    service, by lowering their prices, <strong><u>not</u></strong> by offering you a better service!! But just don’t just take
+                    my word for it, again just check our reviews and compare with any other company, and you’ll see why
+                    we are <strong>Rated Number #1 on TripAdvisor!!</strong></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .our-fleet-block li p {
+        display: inline;
+        margin: 0;
+    }
+</style>

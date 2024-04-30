@@ -1,0 +1,14 @@
+{% extends "@EasyAdmin/default/new.html.twig" %}
+
+{% block main %}
+    {{ parent() }}
+
+
+    <script>
+        $(function() {
+            $('#extra_addByDefault').closest('.col-12').hide();
+        });
+    </script> 
+
+    {% include "@WicrewAddon/Admin/submit.js.html.twig" with { "entity": entity } %}
+{% endblock %}

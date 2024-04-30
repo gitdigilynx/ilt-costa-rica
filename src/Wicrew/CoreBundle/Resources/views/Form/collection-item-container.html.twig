@@ -1,0 +1,22 @@
+{% block collection_item_container %}
+    <div {{ block('widget_attributes') }}>
+        {% for key, field in form.children %}
+            {% if "hidden" in field.vars.block_prefixes %}
+                {{ form_widget(field) }}
+            {% else %}
+                <div class="form-group {% if field.vars.errors|length %}has-error{% endif %} col">
+                    {{ form_widget(field) }}
+                    {{ form_help(field) }}
+                    {{ form_errors(field) }}
+                </div>
+            {% endif %}
+        {% endfor %}
+        {% if form.parent.vars.allow_delete|default(false) %}
+            <div class="form-actions col">
+                <a href="javascript:void(0);" onclick="jQuery(this).parents('div:eq(1)').remove();return false;"
+                   class="collection-remove btn btn-default" title="Delete element"><span
+                            class="glyphicon glyphicon-trash"></span></a>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

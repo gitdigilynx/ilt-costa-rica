@@ -1,0 +1,18 @@
+# Read the documentation: https://symfony.com/doc/current/bundles/FOSCKEditorBundle/index.html
+fos_ck_editor:
+    input_sync: true
+    default_config: advanced
+    configs:
+        advanced:
+            toolbar: 'full'
+            filebrowserBrowseRoute: 'elfinder'
+            filebrowserBrowseRouteParameters: []
+            allowedContent: true
+        basic:
+            # https://docs-old.ckeditor.com/CKEditor_3.x/Developers_Guide/Toolbar
+            toolbar:
+                - { name: "styles", items: ['Bold', 'Italic', 'BulletedList', 'Link'] }
+
+twig:
+    form_themes:
+        - '@FOSCKEditor/Form/ckeditor_widget.html.twig'

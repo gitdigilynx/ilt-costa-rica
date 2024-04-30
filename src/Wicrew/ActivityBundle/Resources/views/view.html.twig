@@ -1,0 +1,345 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ activity.name }}{% endblock %}
+{% block meta_title %}{{ activity.metaTitle }}{% endblock %}
+{% block meta_description %}{{ activity.metaDescription }}{% endblock %}
+{% block meta_keywords %}{{ activity.metaKeywords }}{% endblock %}
+
+{% block body %}
+    <div class="main-activity-content" id="main_activity_content">
+        {% embed '@WicrewActivity/Headers/header.activity.html.twig' %}
+            {% block title %}
+                {{ activity.location.name }}
+            {% endblock %}
+        {% endembed %}
+
+        <div>
+            <section class="breadcrumbs">
+                <div class="container">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/">{{ "Home"|trans }}</a></li>
+                            <li class="breadcrumb-item"><a href="{{ path("wicrew_locations") }}"
+                                                           title="{{ "Activities Destinations"|trans }}">{{ "Activities Destinations"|trans }}</a>
+                            </li>
+                            <li class="breadcrumb-item"><a
+                                        href="{{ path("wicrew_activities", {location: activity.location.slug}) }}"
+                                        title="{{ activity.location.name }}">{{ activity.location.name }}</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">{{ activity.name }}</li>
+                        </ol>
+                    </nav>
+                </div>
+            </section>
+
+            <section class="activity-detail">
+                <div class="container activity-container">
+                    <div class="row activity-header">
+
+                        <div class="col-md-7">
+                            <div class="activity-image activity-slider-block">
+                                {% for slide in activity.slides %}
+                                    <div class="item-block">
+                                        <img src="{{ app.request.getSchemeAndHttpHost() ~ vich_uploader_asset(slide, 'imageFile') }}"
+                                             alt="{{ activity.name }}"/>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="col-md-5">
+                            <div class="activity-info">
+                                <h1>{{ activity.name }}</h1>
+
+                                <div class="trip-info">
+                                    <ul>
+                                        <li class="location"><strong>{{ "activity.location"|trans }}
+                                                :</strong> {{ activity.location.name }}</li>
+                                        <li class="pickuptime"><strong>{{ "activity.tour_time"|trans }}
+                                                :</strong> {{ activity.tourTime|join(", ") }}</li>
+                                        <li class="duration">
+                                            <strong>{{ "activity.duration"|trans }} :</strong>
+                                            {% if stringsEqualIgnoreCase(activity.duration, "activity.duration.option.1_2_hours"|trans([], null, null, 'en')) %}
+                                                {{ "activity.duration.option.1_2_hours"|trans }}
+                                            {% elseif stringsEqualIgnoreCase(activity.duration, "activity.duration.option.half_day"|trans([], null, null, 'en')) %}
+                                                {{ "activity.duration.option.half_day"|trans }}
+                                            {% elseif stringsEqualIgnoreCase(activity.duration, "activity.duration.option.full_day"|trans([], null, null, 'en')) %}
+                                                {{ "activity.duration.option.full_day"|trans }}
+                                            {% endif %}
+                                        </li>
+
+                                        <li class="difficulty">
+                                            <strong>{{ "activity.difficulty_levels"|trans }} :</strong>
+                                            {% set difficultyLabels = [] %}
+                                            {% for level in activity.difficultyLevels %}
+                                                {% if level == constant('App\\Wicrew\\ActivityBundle\\Entity\\Activity::DIFFICULTY_EASY') %}
+                                                    {% set difficultyLabels = difficultyLabels|merge(["Easy"|trans]) %}
+                                                {% elseif level == constant('App\\Wicrew\\ActivityBundle\\Entity\\Activity::DIFFICULTY_MODERATE') %}
+                                                    {% set difficultyLabels = difficultyLabels|merge(["Moderate"|trans]) %}
+                                                {% elseif level == constant('App\\Wicrew\\ActivityBundle\\Entity\\Activity::DIFFICULTY_DIFFICULT') %}
+                                                    {% set difficultyLabels = difficultyLabels|merge(["Difficult"|trans]) %}
+                                                {% endif %}
+                                            {% endfor %}
+                                            {{ difficultyLabels|join(", ", " " ~ "and"|trans ~ " ") }}
+                                        </li>
+                                        <li class="min-age">
+                                            <strong>{{ 'activity.age_group'|trans }} :</strong>
+                                            {{ activity.ageGroup }}+
+                                        </li>
+                                        <li class="notecustomer"><strong>{{ "Notes"|trans }}
+                                                :</strong> {{ activity.notesToDisplayToTheCustomer }}</li>
+                                    </ul>
+                                </div>
+                                {% set priceActivity = getActivityFeeForAdultAndChild(activity) %}
+                                {% set priceAdultActivity = priceActivity["adultRack"] %}
+                                {% set priceKidActivity = priceActivity["childRack"] %}
+                               
+                                {% if 1 in priceActivity.priceType %}
+
+                                    {% set groupPriceAdultActivity = priceActivity["groupAdultRack"] %}
+                                    {% set groupPriceKidActivity = priceActivity["groupChildRack"] %}
+                              
+                                    <div class="price-info">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="price-container" style="margin-bottom: 12px; font-weight: bold;">Group</div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="price-info-col-left col-lg-6">
+                                                <div class="from">{{ "from"|trans }}</div>
+                                                <div class="price">{{ 'currency.symbol'|trans() }}{{ groupPriceAdultActivity }}</div>
+                                                <div class="price-detail">
+                                                    <span class="currency">{{ getCurrencyTranslationKey() }}</span>
+                                                    <span class="per-person">{{ (priceActivity['priceType'] == constant('App\\Wicrew\\CoreBundle\\Entity\\IBasePriceEntity::PRICE_TYPE_FOR_THE_TRIP') and not activity.isCombo) ? "per.fixed"|trans : "per.adult"|trans }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="price-info-col-right col-lg-6">
+                                                {% if priceActivity['priceType'] != constant('App\\Wicrew\\CoreBundle\\Entity\\IBasePriceEntity::PRICE_TYPE_FOR_THE_TRIP') %}
+                                                    <div class="from">{{ "from"|trans }}</div>
+                                                    <div class="price">{{ 'currency.symbol'|trans() }}{{ groupPriceKidActivity }}</div>
+                                                    <div class="price-detail">
+                                                        <span class="currency">{{ getCurrencyTranslationKey() }}</span>
+                                                        <span class="per-person">{{ "per.child"|trans }}</span>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+                                {% if 2 in priceActivity.priceType %}
+
+                                    <div class="price-info">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="price-container" style="margin-bottom: 12px; font-weight: bold;">Private</div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="price-info-col-left col-lg-6">
+                                                <div class="from">{{ "from"|trans }}</div>
+                                                <div class="price">{{ 'currency.symbol'|trans() }}{{ priceAdultActivity }}</div>
+                                                <div class="price-detail">
+                                                    <span class="currency">{{ getCurrencyTranslationKey() }}</span>
+                                                    <span class="per-person">{{ (priceActivity['priceType'] == constant('App\\Wicrew\\CoreBundle\\Entity\\IBasePriceEntity::PRICE_TYPE_FOR_THE_TRIP') and not activity.isCombo) ? "per.fixed"|trans : "per.adult"|trans }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="price-info-col-right col-lg-6">
+                                                {% if priceActivity['priceType'] != constant('App\\Wicrew\\CoreBundle\\Entity\\IBasePriceEntity::PRICE_TYPE_FOR_THE_TRIP') %}
+                                                    <div class="from">{{ "from"|trans }}</div>
+                                                    <div class="price">{{ 'currency.symbol'|trans() }}{{ priceKidActivity }}</div>
+                                                    <div class="price-detail">
+                                                        <span class="currency">{{ getCurrencyTranslationKey() }}</span>
+                                                        <span class="per-person">{{ "per.child"|trans }}</span>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+
+                                <div class="btn-group">
+                                    <form method="post" action="{{ url('start_booking') }}">
+                                        <input type="hidden" name="activityIDs[]" value="{{ activity.id }}">
+                                        <button type="submit" class="btn-black">{{ "booknow"|trans }}</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- container -->
+
+                <div class="activity-detail">
+                    <div class="container activity-tab-desc-block">
+                        <ul>
+                            <li>
+                                <a href="#" class="active"
+                                   data-target=".activity-description">{{ "Description"|trans }}</a>
+                            </li>
+                            <li>
+                                <a href="#" data-target=".activity-highlight">{{ "Tour Highlight"|trans }}</a>
+                            </li>
+                            <li>
+                                <a href="#" data-target=".activity-included">{{ "What's included"|trans }}</a>
+                            </li>
+                            <li>
+                                <a href="#" data-target=".activity-to-bring">{{ "What to Bring"|trans }}</a>
+                            </li>
+                            <li>
+                                <a href="#"
+                                   data-target=".activity-important-info">{{ "Important Information"|trans }}</a>
+                            </li>
+                            <li>
+                                <a href="#" data-target=".activity-policy">{{ "Cancellation Policy"|trans }}</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="activity-detail-content-block">
+                        <div class="container">
+                            <div class="activity-detail-item activity-description">
+                                <h2>{{ "Description"|trans }}</h2>
+                                <p>{{ activity.description|raw }}</p>
+                            </div>
+                            <div class="activity-detail-item activity-highlight">
+                                <h2>{{ "Tour Highlight"|trans }}</h2>
+                                <p>{{ activity.highlight|raw }}</p>
+                            </div>
+                            <div class="activity-detail-item activity-included">
+                                <h2>{{ "What's included"|trans }}</h2>
+                                <p>{{ activity.included|raw }}</p>
+                            </div>
+                            <div class="activity-detail-item activity-to-bring">
+                                <h2>{{ "What to Bring"|trans }}</h2>
+                                <p>{{ activity.whatToBring|raw }}</p>
+                            </div>
+                            <div class="activity-detail-item activity-important-info">
+                                <h2>{{ "Important Information"|trans }}</h2>
+                                <p>{{ activity.importantNotes|raw }}</p>
+                            </div>
+                            <div class="activity-detail-item activity-policy">
+                                <h2>{{ "Cancellation Policy"|trans }}</h2>
+                                <p>{{ activity.cancellationPolicy|raw }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if otherActivities|length > 0 %}
+                    <div class="same-place-activities">
+                        <div class="container">
+                            <h2>{{ "Other Tours from"|trans ~ " " ~ activity.location.name }}</h2>
+
+                            <div class="activity-listing row">
+                                {% for activity in otherActivities %}
+                                    <div class="col-lg-3 col-sm-6 activity-col">
+                                        <div class="activity-item">
+                                            {% if activity.slides|length > 0 and activity.slides[0].image != "" %}
+                                                <div class="image-box">
+                                                    <a href="/{{ activity.slug }}">
+                                                        <div class="image">
+                                                            <img src="{{ app.request.getSchemeAndHttpHost() ~ vich_uploader_asset(activity.slides[0], 'imageFile') }}"
+                                                                 alt="{{ activity.name }}"/>
+                                                        </div>
+                                                        <span class="title">{{ activity.name }}</span>
+                                                    </a>
+                                                </div>
+                                            {% endif %}
+                                            <div class="trip-info">
+                                                <ul>
+                                                    <li class="duration">
+                                                        {% if activity.duration == "activity.duration.option.1_2_hours"|trans %}
+                                                            {{ "activity.duration.option.1_2_hours"|trans }}
+                                                        {% elseif activity.duration == "activity.duration.option.half_day"|trans %}
+                                                            {{ "activity.duration.option.half_day"|trans }}
+                                                        {% elseif activity.duration == "activity.duration.option.full_day"|trans %}
+                                                            {{ "activity.duration.option.full_day"|trans }}
+                                                        {% endif %}
+                                                    </li>
+                                                    <li class="difficulty">
+                                                        {% set difficultyLabels = [] %}
+                                                        {% for level in activity.difficultyLevels %}
+                                                            {% if level == constant('App\\Wicrew\\ActivityBundle\\Entity\\Activity::DIFFICULTY_EASY') %}
+                                                                {% set difficultyLabels = difficultyLabels|merge(["Easy"|trans]) %}
+                                                            {% elseif level == constant('App\\Wicrew\\ActivityBundle\\Entity\\Activity::DIFFICULTY_MODERATE') %}
+                                                                {% set difficultyLabels = difficultyLabels|merge(["Moderate"|trans]) %}
+                                                            {% elseif level == constant('App\\Wicrew\\ActivityBundle\\Entity\\Activity::DIFFICULTY_DIFFICULT') %}
+                                                                {% set difficultyLabels = difficultyLabels|merge(["Difficult"|trans]) %}
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                        {{ difficultyLabels|join(", ", " " ~ "and"|trans ~ " ") }}
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="price-info">
+                                                <div class="row">
+                                                    <div class="col-custom col-xl-7">
+                                                        {% set priceActivity = getActivityFeeForAdultAndChild(activity) %}
+                                                        <div class="from">{{ "from"|trans }}</div>
+                                                        <div class="price">{{ 'currency.symbol'|trans() }}
+                                                            {% if priceActivity["adultRack"] == "0.00"%}
+                                                                {{ priceActivity["groupAdultRack"] }}
+                                                            {% else %}
+                                                                {{ priceActivity["adultRack"] }}
+                                                            {% endif %}
+                                                            <span class="currency">{{ 'currency.text.tax'|trans() }}</span>
+                                                        </div>
+                                                        <div class="per-person">
+                                                            {{ priceActivity['priceType'] == constant('App\\Wicrew\\CoreBundle\\Entity\\IBasePriceEntity::PRICE_TYPE_FOR_THE_TRIP') ? "per.fixed"|trans : "per.person"|trans }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-custom col-xl-5 col-readmore">
+                                                        <a href="/{{ activity.slug }}" class="btn-black readmore"
+                                                           title="{{ "Read More"|trans }}">{{ "Read More"|trans }}</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if locations|length > 0 %}
+                    <div class="other-locations locations">
+                        <div class="container">
+                            <h2>{{ "Tours From Other Locations"|trans }}</h2>
+
+                            <div class="row location-items">
+                                {% for location in locations %}
+                                    <div class="col-lg-4 col-sm-6 location-info">
+                                        <a href="{{ path("wicrew_activities", { location: location.slug }) }}"
+                                           title="{{ location.name }}" class="location-item">
+                                            {% if location.image != "" %}
+                                                <div class="image">
+                                                    <img src="{{ app.request.getSchemeAndHttpHost() ~ vich_uploader_asset(location, 'imageFile') }}"
+                                                         alt="{{ location.name }}"/>
+                                                </div>
+                                            {% else %}
+                                                <div class="image">
+                                                    <img src="{{ absolute_url(asset('bundles/wicrewcore/images/placeholder.png')) }}">
+                                                </div>
+                                            {% endif %}
+                                            <div class="d-flex title">
+                                                <h3 class="align-self-center">Tours from {{ location.name }}</h3>
+                                            </div>
+                                            <div class="d-flex btn"><span
+                                                        class="align-self-center">{{ "View Tours"|trans }}</span></div>
+                                        </a>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div> <!-- container -->
+                {% endif %}
+
+            </section>
+
+            {# {% include "@WicrewPage/testimonials.html.twig" %} #}
+        </div>
+    </div>
+{% endblock %}
+

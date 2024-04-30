@@ -1,0 +1,46 @@
+services:
+    wicrew.core.security:
+        class: App\Wicrew\CoreBundle\Security\EasyAdminSecurityEventSubscriber
+        arguments: ['@security.access.decision_manager', '@security.token_storage' ]
+        tags:
+            - { name: kernel.event_subscriber }
+
+    wicrew.core.utils:
+        class: App\Wicrew\CoreBundle\Service\Utils
+        arguments: ["@service_container", "@doctrine.orm.entity_manager", "@translator", "@filesystem", "@session"]
+        public: true
+
+    wicrew.core.cache:
+        class: App\Wicrew\CoreBundle\Service\Cache
+#        arguments: ["@wicrew.core.utils"]
+        public: true
+
+    wicrew.core.writer:
+        class: App\Wicrew\CoreBundle\Service\Writer
+        arguments: ["@wicrew.core.utils"]
+        public: true
+
+    wicrew.core.mailer:
+        class: App\Wicrew\CoreBundle\Service\Mailer
+        arguments: ['@wicrew.core.utils']
+        public: true
+
+    wicrew.core.mailchimp:
+        class: App\Wicrew\CoreBundle\Service\Mailchimp
+        arguments: ["@wicrew.core.utils"]
+        public: true
+
+    wicrew.core.stripe:
+        class: App\Wicrew\CoreBundle\Service\Stripe
+        arguments: ["@wicrew.core.utils"]
+        public: true
+
+    wicrew.core.reminder:
+        class: App\Wicrew\CoreBundle\Service\Reminder
+        arguments: ["@wicrew.core.utils"]
+        public: true
+
+    wicrew.twig.security:
+        class: App\Wicrew\CoreBundle\Twig\SecurityExtension
+        arguments: ["@wicrew.core.security"]
+

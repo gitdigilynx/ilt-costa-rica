@@ -1,0 +1,272 @@
+{% if targetFields is defined and targetFields|length > 0 %}
+    {% for targetField in targetFields %}
+        <style type="text/css">
+            /* Always set the map height explicitly to define the size of the div
+             * element that contains the map. */
+            #{{ targetField.destInputId }}Map {
+                width: {% if mapSize.width is defined %}{{ targetField.mapSize.width }}{% else %}100%{% endif %};
+                height: {% if mapSize.height is defined %}{{ targetField.mapSize.height }}{% else %}300px{% endif %};
+            }
+
+            .controls {
+                background-color: #fff;
+                border-radius: 2px;
+                border: 1px solid transparent;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+                box-sizing: border-box;
+                font-family: Roboto, serif;
+                font-size: 15px;
+                font-weight: 300;
+                height: 29px;
+                margin-left: 17px;
+                margin-top: 10px;
+                outline: none;
+                padding: 0 11px 0 13px;
+                text-overflow: ellipsis;
+                width: 400px;
+            }
+
+            .controls:focus {
+                border-color: #4d90fe;
+            }
+
+            .title {
+                font-weight: bold;
+            }
+
+            #{{ targetField.destInputId }}-infowindow-content {
+                display: none;
+            }
+
+            #{{ targetField.destInputId }}Map #{{ targetField.destInputId }}-info-content {
+                display: inline;
+            }
+        </style>
+        <script type="text/javascript">
+            var options = {componentRestrictions: {country: 'cr'}};
+
+            function init{{ targetField.destInputId }}() {
+                let showMap = {% if targetField.showMap is not defined or targetField.showMap == true %}true{% else %}false{% endif %};
+
+                // Get the target input field
+                var targetInput = document.getElementById("{{ targetField.destInputId }}");
+                if (targetInput == null || targetInput === undefined) {
+                    return;
+                }
+
+                // Prevent hitting enter on a result from firing the form.
+                google.maps.event.addDomListener(targetInput, 'keydown', function (event) {
+                    if (event.keyCode === 13) {
+                        event.preventDefault();
+                    }
+                });
+
+                var googlePlaceIdInput = null;
+                {% if targetField.googlePlaceIdInputId is defined %}
+                googlePlaceIdInput = document.getElementById("{{ targetField.googlePlaceIdInputId }}");
+                {% endif %}
+
+                if (showMap && googlePlaceIdInput != null) {
+                    targetInput.style.display = "none";
+                }
+
+                if (showMap) {
+                    targetInput.setAttribute("readonly", "readonly");
+
+                    var inputContainer = targetInput.parentElement;
+
+                    // Create and append a search input as the input for searching
+                    var searchInput = document.createElement("input");
+                    searchInput.setAttribute("class", "controls");
+                    searchInput.setAttribute("placeholder", "{{ "google.place.search_input.placeholder"|trans }}");
+                    searchInput.style.display = "none";
+                    if (googlePlaceIdInput != null) {
+                        searchInput.value = targetInput.value;
+                    }
+                    inputContainer.appendChild(searchInput);
+
+                    // Create and append a map container
+                    var mapContainer = document.createElement("div")
+                    mapContainer.setAttribute("id", "{{ targetField.destInputId }}Map");
+                    inputContainer.appendChild(mapContainer);
+
+                    // Create and append a info container
+                    var infoContainer = document.createElement("div")
+                    infoContainer.setAttribute("id", "{{ targetField.destInputId }}-info-content");
+                    infoContainer.style.display = "none";
+                    inputContainer.appendChild(infoContainer);
+
+                    var placeName = document.createElement("span");
+                    placeName.setAttribute("id", "{{ targetField.destInputId }}PlaceName");
+                    placeName.setAttribute("class", "title");
+                    infoContainer.appendChild(placeName);
+
+                    var newLine1 = document.createElement("br");
+                    infoContainer.appendChild(newLine1);
+
+                    var titlePlaceId = document.createElement("strong");
+                    titlePlaceId.innerText = "{{ "google.place.info.id"|trans }}";
+                    infoContainer.appendChild(titlePlaceId);
+
+                    var placeId = document.createElement("span");
+                    placeId.setAttribute("id", "{{ targetField.destInputId }}PlaceId");
+                    infoContainer.appendChild(placeId);
+
+                    var newLine2 = document.createElement("br");
+                    infoContainer.appendChild(newLine2);
+
+                    var placeAddress = document.createElement("span");
+                    placeAddress.setAttribute("id", "{{ targetField.destInputId }}PlaceAddress");
+                    infoContainer.appendChild(placeAddress);
+
+                    // Set info window content
+                    var infoWindow = new google.maps.InfoWindow();
+                    var infoContainer = document.getElementById("{{ targetField.destInputId }}-info-content");
+                    infoWindow.setContent(infoContainer);
+
+                    // Initialize the map
+                    var map = new google.maps.Map(mapContainer, {
+                        center: {
+                            lat: {{ getSystemConfigValue('google-api/place/default_lat') }},
+                            lng: {{ getSystemConfigValue('google-api/place/default_long') }}},
+                        zoom: {{ getSystemConfigValue('google-api/place/default_zoom') }}
+                    });
+                    map.addListener('tilesloaded', function () {
+                        searchInput.style.display = "block";
+                    });
+
+                    // Setup the positioning for the search input
+                    map.controls[google.maps.ControlPosition.TOP_LEFT].push(searchInput);
+
+                    var marker = new google.maps.Marker({map: map});
+
+                    marker.addListener("click", function () {
+                        infoWindow.open(map, marker);
+                    });
+                }
+
+                // Auto mark the selected place
+                if (
+                    showMap
+                    && (
+                        (googlePlaceIdInput != null && googlePlaceIdInput.value.length > 0)
+                        || targetInput.value.length > 0
+                    )
+                ) {
+                    var request = {
+                        placeId: (googlePlaceIdInput != null && googlePlaceIdInput.value.length > 0) ? googlePlaceIdInput.value : targetInput.value,
+                        fields: ["place_id", "geometry", "name", "formatted_address", "formatted_phone_number", "url"]
+                    };
+                    var service = new google.maps.places.PlacesService(map);
+
+                    service.getDetails(request, function (place, status) {
+                        if (status === google.maps.places.PlacesServiceStatus.OK) {
+                            var marker = new google.maps.Marker({
+                                map: map,
+                                position: place.geometry.location
+                            });
+                            google.maps.event.addListener(marker, "click", function () {
+                                infoContainer.children["{{ targetField.destInputId }}PlaceName"].textContent = place.name;
+                                infoContainer.children["{{ targetField.destInputId }}PlaceId"].textContent = place.place_id;
+                                infoContainer.children["{{ targetField.destInputId }}PlaceAddress"].textContent = place.formatted_address;
+                                infoContainer.style.display = "block";
+                                infoWindow.open(map, this);
+                            });
+                            map.setCenter(place.geometry.location);
+                            map.setZoom({{ getSystemConfigValue('google-api/place/default_place_zoom') }});
+                            marker.setVisible(true);
+                        }
+                    });
+                }
+
+                // Apply auto complete feature to the search input
+                var autocomplete = new google.maps.places.Autocomplete(showMap ? searchInput : targetInput, options);
+                if (showMap) {
+                    autocomplete.bindTo("bounds", map);
+                }
+
+                // Specify just the place data fields that you need.
+                autocomplete.setFields(["place_id", "geometry", "name", "formatted_address"]);
+
+                // On click changing the place
+                autocomplete.addListener("place_changed", function () {
+                    let changeEvent = new Event('change', {
+                        bubbles: true
+                    });
+                    targetInput.dispatchEvent(changeEvent);
+
+                    if (showMap) {
+                        infoWindow.close();
+                    }
+
+                    var place = autocomplete.getPlace();
+
+                    {% if targetField.callback is defined %}
+                    if (typeof window["{{ targetField.callback }}"] == "function") {
+                        window["{{ targetField.callback }}"]("{{ targetField.destInputId }}", place);
+                    }
+                    {% endif %}
+
+                    if (!place.geometry) {
+                        return;
+                    }
+
+                    if (googlePlaceIdInput != null) {
+                        googlePlaceIdInput.value = place.place_id;
+
+                        let inputEvent = new Event('input', {
+                            bubbles: true
+                        });
+
+                        googlePlaceIdInput.dispatchEvent(inputEvent);
+                    }
+
+                    if (showMap) {
+                        if (place.geometry.viewport) {
+                            map.fitBounds(place.geometry.viewport);
+                        } else {
+                            map.setCenter(place.geometry.location);
+                            map.setZoom({{ getSystemConfigValue('google-api/place/default_place_zoom') }});
+                        }
+
+                        // Set the position of the marker using the place ID and location.
+                        marker.setPlace({
+                            placeId: place.place_id,
+                            location: place.geometry.location
+                        });
+                        marker.setVisible(true);
+
+                        if (googlePlaceIdInput != null) {
+                            targetInput.value = searchInput.value;
+                        } else {
+                            targetInput.value = place.place_id;
+                        }
+
+                        infoContainer.children["{{ targetField.destInputId }}PlaceName"].textContent = place.name;
+                        infoContainer.children["{{ targetField.destInputId }}PlaceId"].textContent = place.place_id;
+                        infoContainer.children["{{ targetField.destInputId }}PlaceAddress"].textContent = place.formatted_address;
+                        infoContainer.style.display = "block";
+                        infoWindow.open(map, marker);
+                    }
+                });
+            }
+        </script>
+    {% endfor %}
+    <script type="text/javascript">
+        function init() {
+            {% for targetField in targetFields %}
+            init{{ targetField.destInputId }}();
+            {% endfor %}
+        }
+
+        // if(document.readyState === 'loading') {
+        //     document.addEventListener('DOMContentLoaded', runoi);
+        // } else {
+        //     //The DOMContentLoaded event has already fired. Just run the code.
+        //     runoi();
+        // }
+    </script>
+    <script type="text/javascript"
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBqdHKEGoTHOr39woeq_zQlg-sPdiJf6SE&libraries=places&callback=init"
+            async defer></script>
+{% endif %}

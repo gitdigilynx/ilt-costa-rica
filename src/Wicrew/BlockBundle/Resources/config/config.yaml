@@ -1,0 +1,4 @@
+imports:
+    - { resource: "@WicrewBlockBundle/Resources/config/easy_admin.yaml" }
+    - { resource: "@WicrewBlockBundle/Resources/config/services.yaml" }
+#    - { resource: "@WicrewBlockBundle/Resources/config/fos_ckeditor.yaml" }

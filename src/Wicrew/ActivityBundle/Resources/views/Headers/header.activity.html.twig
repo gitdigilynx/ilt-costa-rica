@@ -1,0 +1,32 @@
+{% extends "WicrewCoreBundle:Browsing:browsing.header.html.twig" %}
+{% set backgroundImageURL = absolute_url(asset('bundles/wicrewcore/images/bg_activities.jpg')) %}
+
+{% block title %}
+    Activities
+{% endblock %}
+
+{% block subTitle %}
+    {% if subTitle is defined %}
+        {{ subTitle }}
+    {% endif %}
+{% endblock %}
+
+{% block background_header %}
+    {% if activities is defined and activities[0] is defined %}
+        {% set activity = activities[0] %}
+        {% set is_activity = true %}
+    {% elseif activity is defined %} 
+        {% set is_activity = true %} 
+    {% else %}
+        {% set is_activity = false %}
+    {% endif %}
+
+    <div class="bg"
+        {% if is_activity and activity.location.image != "" %}
+            style="background-image: url('{{ app.request.getSchemeAndHttpHost() ~ vich_uploader_asset(activity.location, 'imageFile') }}');"
+        {% else %}
+            style="background-image: url('{{ absolute_url(asset('bundles/wicrewcore/images/bg_activities.jpg')) }}');"
+        {% endif %}
+    >
+    </div>
+{% endblock %}

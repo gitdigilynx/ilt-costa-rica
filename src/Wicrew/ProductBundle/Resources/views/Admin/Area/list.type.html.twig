@@ -1,0 +1,6 @@
+{% if value == constant('App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT') %}
+    {{ "area.type.option.airport"|trans }}
+{% elseif value == constant('App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AREA') %}
+    {{ "area.type.option.area"|trans }}
+{% endif %}
+

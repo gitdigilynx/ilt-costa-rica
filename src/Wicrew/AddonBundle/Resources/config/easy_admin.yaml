@@ -1,0 +1,104 @@
+easy_admin:
+    design:
+        menu:
+            - { css_class: 'menu--addon', entity: 'Addon', label: 'addon.title', icon: 'comment-dollar', permission: ROLE_ADMIN }
+            - { entity: 'Extra', label: 'extra.title', icon: 'comment-dollar', permission: ROLE_ADMIN }
+    entities:
+        Addon:
+            permissions:
+                list: [ 'ROLE_EMPLOYEE' ]
+                new: [ 'ROLE_EMPLOYEE' ] 
+                edit: [ 'ROLE_EMPLOYEE' ]
+                delete: [ 'ROLE_EMPLOYEE' ]
+            controller: App\Wicrew\AddonBundle\Controller\Admin\AddonController
+            label: 'addon.title'
+            icon: 'comment-dollar'
+            class: App\Wicrew\AddonBundle\Entity\Addon
+            list:
+                title: 'addon.title'
+                fields:
+                    - { property: 'label', label: 'addon.label' }
+                    - { property: 'adultRackPrice', label: 'addon.adult_rack_price' }
+                    - { property: 'adultNetPrice', label: 'addon.adult_net_price' }
+                    - { property: 'childRackPrice', label: 'addon.child_rack_price' }
+                    - { property: 'childNetPrice', label: 'addon.child_net_price' }
+                    - { property: 'extraTransportation', label: 'addon.extra_transportation' }
+                    - { property: 'discountPercentage', label: 'addon.discount_price' }
+                    - { property: 'tax', label: 'addon.tax' }
+                    - { property: 'supplier', label: 'addon.supplier' }
+                    - { property: 'createdAt', label: 'addon.created_at', format: '%global.date.format%' }
+                max_results: '%global.sort.pagination.default%'
+                sort: ['sortOrder', '%global.sort.asc%']
+            form:
+                form_options: { attr: { novalidate: novalidate } }
+                fields:
+                    - { type: 'tab', label: 'addon.tab.general' }
+                    - { type: 'group', label: 'addon.group.information' }
+                    - { property: 'label', label: 'addon.label' }
+                    - { property: 'description', label: 'activity.description', type: 'FOS\CKEditorBundle\Form\Type\CKEditorType', type_options: { config: { filebrowserBrowseRoute: 'elfinder', filebrowserBrowseRouteParameters: { instance: 'image', homeFolder: '' } } } }
+                    - { property: 'type', label: 'addon.type', type: 'choice', type_options: { placeholder: 'core.option.please_select', choices: { 'addon.type.checkbox': !php/const App\Wicrew\AddonBundle\Entity\Addon::TYPE_CHECKBOX, 'addon.type.multi_checkbox': !php/const App\Wicrew\AddonBundle\Entity\Addon::TYPE_MULTI_CHECKBOX, 'addon.type.radio': !php/const App\Wicrew\AddonBundle\Entity\Addon::TYPE_RADIO } } }
+                    - { property: 'adultRackPrice', label: 'addon.adult_rack_price' }
+                    - { property: 'adultNetPrice', label: 'addon.adult_net_price' }
+                    - { property: 'childRackPrice', label: 'addon.child_rack_price' }
+                    - { property: 'childNetPrice', label: 'addon.child_net_price' }
+                    - { property: 'extraTransportation', label: 'addon.extra_transportation' }
+                    - { property: 'rackPrice', label: 'addon.rack_price' }
+                    - { property: 'netPrice', label: 'addon.net_price' }
+                    - { property: 'options', type: 'collection', label: 'addon.options', type_options: { required: true, block_name: 'custom_options', error_bubbling: false, entry_type: 'App\Wicrew\AddonBundle\Form\Type\Option', by_reference: false, entry_options: { label: false } } }
+                    - { property: 'discountPercentage', label: 'addon.discount_price' }
+                    - { property: 'tax', label: 'addon.tax', type_options: { required: true, placeholder: 'core.option.please_select' } }
+                    - { property: 'priceType', label: 'addon.price_type', type: 'choice', type_options: { placeholder: 'core.option.please_select', choices: { 'addon.price_type.per_person': !php/const App\Wicrew\AddonBundle\Entity\Addon::PRICE_TYPE_PER_PERSON, 'addon.price_type.for_the_trip': !php/const App\Wicrew\AddonBundle\Entity\Addon::PRICE_TYPE_FOR_THE_TRIP } } }
+                    - { property: 'supplier', label: 'addon.supplier', type_options: { placeholder: 'core.option.please_select' } }
+                    - { property: 'imageFile', type: 'vich_image', label: 'addon.image', type_options: { required: false, attr: { data-validate: 'filetype:image/jpeg|image/jpg|image/png|image/bmp,filesize:8000000' }, allow_delete: false } }
+                    - { property: 'imageDescription', label: 'addon.image_description' }
+            templates:
+                new: '@WicrewAddon/Admin/new.html.twig'
+                edit: '@WicrewAddon/Admin/edit.html.twig'
+        Extra:
+            permissions:
+                list: [ 'ROLE_EMPLOYEE' ]
+                new: [ 'ROLE_EMPLOYEE' ] 
+                edit: [ 'ROLE_EMPLOYEE' ]
+                delete: [ 'ROLE_EMPLOYEE' ]
+            controller: App\Wicrew\AddonBundle\Controller\Admin\ExtraController
+            label: 'extra.title'
+            icon: 'comment-dollar'
+            class: App\Wicrew\AddonBundle\Entity\Extra
+            list:
+                title: 'extra.title'
+                fields:
+                    - { property: 'label', label: 'addon.label' }
+                    - { property: 'rackPrice', label: 'addon.rack_price' }
+                    - { property: 'netPrice', label: 'addon.net_price' }
+                    - { property: 'discountPercentage', label: 'addon.discount_price' }
+                    - { property: 'tax', label: 'addon.tax' }
+                    - { property: 'supplier', label: 'addon.supplier' }
+                    - { property: 'createdAt', label: 'addon.created_at', format: '%global.date.format%' }
+                max_results: '%global.sort.pagination.default%'
+                sort: ['sortOrder', '%global.sort.asc%']
+            form:
+                form_options: { attr: { novalidate: novalidate } }
+                fields:
+                    - { type: 'tab', label: 'addon.tab.general' }
+                    - { type: 'group', label: 'addon.group.information' }
+                    - { property: 'label', label: 'addon.label' }
+                    - { property: 'description', label: 'activity.description', type: 'FOS\CKEditorBundle\Form\Type\CKEditorType', type_options: { config: { filebrowserBrowseRoute: 'elfinder', filebrowserBrowseRouteParameters: { instance: 'image', homeFolder: '' } } } }
+                    - { property: 'type', label: 'addon.type', type: 'choice', type_options: { placeholder: 'core.option.please_select', choices: { 'addon.type.checkbox': !php/const App\Wicrew\AddonBundle\Entity\Addon::TYPE_CHECKBOX, 'addon.type.multi_checkbox': !php/const App\Wicrew\AddonBundle\Entity\Addon::TYPE_MULTI_CHECKBOX, 'addon.type.radio': !php/const App\Wicrew\AddonBundle\Entity\Addon::TYPE_RADIO } } }
+                    - { property: 'adultRackPrice', label: 'addon.adult_rack_price' }
+                    - { property: 'adultNetPrice', label: 'addon.adult_net_price' }
+                    - { property: 'childRackPrice', label: 'addon.child_rack_price' }
+                    - { property: 'childNetPrice', label: 'addon.child_net_price' }
+                    - { property: 'extraTransportation', label: 'addon.extra_transportation' }
+                    - { property: 'rackPrice', label: 'addon.rack_price' }
+                    - { property: 'netPrice', label: 'addon.net_price' }
+                    - { property: 'options', type: 'collection', label: 'addon.options', type_options: { required: true, block_name: 'custom_options', error_bubbling: false, entry_type: 'App\Wicrew\AddonBundle\Form\Type\ExtraOption', by_reference: false, entry_options: { label: false } } }
+                    - { property: 'discountPercentage', label: 'addon.discount_price' }
+                    - { property: 'tax', label: 'addon.tax', type_options: { required: true, placeholder: 'core.option.please_select' } }
+                    - { property: 'priceType', label: 'addon.price_type', type: 'choice', type_options: { placeholder: 'core.option.please_select', choices: { 'addon.price_type.per_person': !php/const App\Wicrew\AddonBundle\Entity\Addon::PRICE_TYPE_PER_PERSON, 'addon.price_type.for_the_trip': !php/const App\Wicrew\AddonBundle\Entity\Addon::PRICE_TYPE_FOR_THE_TRIP } } }
+                    - { property: 'supplier', label: 'addon.supplier', type_options: { placeholder: 'core.option.please_select' } }
+                    - { property: 'imageFile', type: 'vich_image', label: 'addon.image', type_options: { required: false, attr: { data-validate: 'filetype:image/jpeg|image/jpg|image/png|image/bmp,filesize:8000000' }, allow_delete: false } }
+                    - { property: 'imageDescription', label: 'addon.image_description' }
+                    - { property: 'addByDefault', label: 'extra.add_by_default' }
+            templates:
+                new: '@WicrewAddon/Admin/new.html.twig'
+                edit: '@WicrewAddon/Admin/edit.html.twig'

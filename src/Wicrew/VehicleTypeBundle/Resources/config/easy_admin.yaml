@@ -1,0 +1,49 @@
+easy_admin:
+    entities:
+        VehicleType:
+            permissions: ROLE_ADMIN
+            controller: App\Wicrew\CoreBundle\Controller\Admin\AdminController
+            label: 'transportation.vehicle'
+            icon: 'file'
+            class: App\Wicrew\VehicleTypeBundle\Entity\VehicleType
+            list:
+                filters:
+                    - { property: 'name' }
+                actions:
+                    - { name: 'edit' }
+                    - { name: 'delete' }
+                title: "transportation.vehicletype.management"
+                fields:
+                    - { property: 'name', label: 'transportation.vehicle.name' }
+                    - { property: 'maxPassengerNumber', label: 'transportation.vehicle.passenger.max' }
+                    - { property: 'minPassengerNumber', label: 'transportation.vehicle.passenger.min' }
+                    - { property: 'maxLuggageWeight', label: 'transportation.luggages.accepted' }
+                    - { property: 'enabled', label: 'vehicle.enabled' }
+                    - { property: 'airConditioning', label: 'vehicle.aircondition' }
+                    - { property: 'createdAt', label: 'core.created_date', format: 'M d Y' }
+                sort: ['createdAt', 'DESC']
+            #                dql_filter: "entity.status = 1"
+            form:
+                form_options: { attr: { novalidate: true, class: 'validate-form' } }
+                fields:
+                    # Tab #1
+                    - { type: 'tab' , label: 'vehicle.tab.general'}
+                    # Group
+                    - { type: 'group', label: 'vehicle.tab.bussinessinformation' }
+                    - { property: 'name', type: 'text', label: 'vehicle.form.name', type_options: { required: true, attr: { data-validate: 'maxlength:255' } } }
+                    - { property: 'maxPassengerNumber', type: 'number', label: 'vehicle.form.passenger.max', type_options: { attr: { data-validate: 'maxlength:2, isnumber:1' } } }
+                    - { property: 'minPassengerNumber', type: 'number', label: 'vehicle.form.passenger.min', type_options: { attr: { data-validate: 'maxlength:2, isnumber:1' } } }
+                    - { property: 'maxLuggageWeight', type: 'number', label: 'vehicle.form.luggages.accepted', help: 'vehicle.form.luggages.accepted.help',  type_options: { attr: { data-validate: 'maxlength:7, isnumber:1' } } }
+                    - { property: 'enabled', label: 'vehicle.enabled' }
+                    - { property: 'airConditioning', label: 'vehicle.aircondition' }
+                    - { property: 'catchySentence', type: 'text', label: 'vehicle.form.catchysentence', type_options: { attr: { data-validate: 'maxlength:255' } } }
+                    #                    - { property: 'image', label: 'transportation.vehicle.form.image' }
+                    - { property: 'imageFile', type: 'vich_image', label: 'vehicle.form.image', type_options: { required: true, attr: { data-validate: 'filetype:image/jpeg|image/jpg|image/png|image/bmp,filesize:8000000' }, allow_delete: false } }
+                    - { property: 'notes', type: 'FOS\CKEditorBundle\Form\Type\CKEditorType', label: 'vehicle.form.notes' }
+                actions:
+                    - { name: '-delete', icon: 'trash' }
+            templates:
+                new: '@WicrewVehicleType/Admin/new.html.twig'
+                edit: '@WicrewVehicleType/Admin/edit.html.twig'
+            search:
+                fields: ['transportationType.name', 'name']

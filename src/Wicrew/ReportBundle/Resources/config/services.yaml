@@ -1,0 +1,6 @@
+#services:
+#    wicrew.report.report_controller:
+#        class: App\Wicrew\ReportBundle\Controller\Admin\ReportController
+#        calls:
+#            - { method: setTranslator, arguments: ['@translator'] }
+#        public: true

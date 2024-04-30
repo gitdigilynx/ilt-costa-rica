@@ -1,0 +1,16 @@
+<div style="min-width: 300px">
+{% set currencySymbol = 'currency.symbol'|trans() %}
+{% set currencyText = 'currency.text'|trans() %}
+{% if item.anyExtras %}
+    <div class="addons">
+        {% for extra in item.extras %}
+            <table>
+                <tr>
+                    <td><strong>{{ extra.label|raw }}</strong></td>
+                    <td>{{ currencySymbol }} {{ extra.rackPrice }} {{ currencyText }}</td>
+                </tr>
+            </table>
+        {% endfor %}
+    </div>
+{% endif %}
+</div>

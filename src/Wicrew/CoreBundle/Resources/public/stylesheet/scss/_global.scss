@@ -1,0 +1,457 @@
+@import 'variables';
+@import 'bootstrap/variables';
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 300;
+    font-size: 14px;
+    color: $dark-blue;
+    letter-spacing: 1px;
+    margin-top: 100px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 300;
+    color: $blue;
+}
+
+h1 {
+
+}
+
+h2 {
+    font-size: 30px;
+    line-height: 38px;
+    margin-bottom: 35px;
+}
+
+strong {
+    font-weight: 600;
+}
+
+img,
+picture {
+    max-width: 100%;
+}
+
+a {
+    opacity: 1;
+    transition: all 0.5s;
+
+    &:hover {
+        opacity: 0.5;
+        text-decoration: none;
+    }
+}
+
+.clearfix:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+@media (max-width: 767px) {
+    .d-xs-none {
+        display: none !important;
+    }
+}
+
+.custom-checkbox {
+    position: relative;
+    display: block;
+    min-height: 1.5rem;
+    padding-left: 25px;
+
+    input {
+        position: absolute;
+        z-index: -1;
+        opacity: 0;
+    }
+
+    label {
+        position: relative;
+        font-size: 12px;
+        line-height: 24px;
+        margin-bottom: 0;
+        vertical-align: middle;
+        cursor: pointer;
+
+        &:before {
+            position: absolute;
+            top: .25rem;
+            left: -1.5rem;
+            display: block;
+            width: 15px;
+            height: 15px;
+            pointer-events: none;
+            content: "";
+            background-color: #fff;
+            border: #7c7f87 solid 1px;
+            transition: background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+        }
+
+        &:after {
+            position: absolute;
+            top: .25rem;
+            left: -1.5rem;
+            display: block;
+            width: 15px;
+            height: 15px;
+            content: "";
+            background: no-repeat 50%/50% 50%;
+        }
+    }
+
+    input:checked ~ label::before {
+        color: #fff;
+        border-color: #7c7f87;
+        background-color: $dark-blue;
+    }
+
+    input:checked ~ label::after {
+        background-image: url('../images/checked.svg');
+    }
+
+}
+
+.page-header {
+    position: relative;
+    width: 100%;
+    background-color: $dark-blue;
+
+    .bg {
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center center;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .content {
+        z-index: 1;
+        position: relative;
+        min-height: 310px;
+
+        @media (max-width: 767px) {
+            min-height: 280px;
+        }
+
+        h1 {
+            font-size: 41px;
+            font-weight: 300;
+            color: #fff;
+            text-transform: none;
+            line-height: 45px;
+            letter-spacing: 3px;
+            margin-top: 5px;
+            margin-bottom: 7px;
+
+            @media (max-width: 991px) {
+                font-size: 37px;
+                line-height: 42px;
+            }
+
+            @media (max-width: 767px) {
+                font-size: 32px;
+                line-height: 36px;
+            }
+
+            @media (max-width: 550px) {
+                font-size: 26px;
+                letter-spacing: 2px;
+                line-height: 30px;
+            }
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: 2px;
+            line-height: 24px;
+            margin: 0 0 40px 0;
+
+            @media (max-width: 767px) {
+                font-size: 18px;
+                line-height: 24px;
+            }
+
+            @media (max-width: 550px) {
+                font-size: 16px;
+                letter-spacing: 1px;
+                line-height: 20px;
+            }
+        }
+    }
+
+    .view-all-activities {
+        text-align: center;
+        position: relative;
+        z-index: 1;
+
+        @media (min-width: 991px) {
+            margin-top: -60px;
+            text-align: right;
+        }
+
+        a {
+            margin-bottom: 1rem;
+            padding: 10px 20px;
+            border: 1px solid #fff;
+            font-weight: bold;
+            color: #fff;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+    }
+}
+
+.breadcrumbs {
+    .breadcrumb {
+        font-size: 12px;
+        color: $dark-blue;
+        text-transform: capitalize;
+        background-color: transparent;
+        padding: 28px 0;
+
+        a {
+            color: $dark-blue;
+        }
+    }
+
+    .breadcrumb-item.active {
+        color: $dark-blue;
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: '>';
+    }
+}
+
+.breadcrumb-item {
+    margin-right: .5rem;
+
+    &:last-child {
+        margin-right: 0;
+    }
+
+    + .breadcrumb-item {
+        padding-left: 0;
+    }
+}
+
+.benefits {
+    padding-top: 60px;
+    padding-bottom: 60px;
+
+    .benefit h2 {
+        text-align: center;
+    }
+
+    .benefit-col {
+    }
+
+    .benefit-item {
+        flex: 0 0 100%;
+        height: 100%;
+        text-align: center;
+        padding: 45px 30px;
+        background-color: $gray;
+
+        @media (max-width: 1199px) {
+            padding: 35px 25px;
+            margin-bottom: 35px;
+        }
+
+        .benefit-icon {
+            margin-bottom: 40px;
+
+            img {
+                height: 50px;
+            }
+        }
+
+        .benefit-content {
+            font-size: 12px;
+            color: $dark-blue;
+
+            h4 {
+                font-size: 14px;
+                font-weight: 600;
+                color: $dark-blue;
+            }
+        }
+    }
+
+    .content {
+        margin-top: 80px;
+    }
+
+}
+
+.navigation {
+    text-align: center;
+
+    .pagination {
+        display: flex;
+        padding-left: 0;
+        list-style: none;
+        border-radius: .25rem;
+        margin-top: .5rem;
+        margin-bottom: .5rem;
+        justify-content: center;
+
+        span {
+            position: relative;
+            display: flex;
+            width: 35px;
+            height: 35px;
+            margin-left: -1px;
+            line-height: 1.25;
+            border: 1px solid #dee2e6;
+
+            &.current {
+                padding: .5rem .75rem;
+                color: $white;
+                background-color: $blue;
+            }
+
+            &:not(.current):hover {
+                background-color: $gray;
+            }
+
+            a {
+                padding: .5rem .75rem;
+                width: 100%;
+                height: 100%;
+            }
+        }
+    }
+
+}
+
+.btn-black {
+    @include lighten-on-hover(black);
+
+    display: inline-block;
+    height: 44px;
+    font-size: 12px;
+    color: $white;
+    line-height: 44px;
+    padding: 0 24px;
+    background-color: $dark-blue;
+    border-radius: 44px;
+    border: 0;
+
+    &.lg-btn {
+        height: 48px;
+        font-size: 14px;
+        line-height: 48px;
+        letter-spacing: 0.8px;
+        padding: 0 35px;
+
+        @media #{$ipad} {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        @media #{$mobile} {
+            height: 42px;
+            font-size: 12px;
+            line-height: 42px;
+        }
+    }
+
+    &:hover {
+        color: white;
+    }
+}
+
+.tabs-group {
+
+    .tabs {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+
+        li {
+            display: inline-block;
+            margin-right: 30px;
+        }
+
+        .tab {
+            display: block;
+            color: $dark-blue;
+            padding: 20px 0;
+            border-bottom: 2px solid transparent;
+
+            &:hover,
+            &.active {
+                border-bottom: 2px solid $blue;
+            }
+        }
+    }
+
+    .container-tabs-content {
+        background-color: $gray;
+    }
+
+    .tabs-content {
+
+        .tab-content {
+            display: none;
+            padding: 50px 0;
+
+            &.active {
+                display: block;
+            }
+        }
+
+    }
+
+}
+
+.container-bg-secondary {
+    background-color: $gray;
+}
+
+.w-100 {
+    width: 100%!important;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+/* dropdown codein /booking "what's included" */
+.open {
+    .dropdown-menu {
+        display: block;
+    }
+}
+
+.container .dropdown-menu {
+    position: static;
+    float: none;
+} 
+
+@media (max-width: 420px) {
+    .header .nav-left .logo img {
+        position: relative;
+        top: 8px;
+    }
+}

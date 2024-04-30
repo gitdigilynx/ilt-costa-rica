@@ -1,0 +1,176 @@
+{% extends "base.html.twig" %}
+
+{% block title %}
+    {{ 'contact.us.title'|trans() }}
+{% endblock %}
+
+{% block body %}
+ 
+    <div class="contact-content booking-form">
+        <div class="container">
+            <div class="row checkout-form-section">
+                <div class="col-md-5 left-panel">
+                    <div>
+                        <h2>{{ 'sale.checkout.contact.title'|trans() }}</h2>
+                        <p>HAVE QUESTIONS ABOUT OUR SERVICES?</p>
+
+                        <p>At ILT Costa Rica we are dedicated to serving our clients with the utmost in personalized service & strive to achieve total customer satisfaction with all our services. If you would like more information concerning any of our services, please do not hesitate to call or email us.</p>
+                        {{ form_start(form, {'attr': {'id': 'contact_us', 'class': 'validate-form', 'autocomplete': 'off', 'novalidate': 'novalidate' , 'action': url('sale_contact_send') }}) }}
+                        {{ form_errors(form) }}
+                        {{ form_widget(form._token) }}
+                        <div class="row-block">
+                            <div class="col-block">
+                                <div class="floating-label-wrap">
+                                    {{ form_errors(form.firstName) }}
+                                    {{ form_widget(form.firstName) }}
+                                    <label class="floating-label">{{ 'sale.checkout.firstName'|trans() }}*</label>
+                                </div>
+                            </div>
+
+                            <div class="col-block">
+                                <div class="floating-label-wrap">
+                                    {{ form_errors(form.lastName) }}
+                                    {{ form_widget(form.lastName) }}
+                                    <label class="floating-label">{{ 'sale.checkout.lastName'|trans() }}*</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row-block">
+                            <div class="col-block">
+                                <div class="floating-label-wrap">
+                                    {{ form_errors(form.email) }}
+                                    {{ form_widget(form.email) }}
+                                    <label class="floating-label">{{ 'sale.checkout.email'|trans() }}*</label>
+                                </div>
+                            </div>
+
+                            <div class="col-block">
+                                <div class="floating-label-wrap">
+                                    {{ form_errors(form.country) }}
+                                    {{ form_widget(form.country) }}
+                                    <label class="floating-label">{{ 'sale.checkout.country'|trans() }}*</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row-block margin">
+                            <div class="floating-label-wrap">
+                                {{ form_errors(form.notes) }}
+                                {{ form_widget(form.notes) }}
+                                <label class="floating-label">{{ 'sale.checkout.notes'|trans() }}</label>
+                            </div>
+                        </div>
+                        <div class="row-block margin">
+                            <div class="g-recaptcha" data-sitekey="6LdE954kAAAAAPueMStzFIm-HGqmC69xrafxeSbJ"></div> 
+                            <br/>
+                        </div>
+                        <div class="row-block margin response_container"  style="display: none;"> </div>
+                        <div class="row-block margin">
+                            <button class="btn-black lg-btn" type="submit" id="contact_us">{{ 'contactus'|trans() }}</button>
+                        </div>
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+                <div class="col-md-6 right-panel contact-text-right"> 
+                        <p><strong>SPEAK TO US VIA PHONE, EMAIL or CHAT</strong></p>
+                        <p><strong>7:00am - 8:00pm</strong></p>
+                        <br>
+                        <p><strong>Toll Free U.S./CAN. </strong>       1-800-993-8696</p>
+                        <p><strong>Costa Rica: </strong>+506 7078 7854</p>
+                        <p><strong>WhatsApp: </strong>+506 7078 7854</p>
+                        <p><strong>Email: </strong><a href="mailto:info@iltcostarica.com">info@iltcostarica.com</a></p>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="map" style="height: 500px;margin-bottom: 100px;"></div>
+    <style>
+    .response_container {position: relative;padding: 0.75rem 1.25rem;margin-bottom: 1rem;border: 1px solid transparent;border-radius: 0.25rem;}
+
+    .response_container.success {
+        color: #155724;
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+    }
+
+    .response_container.error {
+        color: #721c24;
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+    }
+    </style>
+    <script>
+
+    function initMap() {
+        var myLatLng = {lat: 10.012141086144617, lng: -84.27895159851259};
+
+        var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 14,
+        center: myLatLng
+        });
+
+        var marker = new google.maps.Marker({
+        position: myLatLng,
+        map: map,
+        title: 'ILT Costa Rica'
+        });
+    }
+    </script>  
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ getSystemConfigValue('google-api/place/key') }}&callback&callback=initMap" async defer></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script>
+        $( document ).ready(function() {
+            $("textarea#form_notes").removeAttr("required");
+        });
+        
+        $('form#contact_us').submit(function (e) {
+            $("form#contact_us .response_container").hide();
+            e.preventDefault();
+            let save_btn    = $(this).children('button[type="submit"]');
+            if ( save_btn.hasClass("loading-button")) { return; }
+            save_btn.addClass("loading-button");
+            var error = false;
+            error = validateForm();
+            if (error) {
+                $("form#contact_us .response_container").addClass("error").removeClass("success").html("Highlighted fields are required! ")
+                $("form#contact_us .response_container").show();
+                return false;
+            }
+            var formValues = $(this).serializeArray();
+            var formDataToSend = {};
+
+            $.each(formValues, function(i, field){
+                let fieldName = field.name;
+                fieldName = fieldName.replace("form[", "");
+                fieldName = fieldName.replace("]", "");
+                formDataToSend[fieldName] = field.value;
+            });
+            $.ajax({
+                url: "{{ path('sale_contact_send') }}",
+                method: 'POST',
+                data: {
+                    form: formDataToSend
+                },
+                success: function(response) {
+                    if(response.status == "success"){
+                        $("form#contact_us .response_container").addClass("success").removeClass("error").html('Thanks for contacting us! We will be in touch with you shortly.');
+                        $("form#contact_us .response_container").show();
+                        return true;
+                    }else{
+                        $("form#contact_us .response_container").addClass("error").removeClass("success").html(response.message);
+                        $("form#contact_us .response_container").show();
+                        return false;
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block javascripts %}
+    {% include "@WicrewSale/Checkout/checkout.js.html.twig" %}
+{% endblock %}

@@ -1,0 +1,13 @@
+{% if value == constant('App\\Wicrew\\PartnerBundle\\Entity\\Partner::TYPE_DRIVER') %}
+    {{ "partner.type.options.driver"|trans }}
+{% elseif value == constant('App\\Wicrew\\PartnerBundle\\Entity\\Partner::TYPE_AFFILIATE') %}
+    {{ "partner.type.options.affiliate"|trans }}
+{% elseif value == constant('App\\Wicrew\\PartnerBundle\\Entity\\Partner::TYPE_SUPPLIER') %}
+    {{ "partner.type.options.supplier"|trans }}
+{% elseif value == constant('App\\Wicrew\\PartnerBundle\\Entity\\Partner::TYPE_TRAVEL_AGENT') %}
+    {{ "partner.type.options.travel_agent"|trans }}
+{% elseif value == constant('App\\Wicrew\\PartnerBundle\\Entity\\Partner::TYPE_PARTNER') %}
+    {{ "partner.type.options.partner"|trans }}
+{% else %}
+    {{ include('@EasyAdmin/default/label_null.html.twig') }}
+{% endif %}

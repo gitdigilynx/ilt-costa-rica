@@ -1,0 +1,6 @@
+fos_ck_editor:
+    plugins:
+        addBlock:
+            path: "/bundles/wicrewblock/javascript/" # with trailing slash
+            #            filename: "custom-ckeditor-buttons.js"
+            filename: "test.js"

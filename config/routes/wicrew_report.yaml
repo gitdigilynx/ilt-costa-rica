@@ -1,0 +1,2 @@
+#wicrew_report:
+#    resource: "@WicrewReportBundle/Resources/config/routes.yaml"

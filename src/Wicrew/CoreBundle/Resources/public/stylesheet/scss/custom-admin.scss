@@ -1,0 +1,245 @@
+/* Custom admin */
+/*
+--- Global
+--- Login
+--- Field Collection
+*/
+
+// Global
+.product-detail {
+    .edit-item {
+        float: right;
+    }
+
+    .left-panel {
+        width: 60%;
+        float: left;
+    }
+
+    .right-panel {
+        width: 40%;
+        float: right;
+    }
+
+    label {
+        font-weight: bold;
+    }
+
+    .inside {
+        margin-left: 10px;
+
+        label {
+            &:after {
+                content: ":";
+            }
+        }
+    }
+}
+
+// Login
+.alert {
+    padding: .75rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: var(--border-radius)
+}
+.alert-success {
+    color: #10553b;
+    background-color: #d2ede3;
+    border-color: #c0e5d7
+}
+.alert-danger, .alert-error {
+    color: #6b1f33;
+    background-color: #f5d8e0;
+    border-color: #f1c9d3
+}
+// END - Login
+
+
+// Field Collection
+.form-group.field-collection {
+    padding: 0;
+
+    .form-widget {
+        flex: 0 0 100%;
+    }
+
+    fieldset {
+        background-color: var(--white);
+        padding: 0;
+        overflow: hidden;
+    }
+
+    a.collection-add,
+    a.collection-add:focus {
+        margin: 10px;
+        background: var(--color-primary);
+        color: #fff;
+        font-size: 16px;
+        height: 32px;
+        transition: opacity 0.4s;
+
+        &:hover {
+            opacity: 0.5;
+        }
+    }
+
+    .table-responsive {
+
+        .tablelist-wrapper {
+            width: 150%;
+        }
+    }
+
+}
+
+.row-head,
+.row-data > div,
+.price-options-row-item .price-options-data-inner {
+    display: table;
+    width: 100%;
+    min-width: 800px;
+    table-layout: fixed;
+
+    .col {
+        font-size: 13px;
+        display: table-cell;
+        width: 15%;
+        vertical-align: top;
+
+        &:first-of-type {
+            width: 20%;
+        }
+    }
+}
+
+.row-head {
+    background-color: var(--color-primary);
+
+    .col {
+        color: var(--text-on-primary); // var(--text-color-dark);
+        font-weight: 600;
+        line-height: 1.357;
+        padding: 8px;
+        text-align: left;
+        // white-space: nowrap;
+        border-left: 1px solid #fff;
+        // border-top: 1px solid #dee2e6;
+        border-bottom: var(--border-width) var(--border-style) var(--border-color);
+
+        &:first-of-type {
+            border-radius: 5px 0 0 0;
+            border-left: 0;
+        }
+
+        &:last-of-type {
+            border-radius: 0 5px 0 0;
+            width: 8%;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        &.no-action {
+            width: 15%;
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+    }
+}
+
+.row-data > div,
+.price-options-row-item,
+.child-content-options {
+    background: #fff;
+
+    .price-options-data-inner {
+        background: #fff;
+    }
+
+    &:nth-child(2n) {
+        background: var(--form-bg);
+
+        .price-options-data-inner {
+            background: #ecf1f5;
+        }
+    }
+
+    .col {
+        padding: 7px 10px;
+        border-left: 1px solid #fff;
+        border-top: 1px solid #dee2e6;
+        border-bottom: var(--border-width) var(--border-style) var(--border-color);
+        text-align: center;
+
+        &:first-of-type {
+            border-left: 0;
+        }
+
+        &.form-actions {
+            background: transparent;
+            width: 8%!important;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        a.collection-remove {
+            background: transparent;
+            color: #ff5340;
+            transition: opacity 0.4s;
+
+            &:hover {
+                opacity: 0.5;
+            }
+        }
+
+        &.sticky-wrapper {
+            display: none;
+        }
+
+        input[type=text],
+        input[type=date],
+        input[type=tel],
+        input[type=number],
+        select,
+        textarea {
+            border: 1px solid #cfdbe0;
+            box-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
+            padding-left: 8px;
+            padding-right: 8px;
+            font-weight: 400;
+
+            &:focus {
+                border: 1px solid #a8c3ce;
+                box-shadow: 0 0 3px rgba(0, 0, 0, 0.15);
+            }
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        input[type=date] {
+            padding-right: 2px;
+            background-image: url(../images/calendar.svg);
+            background-position: right 5px center;
+            background-repeat: no-repeat;
+            background-size: 18px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+
+            &::-webkit-inner-spin-button {
+                display: none;
+            }
+
+            &::-webkit-clear-button {
+                display: none;
+            }
+
+            &::-webkit-calendar-picker-indicator {
+                display: none;
+            }
+        }
+    }
+}
+// END - Field Collection

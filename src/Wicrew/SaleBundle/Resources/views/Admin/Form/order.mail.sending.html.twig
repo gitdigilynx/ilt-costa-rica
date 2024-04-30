@@ -1,0 +1,160 @@
+{% form_theme form _self %}
+
+{% block _order_custom_mailsending_widget %}
+    <div class="mail-sending-wrapper">
+        <ul class="sub-tab">
+            <li class="active" data-tab="#mail-edit"><a
+                        href="javascript:void(0);">{{ "order.mail.type.edit"|trans }}</a></li>
+            <li data-tab="#mail-charge"><a href="javascript:void(0);">{{ "order.mail.type.charge"|trans }}</a></li>
+            <li data-tab="#mail-refund"><a href="javascript:void(0);">{{ "order.mail.type.refund"|trans }}</a></li>
+            <li data-tab="#mail-canceled"><a href="javascript:void(0);">{{ "order.mail.type.canceled"|trans }}</a></li>
+            <li data-tab="#mail-resendQuote"><a href="javascript:void(0);">Resend Quote</a></li>
+        </ul>
+
+        {# @var order \App\Wicrew\SaleBundle\Entity\Order #}
+        {% set order = easyadmin['item'] %}
+
+        {% set emailInfo = {
+            'customerName': order.fullName,
+            'orderNumber': order.id
+        } %}
+
+        <div class="tab-contents">
+            <div id="mail-edit" class="mail-form active">
+                <h3>{{ "order.mail.subject"|trans }}: {{ "order.mail.edit.subject"|trans }}</h3>
+                <div class="mail-pre-content">{{ "order.mail.edit.body1"|trans(emailInfo)|raw }}</div>
+                <input type="hidden" name="template" value="edit"/>
+                <textarea class="form-control"></textarea>
+                <div class="mail-post-content">{{ "order.mail.edit.body2"|trans()|raw }}</div>
+                <button class="btn btn-secondary sendEmail">{{ "order.mail.send"|trans }}</button>
+            </div>
+
+            <div id="mail-charge" class="mail-form hide">
+                <h3>{{ "order.mail.subject"|trans }}: {{ "order.mail.charge.subject"|trans }}</h3>
+                <div class="mail-pre-content">{{ "order.mail.charge.body1"|trans(emailInfo)|raw }}</div>
+                <input type="hidden" name="template" value="charge"/>
+                <textarea class="form-control"></textarea>
+                <div class="mail-post-content">{{ "order.mail.charge.body2"|trans|raw }}</div>
+                <button class="btn btn-secondary sendEmail">{{ "order.mail.send"|trans }}</button>
+            </div>
+
+            <div id="mail-refund" class="mail-form hide">
+                <h3>{{ "order.mail.subject"|trans }}: {{ "order.mail.refund.subject"|trans }}</h3>
+                <div class="mail-pre-content">{{ "order.mail.refund.body1"|trans(emailInfo)|raw }}</div>
+                <input type="hidden" name="template" value="refund"/>
+                <textarea class="form-control"></textarea>
+                <div class="mail-post-content">{{ "order.mail.refund.body2"|trans|raw }}</div>
+                <button class="btn btn-secondary sendEmail">{{ "order.mail.send"|trans }}</button>
+            </div>
+
+            <div id="mail-canceled" class="mail-form hide">
+                <h3>{{ "order.mail.subject"|trans }}: {{ "order.mail.canceled.subject"|trans }}</h3>
+                <div class="mail-pre-content">{{ "order.mail.canceled.body1"|trans(emailInfo)|raw }}</div>
+                <input type="hidden" name="template" value="canceled"/>
+                <textarea class="form-control"></textarea>
+                <div class="mail-post-content">{{ "order.mail.canceled.body2"|trans|raw }}</div>
+                <button class="btn btn-secondary sendEmail">{{ "order.mail.send"|trans }}</button>
+            </div>
+            
+            <div id="mail-resendQuote" class="mail-form hide">
+                <h3>{{ "order.mail.subject"|trans }}: ILT Costa Rica - Quote confirmation</h3>
+                <div class="mail-pre-content">
+                    Hi {{ order.fullName }},<br />
+                    <br />
+                    Please find the payment link below for your service(s).<br />
+                    <br />
+                    { orderDetails }
+                    <br />
+                </div>
+                <input type="hidden" name="template" value="quote"/>
+                <textarea class="form-control"></textarea>
+                <div class="mail-post-content">
+                    <br />
+                    If you have any questions, please do not hesitate to contact us.
+                    <br />
+                    <br />
+                    Thank you,<br>
+                </div>
+                <button class="btn btn-secondary sendEmail">{{ "order.mail.send"|trans }}</button>
+            </div>
+        </div>
+    </div>
+
+    <style type="text/css">
+        .hide {
+            display: none;
+        }
+    </style>
+
+    <script type="text/javascript">
+        function toggleTab() {
+            jQuery(".mail-sending-wrapper .tab-contents .mail-form").addClass("hide");
+
+            var hasActiveTab = false;
+            if (jQuery(".mail-sending-wrapper ul.sub-tab li.active").length > 0) {
+                jQuery(".mail-sending-wrapper ul.sub-tab li").each(function () {
+                    var li = jQuery(this);
+                    if (!hasActiveTab && li.hasClass("active")) {
+                        hasActiveTab = true;
+
+                        jQuery(li.data("tab")).addClass("active").removeClass("hide");
+                    } else {
+                        li.removeClass("active");
+                        jQuery(li.data("tab")).removeClass("active");
+                    }
+                });
+            }
+
+            if (!hasActiveTab) {
+                var firstTab = jQuery(".mail-sending-wrapper ul.sub-tab li:first");
+                firstTab.addClass("active").removeClass("hide");
+                jQuery(firstTab.data("tab")).addClass("active").removeClass("hide");
+            }
+        }
+
+        toggleTab();
+        jQuery(".mail-sending-wrapper ul.sub-tab li").click(function () {
+            jQuery(".mail-sending-wrapper ul.sub-tab li").removeClass("active");
+            jQuery(".mail-sending-wrapper .tab-contents .mail-form").addClass("hide").removeClass("active");
+
+            var tab = jQuery(this);
+            tab.addClass("active").removeClass("hide");
+            jQuery(tab.data("tab")).addClass("active").removeClass("hide");
+        });
+
+        jQuery(".mail-sending-wrapper .sendEmail").click(function () {
+            var sendButton = jQuery(this);
+            sendButton.attr("disabled", true);
+            var customTextInput = sendButton.parent().find("textarea:first");
+            customTextInput.attr("disabled", true);
+
+            let template = sendButton.parent().find("input[name=template]").val();
+
+            if (template !== undefined) {
+                let customBody = customTextInput.val();
+                jQuery.post({
+                    url: "{{ url('easyadmin', { entity: "Order", action: "sendMail" })|raw }}",
+                    data: {order: "{{ app.request.get('id') }}", template: template, customBody: customBody},
+                    success: function (res) {
+                        if (res.status !== undefined && res.status == "success") {
+                            alert("Email sent successfully.");
+                        } else if (res.message !== undefined) {
+                            alert("Failed: " + res.message);
+                        } else {
+                            alert("Error: Something went wrong, please try again.");
+                        }
+                    }
+                }).fail(function () {
+                    alert("Error: Something went wrong, please try again.");
+                }).always(function () {
+                    sendButton.attr("disabled", false);
+                    customTextInput.val("");
+                    customTextInput.attr("disabled", false);
+                });
+            } else {
+                alert("Please select an email type.");
+            }
+            return false;
+        });
+    </script>
+{% endblock %}

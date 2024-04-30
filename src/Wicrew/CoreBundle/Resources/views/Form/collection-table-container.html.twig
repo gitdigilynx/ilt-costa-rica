@@ -1,0 +1,125 @@
+{% block collection_table_container %}
+    {% spaceless %}
+        {#
+        https://symfony.com/doc/current/form/form_customization.html
+        https://symfony.com/doc/current/form/form_collections.html
+        https://symfony-collection.fuz.org/symfony3/basic/inATable
+        #}
+        {% if prototype is defined %}
+            {% set attr = attr|merge({'data-prototype': form_widget(prototype)}) %}
+            {% set attr = attr|merge({'data-prototype-name': prototype.vars.name}) %}
+        {% endif %}
+        {% set attr = attr|merge({'data-allow-add': allow_add ? 1 : 0}) %}
+        {% set attr = attr|merge({'data-allow-remove': allow_delete ? 1 : 0}) %}
+        {% set attr = attr|merge({'data-name-prefix': full_name}) %}
+
+        {% set allowAdd = form.vars.allow_add|default(false) %}
+        {% set allowDelete = form.vars.allow_delete|default(false) %}
+
+        <fieldset class="well">
+            {# <label>{{ form_label(form) }}</label> #}
+            {# {{ form_errors(form) }} #}
+
+            <div {{ block('widget_attributes') }}>
+                {% if ( prototype|length > 8 ) %}
+                <div class="table-responsive">
+                    {% endif %}
+                    <div class="tablelist-wrapper">
+                        <div class="row-head">
+                            {% for field in prototype.children %}
+                                {% if "hidden" not in field.vars.block_prefixes %}
+                                    <div class="col">{{ field.vars.label|trans() }}</div>
+                                {% endif %}
+                            {% endfor %}
+                            {% if allowDelete %}<div class="form-actions col">&nbsp;</div>{% endif %}
+                        </div>
+                        <div class="row-data">
+                            {% for item in form %}
+                                {{ form_widget(item) }}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% if ( prototype|length > 8 ) %}
+                </div> <!-- table-responsive -->
+                {% endif %}
+            </div>
+        </fieldset>
+
+        {% if allowAdd %}
+            <script type="text/javascript">
+                (function () {
+                    var $container;
+
+                    // Setup an "Add" link
+                    var $addButton = $('<a href="javascript:void(0);" class="collection-add btn btn-default" title="Add"><span class="glyphicon glyphicon-plus-sign"></span></a>');
+                    var $newLink = $addButton;
+
+                    jQuery(document).ready(function () {
+                        // Get the container that holds the collection
+                        $container = $("#{{ id }}");
+
+                        // Remove default add an item button
+                        $container.parents(".form-group:first").siblings(".field-collection-action").remove();
+
+                        $container.find(".row-data:first > div").each(function () {
+                            addFormDeleteLink($(this));
+                        });
+
+                        // Add the "Add" anchor to the container
+                        $container.append($newLink);
+
+                        // Count the current form inputs we have (e.g. 2), use that as the new index when inserting a new item (e.g. 2)
+                        $container.data("index", $container.find(":input").length);
+
+                        $addButton.on("click", function (e) {
+                            // Add a new item form
+                            addForm($container, $newLink);
+                            $addButton.trigger('wi_activity_child_added');
+                            return false;
+                        });
+                    });
+
+                    function addForm($container, $newLink) {
+                        // Get the data-prototype explained earlier
+                        var prototype = $container.data("prototype");
+
+                        // Get the new index
+                        var index = $container.data("index");
+
+                        var newForm = prototype;
+                        // You need this only if you didn't set 'label' => false in your tags field in TaskType
+                        // Replace '__name__label__' in the prototype's HTML to
+                        // instead be a number based on how many items we have
+                        // newForm = newForm.replace(/__name__label__/g, index);
+
+                        // Replace '__name__' in the prototype's HTML to
+                        // instead be a number based on how many items we have
+                        newForm = newForm.replace(/__name__/g, index);
+
+                        // Increase the index with one for the next item
+                        $container.data("index", index + 1);
+
+                        // Display the form in the page in an li, before the "Add a tag" link li
+                        var $newForm = $(newForm);
+                        $container.find(".row-data").append($newForm);
+                        if (typeof(fnWiInitDatePicker) == "function") fnWiInitDatePicker($newForm);
+
+                        addFormDeleteLink($newForm);
+                    }
+
+                    function addFormDeleteLink($form) {
+                        return;
+                        //var $removeFormButton = $('<button type="button">Delete this tag</button>');
+                        /*var $removeFormButton = $("<a href=\"#\" class=\"collection-remove btn btn-default\" title=\"Delete element\"><span class=\"glyphicon glyphicon-trash\"></span></a>");
+                        $form.find(".col:last").append($removeFormButton);
+
+                        $removeFormButton.on("click", function(e) {
+                            // Remove the item container
+                            $form.remove();
+                        });*/
+                    }
+                })();
+            </script>
+        {% endif %}
+    {% endspaceless %}
+{% endblock %}

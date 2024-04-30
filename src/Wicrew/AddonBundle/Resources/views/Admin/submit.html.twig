@@ -1,0 +1,32 @@
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        function toggleFields() {
+            let type = jQuery("#addon_type").val();
+            let optionContainer = jQuery("#addon_options").parents(".form-group:eq(0)");
+            if (type == '' || type == {{ constant('App\\Wicrew\\AddonBundle\\Entity\\Addon::TYPE_CHECKBOX') }}) {
+                jQuery("#addon_rackPrice").parents(".form-group:eq(0)").show();
+                jQuery("#addon_netPrice").parents(".form-group:eq(0)").show();
+                jQuery("#addon_tax").parents(".form-group:eq(0)").show();
+                jQuery("#addon_priceType").parents(".form-group:eq(0)").show();
+                jQuery("#addon_supplier").parents(".form-group:eq(0)").show();
+
+                optionContainer.hide();
+                optionContainer.next(".form-group.field-collection-action").hide();
+            } else {
+                jQuery("#addon_rackPrice").parents(".form-group:eq(0)").hide();
+                jQuery("#addon_netPrice").parents(".form-group:eq(0)").hide();
+                jQuery("#addon_tax").parents(".form-group:eq(0)").hide();
+                jQuery("#addon_priceType").parents(".form-group:eq(0)").hide();
+                jQuery("#addon_supplier").parents(".form-group:eq(0)").hide();
+
+                optionContainer.show();
+                optionContainer.next(".form-group.field-collection-action").show();
+            }
+        }
+        toggleFields();
+
+        jQuery("#addon_type").change(function() {
+            toggleFields();
+        });
+    });
+</script>

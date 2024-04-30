@@ -1,0 +1,31 @@
+/* Frontend style */
+
+// bootstrap layout
+@import 'bootstrap/bootstrap-reboot.scss';
+@import 'bootstrap/bootstrap-grid.scss';
+
+// bootstrap components
+@import 'bootstrap/breadcrumb';
+@import 'bootstrap/dropdown';
+
+// custom style
+@import 'variables';
+@import 'global';
+@import 'icons';
+@import 'header';
+@import 'footer';
+@import 'menu';
+
+// Font Awesome
+@import "fa/fontawesome";
+
+@import 'homepage';
+@import 'activity';
+@import 'activity-listing';
+@import 'activity-view';
+@import 'transportation';
+@import 'search';
+@import 'booking';
+@import 'cart';
+@import 'cms';
+@import 'contact';

@@ -1,0 +1,506 @@
+easy_admin:
+    design:
+        menu:
+            - { css_class: 'menu--activity', entity: 'ActivityLocation', label: 'activity_location.title', icon: 'location-arrow', permission: ROLE_ADMIN }
+            - { entity: 'Activity', label: 'activity.title', icon: 'comment-dollar', permission: ROLE_ADMIN }
+    entities:
+        ActivityLocation: 
+            permissions: ROLE_ADMIN 
+            label: 'activity_location.title'
+            icon: 'location-arrow'
+            class: App\Wicrew\ActivityBundle\Entity\ActivityLocation
+            list:
+                title: 'activity.title'
+                fields:
+                    - id
+                    - { property: 'name', label: 'activity_location.name' }
+                    - { property: 'slug', label: 'page.slug' }
+                    - { property: 'customOrder', label: 'activity_location.custom_order' }
+                    - { property: 'createdAt', label: 'activity_location.created_at', format: '%global.date.format%' }
+                max_results: '%global.sort.pagination.default%'
+                sort: ['customOrder', '%global.sort.asc%']
+            form:
+                form_options: { attr: { novalidate: novalidate, class: 'validate-form' } }
+                fields:
+                    - { type: 'tab', label: 'activity_location.tab.general' }
+                    - { type: 'group', label: 'activity_location.group.information' }
+                    - { property: 'name', label: 'activity_location.name' }
+                    - { property: 'slug', label: 'page.slug', type: 'text' }
+                    - { property: 'imageFile', type: 'vich_image', label: 'activity_location.image', type_options: { required: true, attr: { data-validate: 'filetype:image/jpeg|image/jpg|image/png|image/bmp,filesize:8000000' }, allow_delete: false } }
+                    - { property: 'customOrder', label: 'activity_location.custom_order', type: 'number' }
+            templates:
+                new: '@WicrewActivity/Admin/new.html.twig'
+                edit: '@WicrewActivity/Admin/edit.html.twig'
+
+        Activity:
+            permissions:
+                list: [ 'ROLE_ADMIN' ]
+                new: [ 'ROLE_ADMIN' ]
+                duplicate: [ 'ROLE_ADMIN' ]
+                edit: [ 'ROLE_ADMIN' ]
+                # delete: [ 'ROLE_MANAGER' ]
+                archive: [ 'ROLE_ADMIN' ]
+            controller: App\Wicrew\ActivityBundle\Controller\Admin\ActivityController
+            label: 'activity.title'
+            icon: 'comment-dollar'
+            class: App\Wicrew\ActivityBundle\Entity\Activity
+            list:
+                filters:
+                    -   property: 'types'
+                        type: 'App\Wicrew\CoreBundle\Form\Filter\ChoiceType'
+                        findInSet: true
+                        type_options:
+                            choices:
+                                'activity.type.option.group': !php/const App\Wicrew\ActivityBundle\Entity\Activity::TYPE_GROUP
+                                'activity.type.option.private': !php/const App\Wicrew\ActivityBundle\Entity\Activity::TYPE_PRIVATE
+                            expanded: true
+                            multiple: true
+                    -   property: 'catagories'
+                        type: 'App\Wicrew\CoreBundle\Form\Filter\ChoiceType'
+                        findInSet: true
+                        type_options:
+                            choices: 
+                                'Adventure': !php/const App\Wicrew\ActivityBundle\Entity\Activity::CATAGORY_ADVENTURE
+                                'Nature': !php/const App\Wicrew\ActivityBundle\Entity\Activity::CATAGORY_NATURE
+                                'Cultural': !php/const App\Wicrew\ActivityBundle\Entity\Activity::CATAGORY_CULTURAL
+                                'Water': !php/const App\Wicrew\ActivityBundle\Entity\Activity::CATAGORY_WATER
+                            expanded: true
+                            multiple: true
+                    -   property: 'duration'
+                        label: 'activity.duration'
+                        type: 'App\Wicrew\CoreBundle\Form\Filter\ChoiceType'
+                        type_options:
+                            placeholder: 'core.option.please_select'
+                            choices:
+                                'activity.duration.option.1_2_hours': !php/const App\Wicrew\ActivityBundle\Entity\Activity::DURATION_1_2_HOURS
+                                'activity.duration.option.half_day': !php/const App\Wicrew\ActivityBundle\Entity\Activity::DURATION_HALF_DAY
+                                'activity.duration.option.full_day': !php/const App\Wicrew\ActivityBundle\Entity\Activity::DURATION_FULL_DAY
+                            expanded: true
+                            multiple: true
+                    - { property: 'area' }
+                actions:
+                    - { name: 'edit' }
+                    - { name: 'duplicate' }
+                    # - { name: 'delete' }
+                    - { name: 'archive', css_class: 'text-danger' }
+                title: 'activity.title'
+                fields:
+                    - id
+                    - { property: 'name', label: 'activity.name' }
+                    - { property: 'combo', label: 'activity.combo', type: 'boolean' }
+                    - { property: 'visibility', label: 'activity.visibility', type: 'boolean' }
+                    - { property: 'status', label: 'activity.status', type: 'boolean' }
+                    - { property: 'createdAt', label: 'activity.created_at', format: '%global.date.format%' }
+                max_results: '%global.sort.pagination.default%'
+                sort: ['sortOrder', '%global.sort.asc%']
+                dql_filter: "entity.archived = 0"
+            form:
+                form_options: { attr: { novalidate: novalidate, class: 'validate-form' } }
+                fields:
+                    - { type: 'tab', label: 'activity.tab.general' }
+                    - { type: 'group', label: 'activity.group.information' }
+                    - { property: 'combo', label: 'activity.combo' }
+                    -   property: 'visibility'
+                        label: 'activity.visibility'
+                        type: 'choice'
+                        type_options:
+                            required: true
+                            choices:
+                                'activity.visibility.option.not_visible': false
+                                'activity.visibility.option.visible': true
+                            expanded: true
+                            multiple: false
+                    -   property: 'status'
+                        label: 'activity.status'
+                        type: 'choice'
+                        type_options:
+                            required: true
+                            choices:
+                                'activity.status.option.offline': !php/const App\Wicrew\ActivityBundle\Entity\Activity::STATUS_OFFLINE
+                                'activity.status.option.online': !php/const App\Wicrew\ActivityBundle\Entity\Activity::STATUS_ONLINE
+                            expanded: true
+                            multiple: false
+                    - { property: 'name', label: 'activity.name' }
+                    - { property: 'area', label: 'activity.area', type_options: { required: true, placeholder: 'core.option.please_select' } }
+                    -   property: 'types'
+                        label: 'activity.types'
+                        type: 'choice'
+                        type_options:
+                            required: true
+                            choices:
+                                'activity.type.option.group': !php/const App\Wicrew\ActivityBundle\Entity\Activity::TYPE_GROUP
+                                'activity.type.option.private': !php/const App\Wicrew\ActivityBundle\Entity\Activity::TYPE_PRIVATE
+                            expanded: true
+                            multiple: true
+                    -   property: 'catagories'
+                        label: 'Activity Catagories'
+                        type: 'choice'
+                        type_options:
+                            required: true
+                            choices:
+                                'Adventure': !php/const App\Wicrew\ActivityBundle\Entity\Activity::CATAGORY_ADVENTURE
+                                'Nature': !php/const App\Wicrew\ActivityBundle\Entity\Activity::CATAGORY_NATURE
+                                'Cultural': !php/const App\Wicrew\ActivityBundle\Entity\Activity::CATAGORY_CULTURAL
+                                'Water': !php/const App\Wicrew\ActivityBundle\Entity\Activity::CATAGORY_WATER
+                            expanded: true
+                            multiple: true
+                    -   property: 'difficultyLevels'
+                        label: 'activity.difficulty_levels'
+                        type: 'choice'
+                        type_options:
+                            required: true
+                            choices:
+                                'activity.difficulty_level.option.easy': !php/const App\Wicrew\ActivityBundle\Entity\Activity::DIFFICULTY_EASY
+                                'activity.difficulty_level.option.morerate': !php/const App\Wicrew\ActivityBundle\Entity\Activity::DIFFICULTY_MODERATE
+                                'activity.difficulty_level.option.difficult': !php/const App\Wicrew\ActivityBundle\Entity\Activity::DIFFICULTY_DIFFICULT
+                            expanded: true
+                            multiple: true
+                    - { property: 'ageGroup', label: 'activity.age_group', type_options: { attr: { data-validate: 'isnumber:1,morethanzero:1' } } }
+                    - { property: 'location', label: 'activity.location', type_options: { required: true, placeholder: 'core.option.please_select', choice_label: 'name' } }
+                    -   property: 'tourTime'
+                        label: 'activity.tour_time'
+                        type: 'choice'
+                        type_options:
+                            required: false
+                            choices:
+                                '00:00': '00:00'
+                                '00:30': '00:30'
+                                '01:00': '01:00'
+                                '01:30': '01:30'
+                                '02:00': '02:00'
+                                '02:30': '02:30'
+                                '03:00': '03:00'
+                                '03:30': '03:30'
+                                '04:00': '04:00'
+                                '04:30': '04:30'
+                                '05:00': '05:00'
+                                '05:30': '05:30'
+                                '06:00': '06:00'
+                                '06:30': '06:30'
+                                '07:00': '07:00'
+                                '07:30': '07:30'
+                                '08:00': '08:00'
+                                '08:30': '08:30'
+                                '09:00': '09:00'
+                                '09:30': '09:30'
+                                '10:00': '10:00'
+                                '10:30': '10:30'
+                                '11:00': '11:00'
+                                '11:30': '11:30'
+                                '12:00': '12:00'
+                                '12:30': '12:30'
+                                '13:00': '13:00'
+                                '13:30': '13:30'
+                                '14:00': '14:00'
+                                '14:30': '14:30'
+                                '15:00': '15:00'
+                                '15:30': '15:30'
+                                '16:00': '16:00'
+                                '16:30': '16:30'
+                                '17:00': '17:00'
+                                '17:30': '17:30'
+                                '18:00': '18:00'
+                                '18:30': '18:30'
+                                '19:00': '19:00'
+                                '19:30': '19:30'
+                                '20:00': '20:00'
+                                '20:30': '20:30'
+                                '21:00': '21:00'
+                                '21:30': '21:30'
+                                '22:00': '22:00'
+                                '22:30': '22:30'
+                                '23:00': '23:00'
+                                '23:30': '23:30'
+                            choice_translation_domain: false
+                            expanded: false
+                            multiple: true
+                    - { property: 'notesToDisplayToTheCustomer', label: 'activity.notes_to_display_to_the_customer' }
+                    -   property: 'duration'
+                        label: 'activity.duration'
+                        type: 'choice'
+                        type_options:
+                            required: true
+                            placeholder: 'core.option.please_select'
+                            choices:
+                                'activity.duration.option.1_2_hours': '1-2 hours'
+                                'activity.duration.option.half_day': 'Half day'
+                                'activity.duration.option.full_day': 'Full day'
+                            expanded: false
+                            multiple: false
+                    - { property: 'driver', label: 'activity.supplier', type_options: { required: false } }
+                    - { type: 'group', label: 'activity.group.description' }
+                    - { property: 'description', label: 'activity.description', type: 'FOS\CKEditorBundle\Form\Type\CKEditorType', type_options: { config: { filebrowserBrowseRoute: 'elfinder', filebrowserBrowseRouteParameters: { instance: 'image', homeFolder: '' } } } }
+                    - { property: 'highlight', label: 'activity.highlight', type: 'FOS\CKEditorBundle\Form\Type\CKEditorType', type_options: { config: { filebrowserBrowseRoute: 'elfinder', filebrowserBrowseRouteParameters: { instance: 'image', homeFolder: '' } } } }
+                    - { property: 'included', label: 'activity.included', type: 'FOS\CKEditorBundle\Form\Type\CKEditorType', type_options: { config: { filebrowserBrowseRoute: 'elfinder', filebrowserBrowseRouteParameters: { instance: 'image', homeFolder: '' } } } }
+                    - { property: 'whatToBring', label: 'activity.what_to_bring', type: 'FOS\CKEditorBundle\Form\Type\CKEditorType', type_options: { config: { filebrowserBrowseRoute: 'elfinder', filebrowserBrowseRouteParameters: { instance: 'image', homeFolder: '' } } } }
+                    - { property: 'importantNotes', label: 'activity.important_notes', type: 'FOS\CKEditorBundle\Form\Type\CKEditorType', type_options: { config: { filebrowserBrowseRoute: 'elfinder', filebrowserBrowseRouteParameters: { instance: 'image', homeFolder: '' } } } }
+                    - { property: 'cancellationPolicy', label: 'activity.cancellation_policy', type: 'FOS\CKEditorBundle\Form\Type\CKEditorType', type_options: { config: { filebrowserBrowseRoute: 'elfinder', filebrowserBrowseRouteParameters: { instance: 'image', homeFolder: '' } } } }
+                    - { property: 'imageFile', type: 'vich_image', label: 'activity.image', type_options: { attr: { data-validate: 'filetype:image/jpeg|image/jpg|image/png|image/bmp,filesize:8000000' } } }
+                    - { type: 'group', label: 'activity.group.seo' }
+                    - { property: 'pageTitle', label: 'page.page_title' }
+                    - { property: 'pageContent', label: 'page.content', type: 'FOS\CKEditorBundle\Form\Type\CKEditorType', type_options: { config: { filebrowserBrowseRoute: 'elfinder', filebrowserBrowseRouteParameters: { instance: 'image', homeFolder: '' } } } }
+                    - { property: 'metaTitle', label: 'page.meta_title' }
+                    - { property: 'metaDescription', label: 'page.meta_description' }
+                    - { property: 'metaKeywords', label: 'page.meta_keywords' }
+                    - { property: 'slug', label: 'page.slug', type: 'text' }
+                    - { type: 'tab', label: 'activity.tab.slides' }
+                    - { type: 'group', label: 'activity.tab.slides' }
+                    - { property: 'slides', type: 'collection', css_class: 'required-collection', type_options: { label: false, required: true, block_name: 'custom_slides', error_bubbling: false, entry_type: 'App\Wicrew\ActivityBundle\Form\Type\Slide', by_reference: false, entry_options: { label: false } } }
+                    - { type: 'tab', label: 'activity.tab.childs' }
+                    - { type: 'group', label: 'activity.group.pricing' }
+                    -   property: 'priceType'
+                        label: 'core.price_type'
+                        type: 'choice'
+                        type_options:
+                            required: true
+                            choices:
+                                'per.person': !php/const App\Wicrew\CoreBundle\Entity\IBasePriceEntity::PRICE_TYPE_PER_PERSON
+                                'core.fixed': !php/const App\Wicrew\CoreBundle\Entity\IBasePriceEntity::PRICE_TYPE_FOR_THE_TRIP
+                    - { property: 'adultRackPrice', label: 'activity.adult_rack_price', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'adultNetPrice', label: 'activity.adult_net_price', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'childRackPrice', label: 'activity.kid_rack_price', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'childNetPrice', label: 'activity.kid_net_price', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'groupAdultRackPrice', label: 'Group Adult Rack Price', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'groupAdultNetPrice', label: 'Group Adult Net Price', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'groupKidRackPrice', label: 'Group Kid Rack Price', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'groupKidNetPrice', label: 'Group Kid Net Price', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'fixedRackPrice', label: 'core.rack.fixed', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'fixedNetPrice', label: 'core.net.fixed', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'tax', label: 'activity.pricing_tax', type_options: { required: true, placeholder: 'core.option.please_select' } }
+                    - { type: 'group', label: 'activity.group.childs' }
+                    - { property: 'childs', type: 'collection', css_class: 'required-collection activity-childs', type_options: { label: false, required: true, block_name: 'custom_childs', error_bubbling: false, entry_type: 'App\Wicrew\ActivityBundle\Form\Type\Child', by_reference: false, entry_options: { label: false } } }
+            templates:
+                new: '@WicrewActivity/Admin/new.html.twig'
+                edit: '@WicrewActivity/Admin/edit.html.twig'
+        ActivityArchive:
+            permissions: ROLE_ADMIN
+            controller: App\Wicrew\ActivityBundle\Controller\Admin\ActivityController
+            label: 'activity.title'
+            icon: 'comment-dollar'
+            class: App\Wicrew\ActivityBundle\Entity\Activity
+            list:
+                filters:
+                    -   property: 'types'
+                        type: 'App\Wicrew\CoreBundle\Form\Filter\ChoiceType'
+                        findInSet: true
+                        type_options:
+                            choices:
+                                'activity.type.option.group': !php/const App\Wicrew\ActivityBundle\Entity\Activity::TYPE_GROUP
+                                'activity.type.option.private': !php/const App\Wicrew\ActivityBundle\Entity\Activity::TYPE_PRIVATE
+                            expanded: true
+                            multiple: true
+                    -   property: 'catagories'
+                        type: 'App\Wicrew\CoreBundle\Form\Filter\ChoiceType'
+                        findInSet: true
+                        type_options:
+                            choices: 
+                                'Adventure': !php/const App\Wicrew\ActivityBundle\Entity\Activity::CATAGORY_ADVENTURE
+                                'Nature': !php/const App\Wicrew\ActivityBundle\Entity\Activity::CATAGORY_NATURE
+                                'Cultural': !php/const App\Wicrew\ActivityBundle\Entity\Activity::CATAGORY_CULTURAL
+                                'Water': !php/const App\Wicrew\ActivityBundle\Entity\Activity::CATAGORY_WATER
+                            expanded: true
+                            multiple: true
+                    -   property: 'duration'
+                        label: 'activity.duration'
+                        type: 'App\Wicrew\CoreBundle\Form\Filter\ChoiceType'
+                        type_options:
+                            placeholder: 'core.option.please_select'
+                            choices:
+                                'activity.duration.option.1_2_hours': !php/const App\Wicrew\ActivityBundle\Entity\Activity::DURATION_1_2_HOURS
+                                'activity.duration.option.half_day': !php/const App\Wicrew\ActivityBundle\Entity\Activity::DURATION_HALF_DAY
+                                'activity.duration.option.full_day': !php/const App\Wicrew\ActivityBundle\Entity\Activity::DURATION_FULL_DAY
+                            expanded: true
+                            multiple: true
+                    - { property: 'area' }
+                actions:
+                    - { name: 'edit' }
+                    - { name: 'unarchive' }
+                title: 'activity.title'
+                fields:
+                    - id
+                    - { property: 'name', label: 'activity.name' }
+                    - { property: 'combo', label: 'activity.combo', type: 'boolean' }
+                    - { property: 'visibility', label: 'activity.visibility', type: 'boolean' }
+                    - { property: 'status', label: 'activity.status', type: 'boolean' }
+                    - { property: 'createdAt', label: 'activity.created_at', format: '%global.date.format%' }
+                max_results: '%global.sort.pagination.default%'
+                sort: ['id', '%global.sort.asc%']
+                dql_filter: "entity.archived = 1"
+            form:
+                form_options: { attr: { novalidate: novalidate, class: 'validate-form' } }
+                fields:
+                    - { type: 'tab', label: 'activity.tab.general' }
+                    - { type: 'group', label: 'activity.group.information' }
+                    - { property: 'combo', label: 'activity.combo' }
+                    -   property: 'visibility'
+                        label: 'activity.visibility'
+                        type: 'choice'
+                        type_options:
+                            required: true
+                            choices:
+                                'activity.visibility.option.not_visible': false
+                                'activity.visibility.option.visible': true
+                            expanded: true
+                            multiple: false
+                    -   property: 'status'
+                        label: 'activity.status'
+                        type: 'choice'
+                        type_options:
+                            required: true
+                            choices:
+                                'activity.status.option.offline': !php/const App\Wicrew\ActivityBundle\Entity\Activity::STATUS_OFFLINE
+                                'activity.status.option.online': !php/const App\Wicrew\ActivityBundle\Entity\Activity::STATUS_ONLINE
+                            expanded: true
+                            multiple: false
+                    - { property: 'name', label: 'activity.name' }
+                    - { property: 'area', label: 'activity.area', type_options: { required: true, placeholder: 'core.option.please_select' } }
+                    -   property: 'types'
+                        label: 'activity.types'
+                        type: 'choice'
+                        type_options:
+                            required: true
+                            choices:
+                                'activity.type.option.group': !php/const App\Wicrew\ActivityBundle\Entity\Activity::TYPE_GROUP
+                                'activity.type.option.private': !php/const App\Wicrew\ActivityBundle\Entity\Activity::TYPE_PRIVATE
+                            expanded: true
+                            multiple: true
+                    -   property: 'catagories'
+                        label: 'Activity Catagories'
+                        type: 'choice'
+                        type_options:
+                            required: true
+                            choices:
+                                'Adventure': !php/const App\Wicrew\ActivityBundle\Entity\Activity::CATAGORY_ADVENTURE
+                                'Nature': !php/const App\Wicrew\ActivityBundle\Entity\Activity::CATAGORY_NATURE
+                                'Cultural': !php/const App\Wicrew\ActivityBundle\Entity\Activity::CATAGORY_CULTURAL
+                                'Water': !php/const App\Wicrew\ActivityBundle\Entity\Activity::CATAGORY_WATER
+                            expanded: true
+                            multiple: true
+                    -   property: 'difficultyLevels'
+                        label: 'activity.difficulty_levels'
+                        type: 'choice'
+                        type_options:
+                            required: true
+                            choices:
+                                'activity.difficulty_level.option.easy': !php/const App\Wicrew\ActivityBundle\Entity\Activity::DIFFICULTY_EASY
+                                'activity.difficulty_level.option.morerate': !php/const App\Wicrew\ActivityBundle\Entity\Activity::DIFFICULTY_MODERATE
+                                'activity.difficulty_level.option.difficult': !php/const App\Wicrew\ActivityBundle\Entity\Activity::DIFFICULTY_DIFFICULT
+                            expanded: true
+                            multiple: true
+                    - { property: 'ageGroup', label: 'activity.age_group', type_options: { attr: { data-validate: 'isnumber:1,morethanzero:1' } } }
+                    - { property: 'location', label: 'activity.location', type_options: { required: true, placeholder: 'core.option.please_select', choice_label: 'name' } }
+                    -   property: 'tourTime'
+                        label: 'activity.tour_time'
+                        type: 'choice'
+                        type_options:
+                            required: false
+                            choices:
+                                '00:00': '00:00'
+                                '00:30': '00:30'
+                                '01:00': '01:00'
+                                '01:30': '01:30'
+                                '02:00': '02:00'
+                                '02:30': '02:30'
+                                '03:00': '03:00'
+                                '03:30': '03:30'
+                                '04:00': '04:00'
+                                '04:30': '04:30'
+                                '05:00': '05:00'
+                                '05:30': '05:30'
+                                '06:00': '06:00'
+                                '06:30': '06:30'
+                                '07:00': '07:00'
+                                '07:30': '07:30'
+                                '08:00': '08:00'
+                                '08:30': '08:30'
+                                '09:00': '09:00'
+                                '09:30': '09:30'
+                                '10:00': '10:00'
+                                '10:30': '10:30'
+                                '11:00': '11:00'
+                                '11:30': '11:30'
+                                '12:00': '12:00'
+                                '12:30': '12:30'
+                                '13:00': '13:00'
+                                '13:30': '13:30'
+                                '14:00': '14:00'
+                                '14:30': '14:30'
+                                '15:00': '15:00'
+                                '15:30': '15:30'
+                                '16:00': '16:00'
+                                '16:30': '16:30'
+                                '17:00': '17:00'
+                                '17:30': '17:30'
+                                '18:00': '18:00'
+                                '18:30': '18:30'
+                                '19:00': '19:00'
+                                '19:30': '19:30'
+                                '20:00': '20:00'
+                                '20:30': '20:30'
+                                '21:00': '21:00'
+                                '21:30': '21:30'
+                                '22:00': '22:00'
+                                '22:30': '22:30'
+                                '23:00': '23:00'
+                                '23:30': '23:30'
+                            choice_translation_domain: false
+                            expanded: false
+                            multiple: true
+                    - { property: 'notesToDisplayToTheCustomer', label: 'activity.notes_to_display_to_the_customer' }
+                    -   property: 'duration'
+                        label: 'activity.duration'
+                        type: 'choice'
+                        type_options:
+                            required: true
+                            placeholder: 'core.option.please_select'
+                            choices:
+                                'activity.duration.option.1_2_hours': '1-2 hours'
+                                'activity.duration.option.half_day': 'Half day'
+                                'activity.duration.option.full_day': 'Full day'
+                            expanded: false
+                            multiple: false
+                    - { property: 'driver', label: 'activity.supplier', type_options: { required: false } }
+                    - { type: 'group', label: 'activity.group.description' }
+                    - { property: 'description', label: 'activity.description', type: 'FOS\CKEditorBundle\Form\Type\CKEditorType', type_options: { config: { filebrowserBrowseRoute: 'elfinder', filebrowserBrowseRouteParameters: { instance: 'image', homeFolder: '' } } } }
+                    - { property: 'highlight', label: 'activity.highlight', type: 'FOS\CKEditorBundle\Form\Type\CKEditorType', type_options: { config: { filebrowserBrowseRoute: 'elfinder', filebrowserBrowseRouteParameters: { instance: 'image', homeFolder: '' } } } }
+                    - { property: 'included', label: 'activity.included', type: 'FOS\CKEditorBundle\Form\Type\CKEditorType', type_options: { config: { filebrowserBrowseRoute: 'elfinder', filebrowserBrowseRouteParameters: { instance: 'image', homeFolder: '' } } } }
+                    - { property: 'whatToBring', label: 'activity.what_to_bring', type: 'FOS\CKEditorBundle\Form\Type\CKEditorType', type_options: { config: { filebrowserBrowseRoute: 'elfinder', filebrowserBrowseRouteParameters: { instance: 'image', homeFolder: '' } } } }
+                    - { property: 'importantNotes', label: 'activity.important_notes', type: 'FOS\CKEditorBundle\Form\Type\CKEditorType', type_options: { config: { filebrowserBrowseRoute: 'elfinder', filebrowserBrowseRouteParameters: { instance: 'image', homeFolder: '' } } } }
+                    - { property: 'cancellationPolicy', label: 'activity.cancellation_policy', type: 'FOS\CKEditorBundle\Form\Type\CKEditorType', type_options: { config: { filebrowserBrowseRoute: 'elfinder', filebrowserBrowseRouteParameters: { instance: 'image', homeFolder: '' } } } }
+                    - { property: 'imageFile', type: 'vich_image', label: 'activity.image', type_options: { attr: { data-validate: 'filetype:image/jpeg|image/jpg|image/png|image/bmp,filesize:8000000' } } }
+                    - { type: 'group', label: 'activity.group.seo' }
+                    - { property: 'pageTitle', label: 'page.page_title' }
+                    - { property: 'pageContent', label: 'page.content', type: 'FOS\CKEditorBundle\Form\Type\CKEditorType', type_options: { config: { filebrowserBrowseRoute: 'elfinder', filebrowserBrowseRouteParameters: { instance: 'image', homeFolder: '' } } } }
+                    - { property: 'metaTitle', label: 'page.meta_title' }
+                    - { property: 'metaDescription', label: 'page.meta_description' }
+                    - { property: 'metaKeywords', label: 'page.meta_keywords' }
+                    - { property: 'slug', label: 'page.slug', type: 'text' }
+                    - { type: 'tab', label: 'activity.tab.slides' }
+                    - { type: 'group', label: 'activity.tab.slides' }
+                    - { property: 'slides', type: 'collection', css_class: 'required-collection', type_options: { label: false, required: true, block_name: 'custom_slides', error_bubbling: false, entry_type: 'App\Wicrew\ActivityBundle\Form\Type\Slide', by_reference: false, entry_options: { label: false } } }
+                    - { type: 'tab', label: 'activity.tab.childs' }
+                    - { type: 'group', label: 'activity.group.pricing' }
+                    -   property: 'priceType'
+                        label: 'core.price_type'
+                        type: 'choice'
+                        type_options:
+                            required: true
+                            choices:
+                                'per.person': !php/const App\Wicrew\CoreBundle\Entity\IBasePriceEntity::PRICE_TYPE_PER_PERSON
+                                'core.fixed': !php/const App\Wicrew\CoreBundle\Entity\IBasePriceEntity::PRICE_TYPE_FOR_THE_TRIP
+                    - { property: 'adultRackPrice', label: 'activity.adult_rack_price', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'adultNetPrice', label: 'activity.adult_net_price', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'childRackPrice', label: 'activity.kid_rack_price', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'childNetPrice', label: 'activity.kid_net_price', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'groupAdultRackPrice', label: 'activity.group_adult_rack_price', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'groupAdultNetPrice', label: 'activity.group_adult_net_price', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'groupChildRackPrice', label: 'activity.group_child_rack_price', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'groupChildNetPrice', label: 'activity.group_child_net_price', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'fixedRackPrice', label: 'core.rack.fixed', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'fixedNetPrice', label: 'core.net.fixed', type_options: { required: true, attr: { data-validate: 'isnumber:1' } } }
+                    - { property: 'tax', label: 'activity.pricing_tax', type_options: { required: true, placeholder: 'core.option.please_select' } }
+                    - { type: 'group', label: 'activity.group.childs' }
+                    - { property: 'childs', type: 'collection', css_class: 'required-collection activity-childs', type_options: { label: false, required: true, block_name: 'custom_childs', error_bubbling: false, entry_type: 'App\Wicrew\ActivityBundle\Form\Type\Child', by_reference: false, entry_options: { label: false } } }
+            templates:
+                new: '@WicrewActivity/Admin/new.html.twig'
+                edit: '@WicrewActivity/Admin/edit.html.twig'

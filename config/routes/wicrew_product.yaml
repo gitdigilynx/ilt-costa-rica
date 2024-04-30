@@ -1,0 +1,2 @@
+wicrew_product:
+    resource: "@WicrewProductBundle/Resources/config/routes.yaml"

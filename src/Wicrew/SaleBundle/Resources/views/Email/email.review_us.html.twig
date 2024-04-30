@@ -1,0 +1,35 @@
+{% extends "@WicrewCore/Email/main.email.html.twig" %}
+
+{% block titlemail %}
+    {{ 'email.confirm.order'|trans() }}
+{% endblock %}
+
+{% block mailcontent %}
+    {# @var order \App\Wicrew\SaleBundle\Entity\Order #}
+    <div class="contact-content">
+        <div class="header-information">
+            <div>{{ 'email.hi'|trans() }} {{ order.fullName }}</div>
+            <div>{{ ('email.review.start'|trans()) }}</div>
+            <br />
+            <div>{{ ('email.review.body'|trans()) }}</div>
+        </div>
+        <div class="review-body">
+            <div>{{ ('email.review.link'|trans()) }}</div>
+            <div><a href="{{ getParameterValue('trip_advisor_link') }}">{{ getParameterValue('trip_advisor_link') }}</a></div>
+        </div>
+        <div class="footer-information">
+            <div>{{ 'email.havequestion'|trans() }}</div>
+            <div>{{ 'email.thankyou'|trans() }}</div>
+            <div><img src="{{ absolute_url(asset('bundles/wicrewcore/images/logo.png')) }}" alt=""></div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block additionalCSS %}
+    {{ parent() }}
+    <style>
+        .review-body {
+            margin: 20px 0;
+        }
+    </style>
+{% endblock %}

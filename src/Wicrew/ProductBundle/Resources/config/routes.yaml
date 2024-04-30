@@ -1,0 +1,9 @@
+wicrew_product_frontend:
+    resource: '@WicrewProductBundle/Controller/ProductController.php'
+    type: annotation
+    prefix:
+
+wicrew_product:
+    resource: '@WicrewProductBundle/Controller/Admin/ProductController.php'
+    type: annotation
+    prefix: /admin

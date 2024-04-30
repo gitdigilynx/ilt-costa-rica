@@ -1,0 +1,11 @@
+{% for discountValue in discountValues %}
+    <div class="row-block-flex" style="color: #ff9a52">
+        <div class="col-left">
+            {{ discountValue.discount.name }} <span class="fa fa-trash discount-code-remove" data-discount-id="{{ discountValue.discount.id }}" style="cursor: pointer"></span>
+        </div>
+
+        <div class="col-right discount-value" data-value="{{discountValue.discountRack.toCents()}}">
+            -{{ 'currency.symbol'|trans }}{{ discountValue.discountRack }} {{ 'currency.text'|trans }}
+        </div>
+    </div>
+{% endfor %}

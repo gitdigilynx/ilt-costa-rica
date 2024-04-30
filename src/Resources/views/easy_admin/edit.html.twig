@@ -1,0 +1,30 @@
+{% extends "@EasyAdmin/default/edit.html.twig" %}
+
+{% block body_javascript %}
+    {{ parent() }}
+
+    <script type="text/javascript">
+        jQuery(document).ready(function () {
+            const entityForm = document.querySelector('form.edit-form');
+            const formTabPanes = entityForm.querySelectorAll('.tab-pane');
+            if (0 === formTabPanes.length) {
+                return;
+            }
+
+            let anyActive = false;
+
+            for (let i = 0; i < formTabPanes.length; i++) {
+                anyActive = formTabPanes[i].classList.contains('active');
+                if (anyActive) {
+                    break;
+                }
+            }
+
+            // If no tabs are active, then activate the first one.
+            if (!anyActive) {
+                let navTabItem = entityForm.querySelector('.nav-item a[href="#' + formTabPanes[0].id + '"]');
+                navTabItem.click();
+            }
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,27 @@
+<div class="passengersQty_container">
+    <input class="totalPassengersQty" type="integer" value="{{ item.adultCount + item.childCount }}" style="border: none; width: 50px;" readonly />
+</div>
+
+<div class="passengerQty-dropdown">
+    <div class="sp-quantity">
+        <div class="sp-quantity-label"> Adults: </div>
+        <div class="sp-quantity-content">
+            <div class="sp-minus fff"><a class="ddd" href="javascript:void(0);" data-multi="-1">-</a></div>
+            <div class="sp-input">
+                <input type="text" class="quntity-input adultCount" name="adultCount" value="{{item.adultCount}}" />
+            </div>
+            <div class="sp-plus fff"><a class="ddd" href="javascript:void(0);" data-multi="1">+</a></div>
+        </div>
+    </div>
+
+    <div class="sp-quantity">
+        <div class="sp-quantity-label"> Children: </div>
+        <div class="sp-quantity-content">
+            <div class="sp-minus fff"><a class="ddd" href="javascript:void(0);" data-multi="-1">-</a></div>
+            <div class="sp-input">
+                <input type="text" class="quntity-input childCount" name="childCount" value="{{item.childCount}}" />
+            </div>
+            <div class="sp-plus fff"><a class="ddd" href="javascript:void(0);" data-multi="1">+</a></div>
+        </div>
+    </div>
+</div>

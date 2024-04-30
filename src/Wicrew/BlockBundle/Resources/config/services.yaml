@@ -1,0 +1,10 @@
+services:
+    wicrew.block.service.block:
+        class: App\Wicrew\BlockBundle\Service\Block
+        arguments: ['@wicrew.core.utils']
+        public: true
+
+    wicrew.block.twig.extension.block:
+        class: App\Wicrew\BlockBundle\Twig\BlockExtension
+        arguments: ['@wicrew.core.utils']
+        public: false

@@ -1,0 +1,437 @@
+{% extends "@WicrewCore/Email/main.email.html.twig" %}
+
+{% block titlemail %}{% endblock %}
+
+{% block mailcontent %}
+    Hi {{ order.fullName }},<br />
+    <br />
+    Please find the payment link below for your service(s).<br />
+    <br />
+
+    <h2>Details</h2>
+    {# @var item \App\Wicrew\SaleBundle\Entity\OrderItem #}
+    {% for item in order.items %}
+        <div class="item-box">
+            <div class="item-header">
+                {% if item.product %}{{ item.product.transportationType.name }}{% elseif item.activity %}{{ item.activity.name }}{% endif %}
+                - {{ item.pickDate|formatNoNull('F jS, Y') }}
+            </div>
+
+            <div class="item-info">
+                <div class="item-vehicle-info" style="width: 200px;">
+                    {% set imageURL = getOrderItemImage(item) %}
+                    {% if isUsedInPdf is defined and isUsedInPdf %} 
+                        {% if imageURL is not null %}
+                            <img src="{{ imageToBase64(imageURL) }}"
+                                width="{{ getParameterValue('global_image_vehicletype_width') }}">
+                        {% else %}
+                            <img src="{{ imageToBase64('bundles/wicrewcore/images/placeholder.png') }}"
+                                alt="{{ 'core.image404'|trans }}">
+                        {% endif %} 
+                    {% else %}
+                        {% if imageURL is not null %}
+                            <img src="{{ app.request.getSchemeAndHttpHost() ~ imageURL }}"
+                                width="{{ getParameterValue('global_image_vehicletype_width') }}">
+                        {% else %}
+                            <img src="{{ absolute_url(asset('bundles/wicrewcore/images/placeholder.png')) }}"
+                                alt="{{ 'core.image404'|trans }}">
+                        {% endif %} 
+                    {% endif %}
+                </div>
+                <div class="item-trip-info" style="width: 660px;">
+                    <table>
+                        <tr>
+                            <td style="width: 300px">
+                                <div><strong>Customer name:</strong> {{ item.order.firstname ~ ' ' ~ item.order.lastname }} </div>
+
+                                <div><strong>Date:</strong> {{ item.pickDate|formatNoNull('F jS, Y') }}</div>
+                                {% if item.pickAddress != "" %} 
+                                    <div><span class="item-trip-label">Pick-up Area:</span> {{ item.pickArea.name }}</div>
+                                    <div><span class="item-trip-label">Pick-up Location:</span> {{ item.pickAddress }}</div>
+                                {% else %}
+                                    <div><span class="item-trip-label">Pick-up Location:</span> {{ item.pickArea.name }}</div>
+                                {% endif %}
+                                {% if item.product %}
+                                    {% if ( item.pickArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) ) %} 
+                                        <div><strong>Pick-up Time :</strong> {{ item.pickTime|formatNoNull('H:i') }} </div>
+                                    {% elseif (item.dropArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT'))) %} 
+                                        <div><strong>Pick-up Time :</strong> 
+                                            {% if item.pickTimeTransport == "" %} 
+                                                <span style="color:red;">Will be added on confirmation email</span>
+                                            {% else %}
+                                                {{ item.pickTimeTransport|formatNoNull('H:i') }}
+                                            {% endif %}
+                                        </div>
+                                    {% else %}
+                                        <div><strong>Pick-up Time :</strong> {{ item.pickTime|formatNoNull('H:i') }}</div> 
+                                    {% endif %}
+                                {% else %}
+                                <div><strong>Pick-up Time :</strong> 
+                                    {% if item.pickTime == "" %} 
+                                        <span style="color:red;">Will be added on confirmation email</span>
+                                    {% else %}
+                                        {{ item.pickTime|formatNoNull('H:i') }}
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                                <div><strong>Adults :</strong> {{ item.adultCount }}</div>
+                                <div><strong>Children :</strong> {{ item.childCount }}</div>
+                            </td>
+                            <td>
+                                {% if item.dropAddress != "" %} 
+                                    <div><span class="item-trip-label">Drop-off Area:</span> {{ item.dropArea.name }}</div>
+                                    <div><span class="item-trip-label">Drop-off Location:</span> {{ item.dropAddress }}</div>
+                                {% else %}
+                                    <div><span class="item-trip-label">Drop-off Location:</span> {{ item.dropArea.name }}</div>
+                                {% endif %} 
+                                {% if item.pickArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) and (item.pickAirlineCompany != '' or item.pickFlightNumber != '') %}
+                                    {% if item.pickAirlineCompany != '' %}
+                                        <div><span
+                                            class="item-trip-label">Airline:</span> {{ item.pickAirlineCompany }}
+                                        </div>{% endif %}
+                                    {% if item.pickFlightNumber != '' %}
+                                        <div><span
+                                            class="item-trip-label">Flight #:</span> {{ item.pickFlightNumber }}
+                                        </div>{% endif %} 
+                                {% endif %}  
+                                {% if item.dropArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) and (item.dropAirlineCompany != '' or item.dropFlightNumber != '') %}
+                                    {% if item.dropAirlineCompany != '' %}
+                                        <div><span
+                                            class="item-trip-label">Airline:</span> {{ item.dropAirlineCompany }}
+                                        </div>{% endif %}
+                                    {% if item.dropFlightNumber != '' %}
+                                        <div><span
+                                            class="item-trip-label">Flight #:</span> {{ item.dropFlightNumber }}
+                                        </div>{% endif %}
+                                {% endif %}
+                                <div>
+                                    {% if item.product %}
+                                        
+                                        {% if item.pickArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) and item.dropArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}
+                                            {% if item.pickTime %}
+                                                <div>
+                                                    <strong>Arrival Time: </strong><span>{{item.pickTime|formatNoNull("H:i")}}</span> 
+                                                </div>
+                                                <br />
+                                            {% endif %}
+                                        {% elseif item.dropArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}           
+                                            {% if item.pickTime %}
+                                                <div>
+                                                    <strong>Departure Time: </strong><span>{{item.pickTime|formatNoNull("H:i")}}</span> 
+                                                </div>
+                                                <br />
+                                            {% endif %}
+                                        {% elseif item.pickArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}           
+                                            {% if item.pickTime %}
+                                                <div>
+                                                    <strong>Arrival Time: </strong><span>{{item.pickTime|formatNoNull("H:i")}}</span> 
+                                                </div>
+                                                <br />
+                                            {% endif %}
+                                        {% endif %}
+                                    {% elseif item.activity %}
+                                        <span class="item-trip-label">Tour Time:</span> {{ item.tourTime|formatNoNull('H:i') }}
+                                    {% endif %}
+                                </div>
+                            </td> 
+                        </tr>
+                        {% if item.customerNotes %}
+                            <tr>
+                                <td colspan="2">
+                                    <div class="item-trip-label item-notes-header">Notes:</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">{{ item.customerNotes|raw }}</td>
+                            </tr>
+                        {% endif %}
+                        <tr>
+                            <td colspan="2">
+                                {% if item.anyAddons and item.anyExtras %}<br><div><strong style="text-decoration: underline;">Extras & Add-ons:</strong></div>{% endif %}
+                                {% if item.anyAddons %}
+                                    {% if not item.anyAddons %}<br>{% endif %}
+                                    <div>
+                                        <label style="text-decoration: underline;font-weight:bold;">{{ 'booking.addons'|trans() }}:</label>
+                                        {% for addon in item.addons %}
+                                            <div class="inside">
+                                                {{ addon.label|raw }} - {{ addon.rackPrice ~ 'currency.symbol'|trans() }}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if item.anyExtras %}
+                                    {% if item.anyExtras %}<br>{% endif %}
+                                    <div>
+                                        <label style="text-decoration: underline;font-weight:bold;">{{ 'booking.extras'|trans() }}:</label>
+                                        {% for extra in item.extras %}
+                                            <div class="inside">
+                                                {{ extra.label|raw }} - {{ extra.rackPrice ~ 'currency.symbol'|trans() }}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endfor %}  
+
+    <h2>Purchase Summary</h2>
+    <div class="purchase-summary">
+        <div class="client-contact-info" style="width: 280px;">
+            {% if cardBrand is defined and last4Digits is defined and cardBrand is not null and last4Digits is not null %}
+                <div class="item-trip-label">{{ cardBrand }}</div>
+                <div>XXXX-XXXX-XXXX-{{ last4Digits }}</div>
+            {% endif %}
+            <div class="client-name">{{ order.fullName }}</div>
+        </div>
+        <div class="client-charges" style="width: 100%;">
+        <table>
+            {% set itemTaxes = 0 %}
+            {% set enabledTimeRange = false %}
+            {% for item in order.items %}
+                {% set itemPrice = item.subtotalRack %}
+                {% set itemTaxes = itemTaxes + (itemPrice * 0.13) %}
+                {% if item.anyTimeRangeFees %}
+                    {% set enabledTimeRange = true %}
+                    {% if item.regularTimeFeeRack is not null %}
+                        {% set itemPrice = itemPrice - item.regularTimeFeeRack %}
+                        {% set itemTaxes = itemTaxes + ( item.regularTimeFeeRack * 0.13 ) %}
+                    {% endif %}
+                    {% if item.flightPickTimeFeeRack is not null %}
+                        {% set itemPrice = itemPrice - item.flightPickTimeFeeRack %}
+                        {% set itemTaxes = itemTaxes + ( item.flightPickTimeFeeRack * 0.13 ) %}
+                    {% endif %}
+                    {% if item.flightDropTimeFeeRack is not null %}
+                        {% set itemPrice = itemPrice - item.flightDropTimeFeeRack %}
+                        {% set itemTaxes = itemTaxes + ( item.flightDropTimeFeeRack * 0.13 ) %}
+                    {% endif %}
+                {% endif %} 
+
+                <tr>
+                    <td class="charges-label-col"><span class="item-trip-label">{% if item.product %}{{ item.product.transportationType.name }}{% elseif item.activity %}{{ item.activity.name }}{% endif %}</span> </td>
+                    <td>{{ 'currency.symbol'|trans }}{{ itemPrice|number_format(2, '.', ',')  }} {{ 'currency.text'|trans }}</td>
+                </tr>
+                
+                {% if item.anyTimeRangeFees %}
+                    {% if item.regularTimeFeeRack is not null %}
+                        <tr>
+                            <td class="charges-label-col"><span class="item-trip-label"> {{ 'product.section.regular_time_range'|trans }}</span></td>
+                            <td>{{ 'currency.symbol'|trans() ~ item.regularTimeFeeRack|number_format(2, '.', ',')  }} {{ 'currency.text'|trans }}</td>
+                        </tr>
+                    {% endif %}
+                    {% if item.flightPickTimeFeeRack is not null %}
+                        <tr>
+                            <td class="charges-label-col"><span class="item-trip-label"> {{ 'product.section.flight_pickup_time_range'|trans }}</span></td>
+                            <td>{{ 'currency.symbol'|trans() ~ item.flightPickTimeFeeRack|number_format(2, '.', ',')  }} {{ 'currency.text'|trans }}</td>
+                        </tr>
+                    {% endif %}
+                    {% if item.flightDropTimeFeeRack is not null %}
+                        <tr>
+                            <td class="charges-label-col"><span class="item-trip-label"> {{ 'product.section.flight_drop_off_time_range'|trans }}</span></td>
+                            <td>{{ 'currency.symbol'|trans() ~ item.flightDropTimeFeeRack|number_format(2, '.', ',')  }} {{ 'currency.text'|trans }}</td>
+                        </tr>
+                    {% endif %}
+                {% endif %} 
+            {% endfor %}
+            <tr class="charges-taxes-row">
+                <td class="charges-label-col"><span class="item-trip-label">Taxes, Fees & Charges</span></td>
+                <td>{{ 'currency.symbol'|trans }}{{ itemTaxes|number_format(2, '.', ',') }} {{ 'currency.text'|trans }}</td>
+            </tr>
+            {% for discount in order.discountValues %}
+                <tr class="charges-taxes-row">
+                    <td class="charges-label-col"><span class="item-trip-label">{{ discount.discount.name }}</span></td>
+                    <td>-{{ 'currency.symbol'|trans }}{{ discount.discountRack }} {{ 'currency.text'|trans }}</td>
+                </tr>
+            {% endfor %}
+            <tr>
+                <td>
+                    <div class="item-trip-label charges-total-col">Grand Total:</div>
+                </td>
+                <td>
+                    <div class="item-trip-label charges-total-col">{{ 'currency.symbol'|trans }}{{ order.grandTotal['grandTotal'] }} {{ 'currency.text'|trans }}</div>
+                </td>
+            </tr>
+            
+            {% if (order.quote and order.status == 0) or order.status == 0 %}
+                <tr>
+                    <td colspan="2" style="text-align: center;" style="text-align: center; padding-top: 36px !important; padding-bottom: 20px !important;">
+                        {% if isUsedInPdf is defined and isUsedInPdf %}
+                        {% else %}
+                            <a href="{{ app.request.getSchemeAndHttpHost() ~ payment_link }}" class="btn makePayment" style="display: block; background: #387C44; margin-top: 24px; padding: 10px 24px; border-radius: 5px; color: #fff; text-decoration: none; font-weight: bold;"> Make a payment </a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endif %}
+        </table>
+        </div>
+    </div>    
+    <br />    
+    {{ customBody }}
+    <br/>
+    <div style="border-top: 1px solid #cacaca;padding-bottom: 10px;"></div>
+    <br />
+    If you have any questions, please do not hesitate to contact us.
+    <br />
+    <br />
+    Thank you,
+    <br>
+{% endblock %}
+
+{% block mailfooter %}
+    {% include "@WicrewCore/Email/main.email.footer.html.twig" with {'emailfooter': 'info@iltcostarica.com'} %}
+{% endblock %} 
+
+{% block additionalCSS %}
+    <style>
+        img {
+            max-width: unset;
+        }
+
+        .booking-complete {
+            text-align: center;
+            font-size: 1.5em;
+        }
+
+        .booking-reference-text {
+            margin: 5px 0 20px 0;
+        }
+
+        .booking-number {
+            display: inline;
+            color: red;
+        }
+
+        h2 {
+            border-bottom: 1px solid #cacaca;
+            width: 100%;
+            font-size: 1.8em;
+        }
+
+        h3 {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        h4 {
+            margin-bottom: 0;
+            text-transform: uppercase;
+        }
+
+        .item-box {
+            border-bottom: 1px solid #cacaca;
+            margin-bottom: 10px;
+        }
+
+        .item-header {
+            background-color: #646464;
+            text-align: center;
+            color: white;
+            font-size: 1.5em;
+        }
+
+        .item-info {
+            display: -webkit-box; /* wkhtmltopdf uses this one */
+            display: flex;
+        }
+
+        .purchase-summary > div {
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            flex: 1;
+        }
+
+        .item-vehicle-info {
+            max-width: {{ getParameterValue('global_image_vehicletype_width')|intVal + 20 }}px;
+        }
+
+        .vehicle-notes-list {
+            padding-left: 10px;
+        }
+
+        .item-trip-info {
+            margin: 5px 0 2px 0;
+            padding: 5px;
+
+            flex-grow: 1;
+            background-color: #F9F9F9;
+        }
+
+        .item-trip-label {
+            font-weight: bold;
+        }
+
+        .item-notes-header {
+            text-decoration: underline;
+            margin-top: 10px;
+        }
+
+        .purchase-summary {
+            display: -webkit-box; 
+            display: flex;
+            flex-wrap: nowrap;
+            padding: 5px 3px;
+            background: #F9F9F9;
+            width: 100%;
+            min-height: 180px;
+        }
+
+        .purchase-summary > div {
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            flex: 1;
+        }
+
+        .client-contact-info, .client-charges {
+            padding: 5px 0;
+        }
+
+        .client-contact-info {
+            border-right: 1px solid black;
+            flex-basis: 300px;
+        }
+
+        .client-name {
+            margin-top: 20px;
+        }
+
+        .client-charges {
+            padding-left: 10px;
+        }
+
+        .client-charges table {
+            border-spacing: 0;
+        }
+
+        .client-charges td {
+            padding: 0 8px 0 0;
+        }
+
+        .charges-label-col {
+            min-width: 200px;
+        }
+
+        .charges-taxes-row td {
+            border-bottom: 1px solid black;
+        }
+
+        .charges-total-col {
+            margin-top: 20px;
+        }
+
+        .important-information {
+            background-color: #F9F9F9;
+            padding: 10px 5px;
+        }
+
+        .em-contact-label {
+            font-weight: bold;
+        }
+
+        .info-bullet-list li {
+            list-style: initial;
+        }
+    </style>
+{% endblock %}

@@ -1,0 +1,124 @@
+page.page: Page
+page.title: Label
+page.slug: Slug
+page.content: Content
+page.page_title: Page title
+page.meta_title: Meta title
+page.meta_description: Meta description
+page.meta_keywords: Meta keywords
+page.css: CSS
+page.js: JS
+page.enabled: Enabled
+page.hide_header: Hide header
+page.created_at: Created at
+
+page.tab.general: General
+page.group.information: Information
+page.tab.meta_data: Meta data
+page.group.meta_data: Meta information
+site.title: ILT Costa Rica
+
+page.base.customers_saying: What Customers are Saying
+
+page.header.cart: Cart
+page.header.menu: Menu
+page.footer.tos: Terms of Use
+page.footer.wi: Walter Interactive
+page.footer.site_map: Site Map
+
+homepage:
+    bullets:
+        headline1: Eating & <br>Drinking Safely
+        justify1: |
+            You can find clean running water throughout Costa Rica and most tourist destinations.
+            Compared with other countries in Central America, tourists are much less likely to suffer from stomach upsets.
+            If your restaurant looks clean, please order any food.
+
+        headline2: Shopping<br>& Currency
+        justify2: |
+            The unit of currency in Costa Rica is the colon, which hovers between 550-580 colon / 1 US dollar.
+            As long as the bill amount is not too large (50 and 100 dollar bills are rarely accepted), the U.S. dollar can be widely accepted.
+            Hotels and tours usually list prices in US dollars. Compared with other parts of Central America, Costa Rica’s prices are relatively high, which is largely due to the country’s high standard of living.
+            Typical Costa Rican food and agricultural products are unbelievably cheap, while the prices of imported products are similar to those in the United States.
+            A typical Costa Rican breakfast and lunch will cost about 2000-5000 colones ($4-10).
+
+        headline3: Navigating Costa<br>Rica's Roads
+        justify3: |
+            The road conditions across the country vary widely.
+            Due to the tropical climate and mountainous terrain, many roads are difficult to maintain, while many are not even paved.
+            Relatively short distances can take many hours due to poor road conditions and traffic with some roads simply impassable during the rainy season when rivers swell.
+            Before planning a day trip, it's always a good idea to check with the locals about current road conditions.
+
+        headline4: Geography<br>& Terrain
+        justify4: |
+            Costa Rica is a tropical destination, and it’s look and landscape change throughout the year.
+            Costa Rica is perfect for traveling any time of the year, and your experience in Costa Rica will be satisfying & beyond imaginable.
+            <br><br>
+            Costa Rica is in Central America and is bordered by both the Pacific Ocean and the Caribbean Sea, with Panama to the south and Nicaragua to the north.
+            The country’s total area is 19,730 square miles (51,100 sq km), which is slightly smaller than the U.S. state of West Virginia.
+            Costa Rica’s terrain varies between coastal plains and rugged mountains.
+            The highest point is Cerro Chirripó, which rises to 12,500 feet (3,810 meters) in the Chirripó National Park.
+
+        headline5: Weather &<br>Microclimates
+        justify5: |
+            It rains all year round in Costa Rica, so bring a light raincoat.
+            The mountains and volcanoes of create a series of microclimates.
+            Generally, December to April is considered the dry season, while the rainy season starts in May.
+            However, the Caribbean coast is much less predictable, and it may rain throughout the year.
+
+        headline6: Cultural<br>Overview
+        justify6: |
+            In the past 40 years, the Costa Rican government has shown a keen awareness of the relationship between tourism and the environment.
+            In order to maintain Costa Rica’s awesome biodiversity, the Costa Rica Institute of Tourism has implemented a system to reward hotels and tourism providers that implement green business practices.
+
+        headline7: Society<br>& Economy
+        justify7: |
+            The Ticos – Costa Ricans are proud to have more than a century of democratic tradition and more than 68 years without a military.
+            With the money saved, the country is better able to focus on improving the quality of life of its citizens.
+            This is one of the many reasons why Costa Ricans, also known as “Ticos,” are such a happy and welcoming people.
+            <br><br>
+            Famous for their hospitality, Ticos often go out of their way to help to visitors with directions or offer other assistance if needed.
+            It is said that “Ticos” are the nation’s best asset.
+            Once visitors experience their hospitality, visitors too are convinced.
+            <br><br>
+            Costa Rica is a peaceful country and has not had a standing army since 1948.
+            The government provides free education for citizens through the 11th grade, as well as healthcare.
+            Citizens of Costa Rica enjoy a high standard of living — there is a 96 percent literacy rate and an average life.
+
+        headline8: Sustainable<br>Development
+        justify8: |
+            Costa Rica has chosen the ethics of sustainable development and committed to the development of renewable energy.
+            Costa Rica is expected to become the first country to achieve carbon neutrality. 99% of the country’s energy needs will be met by geothermal, hydroelectric and wind power.
+
+    populartours:
+        title: Popular Costa Rica Tours and Activities
+        btn_text: View Tours
+    populartours_items:
+        title1: Arenal Volcano & La Fortuna
+        link1: tours/arenal-valcano-la-fortuna
+
+        title2: Manuel Antonio
+        link2: tours/manuel-antonio
+
+        title3: Guanacaste
+        link3: tours/guanacaste
+
+        title4: Jaco
+        link4: tours/jaco
+
+        title5: Monteverde
+        link5: tours/monteverde
+
+        title6: Alajuela & San Jose
+        link6: tours/alajuela_san-jose
+
+    justfly:
+        title: Why drive? Just fly!
+        content: Memorable experiences from the sky.
+        btn_text: See our charter services
+        btn_link: product/transportation/private-flight
+
+    tripadvisor:
+        title: 'Rated #1 on TripAdvisor'
+        content: Our goal is simple, to provide personalized service while never losing sight that customer experience & satisfaction will always remain our number one priority.
+        btn_text: Discover our promise

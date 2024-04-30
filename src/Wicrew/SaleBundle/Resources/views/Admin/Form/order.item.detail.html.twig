@@ -1,0 +1,76 @@
+<ul class="list-content">
+    {# @var orderItem \App\Wicrew\SaleBundle\Entity\OrderItem #}
+    {% for orderItem in orderItems %}
+        <li>
+            <h3>
+                {% if orderItem.product is not null %}
+                    {{ orderItem.product.transportationType.name }}
+                {% elseif orderItem.activity is not null %}
+                    {{ orderItem.activity.name }}
+                    {{ orderItem.adultCount }}
+                {% endif %}
+                {{ orderItem.pickDate|date("d M Y") }} {{ 'currency.symbol'|trans() }}<span class="price-total"
+                                                                                            id="price_total">{{ orderItem.grandTotal }}</span> {{ 'currency.text'|trans() }}
+            </h3>
+            <div>
+                {% set imageURL = getOrderItemImage(orderItem) %}
+                {% if imageURL is not null %}
+                    <img src="{{ app.request.getSchemeAndHttpHost() ~ imageURL }}"
+                         width="{{ getParameterValue('global_image_vehicletype_width') }}"
+                         height="{{ getParameterValue('global_image_vehicletype_height') }}"/>
+                {% else %}
+                    <img src="{{ absolute_url(asset('bundles/wicrewcore/images/placeholder.png')) }}"
+                         alt="{{ 'core.image404'|trans }}"
+                    >
+                {% endif %}
+            </div>
+            <div>
+                <label>{{ 'from'|trans() }}: {{ orderItem.pickArea.name }}</label>
+                {% include "@WicrewSale/Admin/Form/order.item.detail.area.html.twig" with
+                    {
+                        "type": orderItem.pickArea.type,
+                        "name": orderItem.pickArea.name,
+                        "address": orderItem.pickAddress,
+                        "flightNumber": orderItem.pickFlightNumber,
+                        "airlineCompany": orderItem.pickAirlineCompany,
+                        "addFee": orderItem.pickAddFeeRack,
+                        "areaType":"from"
+                    } only %}
+            </div>
+            <div>
+                <label>{{ 'to'|trans() }}: {{ orderItem.dropArea.name }}</label>
+                {% include "@WicrewSale/Admin/Form/order.item.detail.area.html.twig" with
+                    {
+                        "type": orderItem.dropArea.type,
+                        "name": orderItem.dropArea.name,
+                        "address": orderItem.dropAddress,
+                        "flightNumber": orderItem.dropFlightNumber,
+                        "airlineCompany": orderItem.dropAirlineCompany,
+                        "addFee": orderItem.dropAddFeeRack,
+                        "areaType":"to"
+                    } only %}
+            </div>
+            {% if orderItem.activity is not null %}
+                <div><label>{{ 'activity.tour_time'|trans() }}:</label> {{ orderItem.tourTime|formatNoNull("H:i") }}</div>
+            {% else %}
+                <div><label>{{ 'booking.pickuptime'|trans() }}:</label> {{ orderItem.pickTime|formatNoNull("H:i") }}</div>
+            {% endif %}
+            <div>{{ 'booking.passenger.adults'|trans({ "count": orderItem.adultCount }) }}</div>
+            <div>{{ 'booking.passenger.children'|trans({ "count": orderItem.childCount }) }}</div>
+
+            {% if orderItem.anyAddons %}
+                <h3>{{ 'booking.addons'|trans() }}</h3>
+                <div class="addons">
+                    {% for addon in orderItem.addons %}
+                        <div>{{ addon.label }}</div>
+                        <div>{{ addon.rackPrice }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div><label>{{ 'email.tax'|trans() }}:</label> {{ orderItem.totalTax }}</div>
+            <div><label>{{ 'email.total'|trans() }}:</label> {{ orderItem.grandTotal }}</div>
+        </li>
+        <hr/>
+    {% endfor %}
+</ul>

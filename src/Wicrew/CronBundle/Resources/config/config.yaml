@@ -1,0 +1,4 @@
+imports:
+    - { resource: "@WicrewCronBundle/Resources/config/easy_admin.yaml" }
+    #    - { resource: "@WicrewCronBundle/Resources/config/monolog.yaml" }
+    - { resource: "@WicrewCronBundle/Resources/config/services.yaml" }

@@ -1,0 +1,23 @@
+{% set dataset = {
+    (constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::STATUS_UNPAID')): "order_item.status.option.unpaid"|trans(),
+    (constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::STATUS_PAID')): "order_item.status.option.paid"|trans(),
+    (constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::STATUS_CANCELLED')): "order_item.status.option.cancelled"|trans(),
+    (constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::STATUS_REFUNDED')): "order_item.status.option.refunded"|trans()
+} %}
+ 
+{% for key, data in dataset %}
+    {% if key is same as constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::STATUS_UNPAID') %}
+        {% set color = '--orange' %}
+    {% elseif key is same as constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::STATUS_PAID') %}
+        {% set color = '--green' %}
+    {% elseif key is same as constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::STATUS_CANCELLED') %}
+        {% set color = '--red' %}
+    {% elseif key is same as constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::STATUS_REFUNDED') %}
+        {% set color = '--red' %}
+    {% endif %}
+    {% if value is same as(key) %}
+        <span style="color: var({{color}});"> 
+            {{ data }}
+        </span> 
+    {% endif %} 
+{% endfor %} 

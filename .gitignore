@@ -1,0 +1,50 @@
+
+###> symfony/framework-bundle ###
+/.env.local
+/public/robot.txt
+/.env.local.php
+/.env.*.local
+/public/bundles/
+/var/
+/vendor/
+/.env
+###< symfony/framework-bundle ###
+
+###> symfony/phpunit-bridge ###
+.phpunit
+/phpunit.xml
+###< symfony/phpunit-bridge ###
+
+###> symfony/web-server-bundle ###
+/.web-server-pid
+###< symfony/web-server-bundle ###
+/nbproject/private/
+
+# Uploaded data and resources.
+public/upload/*
+!public/upload/.htaccess
+public/uploads/*
+!public/uploads/.htaccess
+
+node_modules
+
+# JetBrains IDE data.
+.idea/
+
+# VS Code IDE data.
+.vscode
+
+# macOS Finder file data.
+.DS_Store
+
+# Doctrine migration streams.
+src/Migrations/Version*.php
+composer.phar
+
+src/Wicrew/CoreBundle/Resources/public/images/our-fleet/bus.png
+src/Wicrew/CoreBundle/Resources/public/images/whatsapp-button.png
+src/Wicrew/CoreBundle/Resources/public/images/whatsapp-icon.png
+src/Wicrew/CoreBundle/Resources/public/javascript/dayjs.min.js
+src/Wicrew/CoreBundle/Resources/public/javascript/jquery.dl_timepicker.min.js
+
+exported_products_2023-08-22.xlsx

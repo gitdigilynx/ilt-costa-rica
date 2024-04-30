@@ -1,0 +1,15 @@
+<input type="text"
+       name="{{
+       entity_config['nameInputArrayWrapper'] is defined ?
+       entity_config['nameInputArrayWrapper'] ~ '[' ~ field_options['arrayWrapperIndex'] ~ ']' ~ '[' ~ field_options['property'] ~ ']'
+       : field_options['property'] }}"
+        style="border: none;"
+        class="addressInput"
+        {% if value is not null %}
+            value="{{ value }}"
+        {% endif %}
+        
+        {% if required is defined and required %}required{% endif %}
+>
+
+

@@ -1,0 +1,6 @@
+security:
+    firewalls:
+        main:
+            logout:
+                target: /admin
+                

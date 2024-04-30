@@ -1,0 +1,17 @@
+
+{% if item.type is same as constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::TYPE_PRIVATE_SHUTTLE') %}
+    {% set color = '--orange' %}
+{% elseif item.type is same as constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::TYPE_SHARED_SHUTTLE') %}
+    {% set color = '--purple' %}
+{% elseif item.type is same as constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::TYPE_PRIVATE_JBJ')
+    or item.type is same as constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::TYPE_SHARED_JBJ')
+    or item.type is same as constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::TYPE_RIDING_JBJ') %}
+    {% set color = '--blue' %}
+{% elseif item.type is same as constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::TYPE_WATER_TAXI') %}
+    {% set color = '--blue' %}
+{% elseif item.type is same as constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::TYPE_PRIVATE_FLIGHT') %}
+    {% set color = '--green' %}
+{% endif %}
+
+{# @var item \App\Wicrew\SaleBundle\Entity\OrderItem #}
+<span style="color: var({{ color }});">{{ item.toTranslateString()|trans }}</span>

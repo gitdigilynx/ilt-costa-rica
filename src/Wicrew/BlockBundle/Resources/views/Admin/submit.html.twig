@@ -1,0 +1,19 @@
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        function toggleFields() {
+            if (jQuery("input[name=\"block[type]\"]:checked").val() == {{ constant('App\\Wicrew\\BlockBundle\\Entity\\Block::TYPE_CONTENT') }}) {
+                jQuery("#block_content").parents(".form-group:eq(0)").show();
+                jQuery("#block_customTemplate").parents(".form-group:eq(0)").hide();
+            } else if (jQuery("input[name=\"block[type]\"]:checked").val() == {{ constant('App\\Wicrew\\BlockBundle\\Entity\\Block::TYPE_TEMPLATE') }}) {
+                jQuery("#block_content").parents(".form-group:eq(0)").hide();
+                jQuery("#block_customTemplate").parents(".form-group:eq(0)").show();
+            }
+        }
+
+        toggleFields();
+
+        jQuery("input[name=\"block[type]\"]").change(function () {
+            toggleFields();
+        });
+    });
+</script>

@@ -1,0 +1,6 @@
+error.invalid.pdf: Please upload a valid PDF file.
+error.invalid.image: Please upload a valid image file.
+error.image.corrupted: Product photo is corrupted. Upload it again.
+error.image.required: You must upload a photo.
+error.min: You must specify at least one item.
+error.login: Username or password is invalid.

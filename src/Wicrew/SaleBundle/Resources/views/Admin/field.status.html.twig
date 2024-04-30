@@ -1,0 +1,28 @@
+{# @var item \App\Wicrew\SaleBundle\Entity\OrderItem #}
+{% if item.order is defined %}
+    {% set holder = item.order %}
+{% else %}
+    {% set holder = item %}
+{% endif %}
+
+{% if value is same as constant('\\App\\Wicrew\\SaleBundle\\Entity\\Order::STATUS_PENDING') %}
+    {% set color = '--orange' %}
+{% elseif value is same as constant('\\App\\Wicrew\\SaleBundle\\Entity\\Order::STATUS_PAID') %}
+    {% set color = '--green' %}
+{% elseif value is same as constant('\\App\\Wicrew\\SaleBundle\\Entity\\Order::STATUS_CANCELLED') %}
+    {% set color = '--red' %}
+{% endif %}
+
+<span style="color: var({{ color }});">
+{% if value == constant('App\\Wicrew\\SaleBundle\\Entity\\Order::STATUS_PENDING') %}
+    {{ "sale.order.status.pending"|trans() }}
+{% elseif value == constant('App\\Wicrew\\SaleBundle\\Entity\\Order::STATUS_PAID') %}
+    {% if holder.paymentType == constant('App\\Wicrew\\SaleBundle\\Entity\\Order::PAYMENT_TYPE_CASH') %}
+        {{ "sale.order.status.paid_cash"|trans() }}
+    {% else %}
+        {{ "sale.order.status.paid"|trans() }}
+    {% endif %}
+{% elseif value == constant('App\\Wicrew\\SaleBundle\\Entity\\Order::STATUS_CANCELLED') %}
+    {{ "sale.order.status.cancelled"|trans() }}
+{% endif %}
+</span>

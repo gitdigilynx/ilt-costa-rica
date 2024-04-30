@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale|split('_')|first|default('en') }}">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noodp, noimageindex, notranslate, nocache" />
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <meta name="generator" content="EasyAdmin" />
+
+    <title>{% block page_title %}{{ block('content_title')|striptags|raw }}{% endblock %}</title>
+
+    {% block head_stylesheets %}
+        <link rel="stylesheet" href="{{ asset('bundles/easyadmin/app.css') }}">
+    {% endblock %}
+
+    {% for css_asset in easyadmin_config('design.assets.css') %}
+        <link rel="stylesheet" href="{{ asset(css_asset) }}">
+    {% endfor %}
+
+    {% if easyadmin_config('design.brand_color') != 'hsl(230, 55%, 60%)' %}
+        <style>
+            :root { --color-primary: {{ easyadmin_config('design.brand_color') }}; }
+        </style>
+    {% endif %}
+
+    {% block head_favicon %}
+        {% set favicon = easyadmin_config('design.assets.favicon') %}
+        <link rel="icon" type="{{ favicon.mime_type }}" href="{{ asset(favicon.path) }}" />
+    {% endblock %}
+
+    {% block head_javascript %}
+        <script src="{{ asset('bundles/easyadmin/app.js') }}"></script>
+    {% endblock head_javascript %}
+
+    {% if easyadmin_config('design.rtl') %}
+        <link rel="stylesheet" href="{{ asset('bundles/easyadmin/app-rtl.css') }}">
+    {% endif %}
+</head>
+
+{% block body %}
+    <body id="{% block body_id %}{% endblock %}" class="easyadmin {% block body_class %}{% endblock %}">
+    <script>
+        document.body.classList.add(
+            'easyadmin-content-width-' + (localStorage.getItem('easyadmin/content/width') || 'normal'),
+            'easyadmin-sidebar-width-' + (localStorage.getItem('easyadmin/sidebar/width') || 'normal')
+        );
+    </script>
+
+    {% block wrapper_wrapper %}
+        <div class="wrapper">
+            <div id="loader" style="position:fixed;top:0;left:0;right:0;height:100vh;background:#292D42;z-index:99999999;"><h1 style="top:40%;left:42%;position: fixed; color: #FC7C5C" class="loader-icon" width='200px' height='200px' >Loading...</h1></div>
+
+            {% block wrapper %}
+                <header class="main-header">
+                    {% block header %}
+                        <nav class="navbar" role="navigation">
+                            <button id="navigation-toggler" type="button" aria-label="Toggle navigation">
+                                <img src="../images/sidebar.svg"/>
+                            </button>
+
+                            <div id="header-logo">
+                                {% block header_logo %}
+                                    <a class="logo {{ easyadmin_config('site_name')|length > 14 ? 'logo-long' }}" title="{{ easyadmin_config('site_name')|striptags }}" href="{{ path('easyadmin') }}">
+                                        {{ easyadmin_config('site_name')|raw }}
+                                    </a>
+                                {% endblock header_logo %}
+                            </div>
+                        </nav>
+
+                        {% set _user_name = easyadmin_read_property(app.user, easyadmin_config('user.name_property_path'))|default('user.unnamed'|trans(domain = 'EasyAdminBundle')) %}
+                        {% set _logout_path = easyadmin_logout_path() %}
+                        {% set _user_has_logout = _logout_path is not empty %}
+                        {% set _user_is_impersonated = is_granted('ROLE_PREVIOUS_ADMIN') %}
+                        {% set _user_menu_content %}
+                            <div class="popover-content-section user-details {{ _user_has_logout or _user_is_impersonated ? 'user-has-actions' }}">
+                                <p class="small text-muted mb-0">{{ 'user.logged_in_as'|trans(domain = 'EasyAdminBundle') }}</p>
+                                <p class="user-details-name">
+                                    {% if app.user|default(false) == false %}
+                                        {{ 'user.anonymous'|trans(domain = 'EasyAdminBundle') }}
+                                    {% else %}
+                                        {{ _user_name }}
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                            {% block user_menu %}
+                                {% if _user_has_logout or _user_is_impersonated %}
+                                    <div class="popover-content-section user-menu">
+                                        {% if _user_has_logout %}
+                                            <a class="user-action user-action-logout" href="{{ _logout_path }}">{{ 'user.signout'|trans(domain = 'EasyAdminBundle') }}</a>
+                                        {% endif %}
+                                        {% if _user_is_impersonated %}
+                                            <a class="user-action user-action-exit-impersonation" href="?_switch_user=_exit">{{ 'user.exit_impersonation'|trans(domain = 'EasyAdminBundle') }}</a>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            {% endblock user_menu %}
+                        {% endset %}
+
+                        <div class="content-top navbar-custom-menu">
+                            {% block header_custom_menu %}
+                                <div class="user user-menu-wrapper {{ _user_is_impersonated ? 'user-is-impersonated' }}" data-toggle="popover" data-placement="bottom" data-container=".user-menu-wrapper" data-content="{{ _user_menu_content|e('html_attr') }}" data-html="true">
+                                    {% if easyadmin_config('user.display_avatar') %}
+                                        {% set _avatar_image_path = easyadmin_read_property(app.user, easyadmin_config('user.avatar_property_path')) %}
+                                        {% if null == _avatar_image_path %}
+                                            <i class="fa fa-fw {{ app.user is not null ? 'fa-user-circle' : 'fa-user-times' }} user-avatar"></i>
+                                        {% else %}
+                                            <img class="user-avatar" src="{{ _avatar_image_path }}" />
+                                        {% endif %}
+                                    {% endif %}
+                                    {% if easyadmin_config('user.display_name') %}
+                                        <span class="user-name">{{ _user_name }}</span>
+                                    {% endif %}
+                                </div>
+                            {% endblock header_custom_menu %}
+                        </div>
+                    {% endblock header %}
+                </header>
+
+                <aside class="main-sidebar">
+                    {% block sidebar %}
+                        <section class="sidebar">
+                            {% block main_menu_wrapper %}
+                                {{ include([
+                                    _entity_config is defined ? _entity_config.templates.menu,
+                                    easyadmin_config('design.templates.menu'),
+                                    '@EasyAdmin/default/menu.html.twig'
+                                ]) }}
+                            {% endblock main_menu_wrapper %}
+                        </section>
+
+                    {% endblock sidebar %}
+                </aside>
+
+                <div class="content-wrapper">
+                    {% block flash_messages %}
+                        {{ include(_entity_config is defined ? _entity_config.templates.flash_messages : '@EasyAdmin/default/flash_messages.html.twig') }}
+                    {% endblock flash_messages %}
+                    <div class="resizer-handler-container">
+                        <div id="sidebar-resizer-handler" class="resizer-handler resizer-handler-left"></div>
+                    </div>
+                    {% block content %}
+                        <div class="content">
+                            {% block content_header_wrapper %}
+                                {% set _has_content_help = _entity_config is defined and _entity_config[app.request.query.get('action')]['help']|default(false) %}
+                                <section class="content-header {{ _has_content_help ? 'has-content-help' }}">
+                                    {% block content_header %}
+                                        <div class="d-flex flex-row justify-content-between align-content-center w-100">
+                                            <div class="content-header-title">
+                                                <h1 class="title">{% block content_title %}{% endblock %}</h1>
+                                            </div>
+                                            {% if app.request.get('entity') == 'Order' and app.request.get('action') == 'edit' %}
+                                                {# Run specific code for Order entity and edit action #}
+                                                <div class="quick_access_container">
+                                                    <div class="quick_access_subcontainer" style="display: flex; gap: 15px; align-items: center; justify-content: flex-end;">
+                                                        <div class="quick_access_label_container" style="font-size: 16px; font-weight: 600;">
+                                                            Quick Access to another booking
+                                                        </div>
+                                                        <div class="quick_access_input_container">
+                                                            <input type="text" style="width: 100px; height: 32px; padding: 5px; border-radius: 4px; border: 1px solid #e7e7e7; outline: none;" class="quick_access_input" oninput="this.value = this.value.replace(/\D/g, '')" />
+                                                        </div>
+                                                        <div class="quick_access_button_container">
+                                                            <a href="javascript:void(0)" class="btn btn-primary quickAccessButton" style="font-weight: bold; display: flex; align-items: center; justify-content: center; padding: 5px 15px; border-radius: 6px;">GO</a>
+                                                        </div>    
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+
+                                            {% block global_actions_wrapper %}
+                                                <div class="global-actions">{% block global_actions %}{% endblock %}</div>
+                                            {% endblock %}
+                                        </div>
+
+                                        {% block content_help %}
+                                            {% if _entity_config is defined and _entity_config[app.request.query.get('action')]['help']|default(false) %}
+                                                <div class="content-header-help">
+                                                    {{ _entity_config[app.request.query.get('action')]['help']|trans(domain = _entity_config.translation_domain)|raw }}
+                                                </div>
+                                            {% endif %}
+                                        {% endblock content_help %}
+                                    {% endblock content_header %}
+                                </section>
+                            {% endblock content_header_wrapper %}
+
+                            <section id="main" class="content-body">
+                                {% block main %}{% endblock %}
+                            </section>
+
+                            {% block content_footer_wrapper %}
+                                <section class="content-footer">
+                                    {% block content_footer %}{% endblock %}
+                                </section>
+                            {% endblock %}
+                        </div>
+                    {% endblock content %}
+
+                    <div id="content-resizer-handler" class="resizer-handler resizer-handler-right"></div>
+                </div>
+            {% endblock wrapper %}
+        </div>
+    {% endblock wrapper_wrapper %}
+
+    {% for js_asset in easyadmin_config('design.assets.js') %}
+        <script src="{{ asset(js_asset) }}"></script>
+    {% endfor %}
+
+    {% block body_javascript %}{% endblock body_javascript %}
+    </body>
+    <style>
+        body {
+            background: #292D42;
+        }
+        .wrapper{
+            margin: 0;
+        }
+        body:not(.easyadmin-content-width-full) .wrapper {
+            max-width: 100%;
+        }
+        .main-sidebar {
+            background: #292D42;
+            width: 250px;
+        }
+        .content-wrapper {
+            grid-template-columns: 50px auto 10px;
+        }
+        ul.sidebar-menu.tree li a span {
+            margin-left: 10PX;
+            font-size: 16px;
+            line-height: 24px;
+            letter-spacing: 0.5px;
+        }
+        ul.sidebar-menu.tree {
+            margin-top: 10px;
+        }
+        aside.main-sidebar a {
+            color: #fff;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 24px;
+            letter-spacing: 0.5px;
+            padding: 7px 10px 10px 0;
+        }
+        .sidebar-menu .fa {
+            filter: opacity(1);
+            color: #fff !important;
+            font-size: 20px !important;
+        }
+        .sidebar-menu li:not(.submenu-active).active .fa, .sidebar-menu li:not(.submenu-active).active a {
+            color: #FC7C5C !important;
+            filter: opacity(100%);
+        }
+       
+        .navbar-custom-menu .user {
+            flex-direction: row-reverse;
+            color: #fff;
+            text-transform: capitalize;
+        }
+        .navbar-custom-menu .user-avatar {
+            margin-left: 10px;
+        }
+        .main-header #header-logo a {
+            width: 200px;
+            display: inline-block;
+            margin-left: 10px;
+            margin-top: 10px;
+        }
+         .treeview .treeview-icon {
+            top: 7px;
+            position: absolute;
+            right: 40px;
+        }
+        .treeview a.menu--archives .treeview-icon {
+            right: 36%;
+        }
+        .sidebar-menu a{
+            padding: 7px 10px 10px 0;
+        }
+        .sidebar-menu a.sidebar--close {
+            position: fixed;
+            bottom: 0;
+            background: #292D42;
+            left: 0;
+            padding-top: 10px !important;
+            padding-left: 25px !important;
+            padding-bottom: 23px !important;
+        }
+        .easyadmin-sidebar-width-normal .sidebar-menu a.sidebar--close {
+            width: 250px;
+        }
+        .easyadmin-sidebar-width-compact .sidebar-menu a.sidebar--close {
+            width: 75px;
+        }
+        body.easyadmin-sidebar-width-compact .sidebar-menu a {
+            padding: 7px 10px 10px 0;
+            background: #292D42;
+        }
+        body.easyadmin-sidebar-width-compact .sidebar-menu li:hover{
+            width: 200px;
+        }
+        .easyadmin-sidebar-width-compact .sidebar-menu>li:hover>a.sidebar--close>span {
+            left: 50px;
+            top: -4px;
+            padding: 10px 0;
+            padding-left: 20px;
+            border-radius: 4px;
+        }
+        .easyadmin-sidebar-width-compact .sidebar-menu>li:hover>a>span {
+            background: #292D42;
+            padding-left: 20px !IMPORTANT;
+            padding: 11px 0;
+            top: -4px;
+            left: 40px;
+            width: 195px;
+            border-radius: 5px;
+        }
+        i.fa.fa-fw.fa-money-bill-alt,
+        i.fa.fa-fw.fa-shuttle-van,
+        i.fa.fa-fw.fa-handshake,
+        i.fa.fa-fw.fa-funnel-dollar {
+            margin-left: 0px;
+        }
+        .easyadmin-sidebar-width-compact i.fa.fa-fw.fa-money-bill-alt,
+        .easyadmin-sidebar-width-compact i.fa.fa-fw.fa-shuttle-van,
+        .easyadmin-sidebar-width-compact i.fa.fa-fw.fa-handshake,
+        .easyadmin-sidebar-width-compact i.fa.fa-fw.fa-funnel-dollar{
+            margin-left: 2px;
+        }
+
+        .easyadmin-sidebar-width-compact .sidebar-menu>li:hover>.treeview-menu, .easyadmin-sidebar-width-compact .sidebar-menu>li:hover>a>span {
+            background: #292D42;
+            padding-left: 0px;
+            width: 200px;
+        }
+        .easyadmin-sidebar-width-compact .sidebar-menu>li:hover>.treeview-menu{
+            left: 50px;
+        }
+        .treeview-menu a .fa{
+            filter: opacity(1);
+        }
+        body.easyadmin-sidebar-width-compact .main-sidebar{
+            width: 75px;
+            height: 100px;
+        }
+        body.easyadmin-sidebar-width-compact {
+            min-height: 1032px;
+        }
+        body.easyadmin-sidebar-width-compact .sidebar-menu li{
+            margin-left: 26px !important;
+        }
+        .easyadmin-sidebar-width-normal .sidebar-menu li{
+            margin-left: 28px;
+        }
+        .main-header #header-logo img{
+            width: 200px;
+        }
+         header.main-header {
+            padding: 0 10px;
+        }
+        .content-top.navbar-custom-menu{
+            display: flex;
+        }
+        img.menu--activity,
+        img.menu--addon,
+        img.menu--block,
+        img.menu--discount,
+        img.menu--system {
+            width: 20px;
+            margin: 0 auto;
+            margin-right: 5px;
+        }
+        .easyadmin-sidebar-width-compact img.menu--activity,
+        .easyadmin-sidebar-width-compact img.menu--addon,
+        .easyadmin-sidebar-width-compact img.menu--block,
+        .easyadmin-sidebar-width-compact img.menu--discount,
+        .easyadmin-sidebar-width-compact img.menu--system {
+            margin-left: 2px;
+        }
+    </style>
+
+    <script>
+
+    $(document).ready(function() {
+        $("a.btn.btn-primary.quickAccessButton").click(function(event) {
+            // Your code here
+            // This function will be executed when the anchor tag is clicked
+            // You can perform any actions or operations you want inside this function
+            // For example, you can prevent the default anchor behavior using event.preventDefault()
+            event.preventDefault();
+            let booking_id = $('input.quick_access_input').val();
+            if (booking_id !== null && booking_id !== "") {
+
+                let baseUrl = window.location.origin;
+                window.location.href = baseUrl + "/admin/?entity=Order&action=edit&id=" + booking_id;
+
+            } else {
+                alert("Please enter booking id!");
+            }
+            // You can also get the href attribute of the anchor tag using $(this).attr("href")
+            console.log("Clicked on anchor tag with href: ");
+        });
+    });
+
+    $( window ).on( "load",function() {
+		$("aside.main-sidebar").delay(10000).fadeIn();
+		$("div#loader").delay(1000).fadeOut();
+	})
+
+    //logo
+
+     $(document).ready(function () {
+        $('a.logo.logo-long').html('<img src="../images/logo.svg" alt="Logo">');
+    });
+
+
+    $(document).ready(function() {
+            $('body.easyadmin-sidebar-width-normal .sidebar-menu a.sidebar--close i').removeClass('fa-angle-right').addClass('fa-angle-left');
+            $('body.easyadmin-sidebar-width-compact .sidebar-menu a.sidebar--close i').removeClass('fa-angle-left').addClass('fa-angle-right');
+
+            $('body.easyadmin-sidebar-width-normal .sidebar-menu a.sidebar--close span').text('Collapse Sidebar');
+            $('body.easyadmin-sidebar-width-compact .sidebar-menu a.sidebar--close span').text('Expand Sidebar');
+        });
+
+
+        $('.sidebar-menu a.sidebar--close').on('click', function() {
+            $('div#sidebar-resizer-handler').click();
+            const rowCount = $("table .data_row").length;
+            if(rowCount >= 33){
+                $('.easyadmin-sidebar-width-normal .toolbar_container').css({'position':'fixed', 'width': 'calc(100% - 288px)'});					
+                $('.easyadmin-sidebar-width-compact .toolbar_container').css({'position':'fixed', 'width': 'calc(100% - 100px)'});
+            }
+
+            $('body.easyadmin-sidebar-width-normal .sidebar-menu a.sidebar--close i').removeClass('fa-angle-right').addClass('fa-angle-left');
+            $('body.easyadmin-sidebar-width-compact .sidebar-menu a.sidebar--close i').removeClass('fa-angle-left').addClass('fa-angle-right');
+            
+            $('body.easyadmin-sidebar-width-normal .sidebar-menu a.sidebar--close span').text('Collapse Sidebar');
+            $('body.easyadmin-sidebar-width-compact .sidebar-menu a.sidebar--close span').text('Expand Sidebar');
+            
+        });
+
+         //icons
+        $(document).ready(function(){
+            //activity
+            var imageSrc = '../images/activity.svg'; 
+            var imgElement = $('<img>', {
+                src: imageSrc,
+                class: 'menu--activity'
+            });
+            $('.menu--activity i').replaceWith(imgElement);
+
+            var imageSrc = '../images/addon.svg'; 
+            //addon
+            var imgElement = $('<img>', {
+                src: imageSrc,
+                class: 'menu--addon',
+            });
+            $('.menu--addon i').replaceWith(imgElement);
+            //block
+
+            var imageSrc = '../images/block.svg'; 
+            var imgElement = $('<img>', {
+            src: imageSrc,
+            class: 'menu--block',
+            });
+            $('.menu--block i').replaceWith(imgElement);
+            //discount
+            var imageSrc = '../images/discount.svg'; 
+            var imgElement = $('<img>', {
+            src: imageSrc,
+            class: 'menu--discount' 
+            });
+            $('.menu--discount i').replaceWith(imgElement);
+            
+            //system
+            var imageSrc = '../images/system.svg';
+            var imgElement = $('<img>', {
+                src: imageSrc,
+                class: 'menu--system'
+                });
+            $('.menu--system i').replaceWith(imgElement);
+        })
+
+    </script>
+{% endblock body %}
+</html>

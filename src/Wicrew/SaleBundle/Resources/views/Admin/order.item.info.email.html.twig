@@ -1,0 +1,167 @@
+{# @var item \App\Wicrew\SaleBundle\Entity\OrderItem #}
+<fieldset>
+    <legend>
+        {% if item.product is not null %}
+            {{ item.product.transportationType.name }}
+        {% elseif item.type == constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::TYPE_ACTIVITY_REGULAR') %}
+            {{ item.activity.name }}
+        {% elseif item.type == constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::TYPE_ACTIVITY_TRANSPORTATION') %}
+            {{ item.activity.name ~ 'order.items.activity.transportation'|trans }}
+        {% endif %}
+    </legend>
+    <style>label {
+        font-weight: bold;
+    }
+    </style>
+    <div class="product-detail">
+        {% if email is not defined or email == false %}
+            <div class="edit-item">
+                <a href="{{ path('order_item_edit', { id: item.id }) }}">{{ 'order.items.edit'|trans() }}</a>
+                <a href="{{ path('order_item_delete', { id: item.id }) }}"
+                   onclick="confirm('{{ "delete.confirm"|trans() }}')">{{ 'order.items.delete'|trans() }}</a>
+            </div>
+        {% endif %}
+        <div class="left-panel">
+            <div><label style="font-weight:bold;"><span style="color:red;">#RJ{{item.order.id}}</span> {{item.order.firstName ~ ' ' ~ item.order.lastName }}</label></div><br>
+
+            {% if item.product is not null %}
+                <div><strong>Date:</strong> {{ item.pickDate|formatNoNull('F jS, Y') }}</div> 
+                {% if item.pickAddress != "" %} 
+                    <div><strong>Pick-up Area:</strong> {{ item.pickArea.name }}</div>
+                    <div><strong>Pick-up Location:</strong> {{ item.pickAddress }}</div>
+                {% else %}
+                    <div><strong>Pick-up Location:</strong> {{ item.pickArea.name }}</div>
+                {% endif %}
+                {% if item.dropAddress != "" %} 
+                    <div><strong>Drop-off Area:</strong> {{ item.dropArea.name }}</div>
+                    <div><strong>Drop-off Location:</strong> {{ item.dropAddress }}</div>
+                {% else %}
+                    <div><strong>Drop-off Location:</strong> {{ item.dropArea.name }}</div>
+                {% endif %} 
+                {% if item.pickTimeTransport %}
+                    <div><strong>{{ 'booking.pickuptime'|trans() }}:</strong> {{ item.pickTimeTransport|date("H:i") }}</div>
+                    <div><strong>{{ 'booking.flight.departuretime'|trans() }}:</strong> {{ item.pickTime|date("H:i") }}</div> 
+                {% else %}
+                    <div><strong>{{ 'booking.pickuptime'|trans() }}:</strong> {{ item.pickTime|date("H:i") }}</div>
+                {% endif %}
+                <div><strong>Adults :</strong> {{ item.adultCount }}</div>
+                <div><strong>Children :</strong> {{ item.childCount }}</div>
+                <div><strong>Vehicle: </strong> {{ item.product.vehicleType.name }}</div>
+                <div>
+                <strong>Travel Time: </strong>  
+                    <span >
+                        {% set hour = item.product.duration|round(0, 'floor')  %}
+                        {% set min = (60 * (item.product.duration - hour))|round  %}
+                        {% if hour <= 0 %}
+                            {{ min ~ ' Minutes ' }}
+                        {% elseif hour == 1 %}
+                            {% if min <= 0 %}
+                                {{ hour ~ ' Hour ' }}
+                            {% elseif min >= 1 %}
+                                {{ hour ~ ' Hour ' ~ min ~ ' Minutes ' }}
+                            {% endif %}
+                        {% elseif hour > 1 %}
+                            {% if min <= 0 %}
+                                {{ hour ~ ' Hours ' }}
+                            {% elseif min >= 1 %}
+                                {{ hour ~ ' Hours ' ~ min ~ ' Minutes ' }}
+                            {% endif %}
+                        {% endif %}
+                    </span>
+                </div>
+                <br>
+            {% elseif item.activity is not null %}
+                <div><strong>Tour Date:</strong> {{ item.pickDate|formatNoNull('F jS, Y') }}</div> 
+                {% if item.pickAddress != "" %} 
+                    <div><strong>Pick-up Area:</strong> {{ item.pickArea.name }}</div>
+                    <div><strong>Pick-up Location:</strong> {{ item.pickAddress }}</div>
+                {% else %}
+                    <div><strong>Pick-up Location:</strong> {{ item.pickArea.name }}</div>
+                {% endif %}
+                {% if item.dropAddress != "" %} 
+                    <div><strong>Drop-off Area:</strong> {{ item.dropArea.name }}</div>
+                    <div><strong>Drop-off Location:</strong> {{ item.dropAddress }}</div>
+                {% else %}
+                    <div><strong>Drop-off Location:</strong> {{ item.dropArea.name }}</div>
+                {% endif %}
+                <div><strong>Tour Time:</strong> {{ item.tourTime|formatNoNull('H:i') }}</div> 
+                <div><strong>Adults :</strong> {{ item.adultCount }}</div>
+                <div><strong>Children :</strong> {{ item.childCount }}</div>
+                <br>
+            {% endif %}
+
+            <div>
+                <span style="font-weight:bold;text-decoration: underline;">Notes:</span><br>
+                <p>{{ item.order.customerNotes }}</p>
+            </div>  
+
+            {# {% if item.activity is not null and item.activity.combo %}
+                <div>
+                    <div style="text-decoration: underline"><strong>{{ 'order.items.child_activities'|trans() }}</strong></div>
+                    {% for comboChildren in item.comboChildren %}
+                        <div>
+                            <strong>{{ comboChildren.activityChild.regular.name }}</strong> 
+                        </div>
+                    {% endfor %}
+                </div> #}
+            {% if item.type == constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::TYPE_PRIVATE_FLIGHT') %}
+                <div>
+                    <div style="text-decoration: underline"><strong>{{ 'order.items.flight.details'|trans() }}</strong></div>
+                    <div>
+                        <strong>{{ 'booking.luggage.weight'|trans }}:</strong> {{ item.luggageWeight }}
+                    </div>
+                    <div>
+                        <strong>{{ 'booking.passenger.weight'|trans }}:</strong> {{ item.passengerWeight }}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if item.anyTimeRangeFees %}
+                <div>
+                    <div style="text-decoration: underline"><strong>{{ 'order.items.range_fees'|trans() }}</strong></div>
+                    {% if item.regularTimeFeeRack is not null %}
+                        <div>
+                            <strong>{{ 'product.section.regular_time_range'|trans }}</strong> {{ item.regularTimeFeeRack ~ 'currency.symbol'|trans() }}
+                        </div>
+                    {% endif %}
+                    {% if item.flightPickTimeFeeRack is not null %}
+                        <div>
+                            <strong>{{ 'product.section.flight_pickup_time_range'|trans }}</strong> {{ item.flightPickTimeFeeRack ~ 'currency.symbol'|trans() }}
+                        </div>
+                    {% endif %}
+                    {% if item.flightDropTimeFeeRack is not null %}
+                        <div>
+                            <strong>{{ 'product.section.flight_drop_off_time_range'|trans }}</strong> {{ item.flightDropTimeFeeRack ~ 'currency.symbol'|trans() }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="right-panel">  
+            {% if item.anyAddons and item.anyExtras %}<br><div><strong style="text-decoration: underline;">Extras & Add-ons:</strong></div>{% endif %}
+            {% if item.anyExtras %}
+            {% if not item.anyAddons %}<br>{% endif %}
+            <div>
+                <strong style="text-decoration: underline;">{{ 'booking.extras'|trans() }}:</strong>
+                {% for extra in item.extras %}
+                <div>
+                    - {{ extra.addonTitle }} x {{extra.quantity}}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}  
+            {% if item.anyAddons %}
+                {% if item.anyExtras %}<br>{% endif %}
+                <div>
+                    <strong style="text-decoration: underline;">{{ 'booking.addons'|trans() }}:</strong>
+                    {% for addon in item.addons %}
+                    <div >
+                        - {{ addon.addonTitle }}: Adults x {{addon.adultQuantity}} , Child x {{addon.childQuantity}}, Extra Transportation
+                    </div>
+                    {% endfor %}
+                </div>
+            {% endif %} 
+            {% if item.anyAddons or item.anyExtras %}<br>{% endif %}
+        </div>
+    </div>
+</fieldset>

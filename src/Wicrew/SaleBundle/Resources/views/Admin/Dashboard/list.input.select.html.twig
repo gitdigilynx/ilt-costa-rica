@@ -1,0 +1,22 @@
+{% block input_select %}
+<select class="selectSupplier {{
+        (entity_config['nameInputArrayWrapper'] is defined ?
+        entity_config['nameInputArrayWrapper'] ~ '[' ~ field_options['arrayWrapperIndex'] ~ ']' ~ '[' ~ field_options['property'] ~ ']'
+        : field_options['property'])|replace({'.': "_"}) }} _{{ item.id }}" data-item_id="{{item.id}}"
+        name="{{
+        entity_config['nameInputArrayWrapper'] is defined ?
+        entity_config['nameInputArrayWrapper'] ~ '[' ~ field_options['arrayWrapperIndex'] ~ ']' ~ '[' ~ field_options['property'] ~ ']'
+        : field_options['property'] }}">
+    {% if noNone is not defined %}
+        <option value="">Please Select</option>
+    {% endif %}
+    
+    {% for key, data in dataset %}
+        <option  value="{{ key }}"
+                {% if value is same as(key) %}selected{% endif %}>
+            {{ data }}
+        </option>
+    {% endfor %}
+    
+</select>
+{% endblock %}

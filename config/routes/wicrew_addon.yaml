@@ -1,0 +1,2 @@
+#wicrew_addon:
+#    resource: "@WicrewAddonBundle/Resources/config/routes.yaml"

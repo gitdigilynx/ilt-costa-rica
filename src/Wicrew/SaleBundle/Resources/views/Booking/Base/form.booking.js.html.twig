@@ -1,0 +1,646 @@
+<script type="text/javascript">
+    $(document).on("submit", "form#form_booking", function (e) {
+        $(".notices").html("");
+        let submittedForm = $(this);
+        submittedForm.find('button[type="submit"]').prop('disabled', true);
+        let error = validateForm();
+        if (error) {
+            submittedForm.find('button[type="submit"]').prop('disabled', false);
+            return false;
+        }
+        
+        var pathname = window.location.pathname; 
+        if (pathname.toLowerCase().indexOf("edit_item") === -1){
+            let pickUpDateInput  = $('input[name$="[pickUpDate]"]');
+            pickUpDateInput.each(function( index ) {            
+                let pickUpDateInputVal =  $(this).val();
+
+                let pickupDateBlock = $(this).parents(".booking-pickup-block:not(.hidden)");
+                // CHECK LAST MINUTE BOOKING VALIDATION 
+                const tomorrow = moment().add(1, 'day').endOf('day').format('MM/DD/YYYY');
+                if( moment( pickUpDateInputVal ).format('MM/DD/YYYY') == moment().format('MM/DD/YYYY') ||  moment( pickUpDateInputVal ).format('MM/DD/YYYY') == tomorrow  ){
+                    if( $(this).parents(".booking-pickup-block:not(.hidden)").find(".floating-label-wrap").length > 0 ){
+                        $(this).parents(".booking-pickup-block:not(.hidden)").find(".floating-label-wrap").addClass("has-error")   
+                        $(".notices").html('<div class="lastMinute-booking-banner">One or more of the bookings is last minute and we are not sure if we can make it happen. Please change the date or contact us to check for availability at {% include "@WicrewPage/email.html.twig" %}. Thank you!</div>');
+                        error = true;
+                    }
+                }
+                
+                // CHECK IF DATE IS AVAILABLE IN CALENDER
+                $.ajax({
+                    async: false,
+                    url:'/check/date/availability',
+                    type: "GET",
+                    dataType: "json",
+                    data: {
+                        "selected_date": moment( pickUpDateInputVal ).format(),
+                    },
+                    success: function (data) {
+                        if( data == "not-available" ){
+                            if( pickupDateBlock.find(".floating-label-wrap").length > 0 ){
+                                pickupDateBlock.find(".floating-label-wrap").addClass("has-error")   
+                                $(".notices").html('<div class="date-availability-banner">The date selected is not available. Please change the date or contact us to check for availability at {% include "@WicrewPage/email.html.twig" %}. Thank you! </div>');
+                                error = true;
+                            }
+                        }
+                    }
+                });
+
+                let selected_product_type  = $("input[name='products[1][type]']").val();
+                let selected_product_id    = $("input[name='products[1][id]']").val();
+                let selected_tour_time     = $("[name='products[1][tourTime]']").val();
+                let selected_tour_type     = $("[name='products[1][activityType]']").val();
+                
+                if( selected_tour_type == 1){
+                    selected_tour_type = 'Group';
+                }else if( selected_tour_type == 2){
+                    selected_tour_type = 'Private';
+                }
+                
+                
+                // CHECK IF TIME SLOT IS AVAILABLE
+                if(selected_product_type != 'activity'){
+                    let selected_time       = $('input.booking-pickup-time').val();
+                    let selected_area_from  = $('select.dl_area_select_from').val();
+                    let selected_area_to    = $('select.dl_area_select_to').val();
+                    let selected_vehicle    = $('.vehicleType-id').text().trim();
+                    
+                    $.ajax({
+                        async: false,
+                        url:'/check/time/availability',
+                        type: "GET",
+                        dataType: "json",
+                        data: {
+                            "selected_time": selected_time,
+                            "selected_date": moment( pickUpDateInputVal ).format(),
+                            "selected_area_from": selected_area_from,
+                            "selected_area_to": selected_area_to,
+                            "selected_vehicle": selected_vehicle,
+
+                        },
+                        success: function (data) {
+
+                            if( data == "not-available" ){
+                                $(".notices").html('<div class="date-availability-banner">The selected booking details are not available. Please contact us to check for availability at {% include "@WicrewPage/email.html.twig" %}. Thank you! </div>');
+                                error = true;
+                            
+                            }
+                        }
+                    });
+
+                }
+
+
+                
+                // CHECK IF ACTIVITY IS AVAILABLE
+                if(selected_product_type == 'activity'){
+
+                    $.ajax({
+                        async: false,
+                        url:'/check/activity/availability',
+                        type: "GET",
+                        dataType: "json",
+                        data: {
+                            "selected_date": moment( pickUpDateInputVal ).format(),
+                            "selected_time": selected_tour_time,
+                            "activity_id": selected_product_id,
+                            "tour_type": selected_tour_type,
+                        },
+                        success: function (data) {
+                            if( data == "not-available" ){
+                                $(".notices").html('<div class="date-availability-banner">The activity selected is not available. Please change the activity or contact us to check for availability at {% include "@WicrewPage/email.html.twig" %}. Thank you! </div>');
+                                error = true;
+                            
+                            }
+                        }
+                    });
+                }
+    
+            });
+
+        }
+
+        let flightCompanyInput  = $('input[name$="[airlineCompany]"]');
+        flightCompanyInput.each(function( index ) {
+            let flightCompanyInputVal =  $(this).val();
+            if( flightCompanyInputVal.length == 0 ){
+                if( $(this).parents(".airport-type-section:not(.hidden)").find(".floating-label-wrap").length > 0 && $(this).parents(".dl_autocompleteFields:hidden").length == 0 && $(this).parents(".mr-2:hidden").length == 0 ){
+                    $(this).parents(".airport-type-section:not(.hidden)").find(".floating-label-wrap").addClass("has-error")   
+                    error = true;
+                }
+            }
+        });
+
+        let flightNumberInput  = $('input[name$="[flightNumber]"]');
+        flightNumberInput.each(function( index ) {
+            let flightNumberInputVal =  $(this).val();
+            if( flightNumberInputVal.length == 0 ){
+                if( $(this).parents(".airport-type-section:not(.hidden)").find(".floating-label-wrap").length > 0 && $(this).parents(".dl_autocompleteFields:hidden").length == 0 && $(this).parents(".mr-2:hidden").length == 0 ){
+                    $(this).parents(".airport-type-section:not(.hidden)").find(".floating-label-wrap").addClass("has-error")   
+                    error = true;
+                }
+            }
+        });
+
+        let adultCountInputs = $('input[name$="[adultCount]"]');
+        adultCountInputs.each(function () {
+            const count = parseInt($(this).val());
+            if (count < 1 && !error) {
+                error = true;
+                alert("Please insert a number of adults greater than 0.")
+                scrollToValidationError($(this).offset().top);
+            }
+        });
+
+        let childCountInputs = $('input[name$="[childCount]"]');
+        childCountInputs.each(function () {
+            const count = parseInt($(this).val());
+            if (count < 0 && !error) {
+                error = true;
+                alert("Please insert a number of children greater than or equal to 0.")
+                scrollToValidationError($(this).offset().top);
+            }
+        });
+
+
+        adultCountInputs.each(function( index ) {   
+            let _adult_count        = parseInt( $(this).val() );
+            let _child_count        = parseInt( $(this).parents(".booking-section-inner").find('input[name$="[childCount]"]').val() );
+            let product_type        = $(this).parents(".booking-section-inner").find('input[name$="[type]"]').val();
+            let passengers_count    = _adult_count + _child_count;
+            let maxPassengerNumber  = parseInt( $(this).parents(".booking-section-inner").find("span#maxPassengerNumber").text() );
+            let transportation_type = $(this).parents(".booking-section-inner").find('input[name$="[dl_transportationType]"]').val();
+            if( product_type == 'activity'){
+                if( passengers_count < 2 ){
+                    error = true;
+                    alert( 'There is a 2 person minimum to operate this tour. Please contact us at info@iltcostarica.com for availability. Thank you!' );  
+                }
+            }
+            if( typeof transportation_type  !== "undefined" ){
+                if (transportation_type.toLowerCase().indexOf("shuttles") >= 0){
+                    if( passengers_count > maxPassengerNumber ){
+                        error = true;
+                        alert( 'You have surpassed the maximum amount of passengers for this vehicle. Please upgrade to a larger vehicle.' );
+                    }
+                }
+            }
+        });
+
+        if (error) {
+            submittedForm.find('button[type="submit"]').prop('disabled', false);
+            return false;
+        }else{
+            $(".notices").html('');
+        }
+    });
+
+    function is_time_format(time) {
+        let is_time_format = false;
+ 
+        let regex = new RegExp('^\\d{2}:\\d{2}\\s([ap][m])$');
+        if (regex.test(time)) {
+            console.log('regex')
+            is_time_format = true;
+        }
+
+        let regex2 = new RegExp('^\\d{1,2}h\\d{1,2}$');
+        if (regex2.test(time)) {
+            console.log('regex2')
+            time_explode = time.split('h');
+            hour = String(time_explode[0]).padStart(2, '0');
+            minute = String(time_explode[1]).padStart(2, '0');
+            time = moment("2014-02-01T"+hour+":"+minute+":00").format('HH:mm');
+            is_time_format = true;
+        }
+
+        let regex3 = new RegExp('^\\d{1,2}:\\d{1,2}$');
+        if (regex3.test(time)) {
+            console.log('regex3')
+            time_explode = time.split(':'); 
+            hour = String(time_explode[0]).padStart(2, '0');
+            minute = String(time_explode[1]).padStart(2, '0'); 
+            time = moment("2014-02-01T"+hour+":"+minute+":00").format('HH:mm');
+            is_time_format = true;
+        }
+
+        let regex4 = new RegExp('^\\d{1,2}h$');
+        if (regex4.test(time)) {
+            console.log('regex4')
+            time_explode = time.split('h');
+            hour = String(time_explode[0]).padStart(2, '0');
+            minute = '00'; 
+            time = moment("2014-02-01T"+hour+":"+minute+":00").format('HH:mm');
+            is_time_format = true; 
+        }
+ 
+        if (time == "Invalid date") {
+            is_time_format = false;
+        }
+
+        if (is_time_format) {
+            time_part = time.split(':');
+
+            hour = time_part[0];
+            time_part1 = time_part[1].split(' ');
+            minute = time_part1[0];
+
+            if (hour > 12) {
+                is_time_format = false;
+            } else if (minute > 59) {
+                is_time_format = false;
+            }
+        }
+ 
+        return {is_time_format: is_time_format, time : time};
+    } 
+
+    $(document).ready(function () {
+        if( $(".dl_autocompleteFields:hidden").length > 0 ){
+            $(".booking-section-inner").each(function (index, element) {
+                $(element).find(".col-block.booking-time-block > div > .row-block").find(".area-type-section").remove();
+                let fromField = $(element).find(".dl_autocompleteFields").eq( 0 ).find(".area-type-section .floating-label-wrap").detach();
+                let toField   = $(element).find(".dl_autocompleteFields").eq( 1 ).find(".area-type-section .floating-label-wrap").detach();
+                $(element).find(".col-block.booking-time-block > div > .row-block").eq( 1 ).html( fromField );
+                $(element).find(".col-block.booking-time-block > div > .row-block").eq( 2 ).html( toField );
+            });
+        }
+    });
+
+</script>
+
+
+<script>
+$( document ).ready(function() {
+    let url_last_segment = location.href.substring(location.href.lastIndexOf('/') + 1);
+    url_last_segment = decodeURI(url_last_segment);
+
+    if (url_last_segment.indexOf('edit_item') > -1) {
+        url_last_segment = $(".booking-form .left-panel h2").text().toLowerCase().replace(" ", "-").trim();    
+    }    
+
+    if (url_last_segment.indexOf('private-shuttles') > -1) {
+        
+        url_last_segment = 'private-shuttles';
+        
+    } else if (url_last_segment.indexOf('private-flight') > -1) {
+        
+        url_last_segment = 'private-flight';
+        
+    } else if (url_last_segment.indexOf('water-taxi') > -1) {
+        
+        url_last_segment = 'water-taxi';
+        
+    } 
+    if( url_last_segment === 'private-shuttles' || url_last_segment === 'private-flight' || url_last_segment === 'water-taxi'){
+
+        $.ajax({
+            url:'/get/all/areas',
+            type: "GET",
+            dataType: "json",
+            data: {
+                "transportation_type": url_last_segment,
+            },
+            async: true,
+            success: function (data) {
+                let response = jQuery.parseJSON( data );
+                if(response.status == "OK"){
+                    
+                    $.each(response.areas_to, function(key, value) {
+                        $(".dl_area_select_to").append(`<option value='{"name":"${value.name}","type":${value.type},"id":${key}}' >${value.name}</option>`);
+                    });
+
+                    $.each(response.areas_from, function(key, value) {
+                        $(".dl_area_select_from").append(`<option value='{"name":"${value.name}","type":${value.type},"id":${key}}' >${value.name}</option>`);
+                    });
+                    
+                    var sel_from = $('.dl_area_select_from');    
+                    var selected_from = sel_from.val(); // cache selected value, before reordering
+                    var opts_list_from = sel_from.find('option');
+                    opts_list_from.sort(function(a, b) { return $(a).text() > $(b).text() ? 1 : -1; });
+                    sel_from.html('').append(opts_list_from);
+                    sel_from.val(selected_from); // set cached selected value
+
+                   
+                    var sel_to = $('.dl_area_select_to');
+                   
+                    var selected_to = sel_to.val(); // cache selected value, before reordering
+                    var opts_list_to = sel_to.find('option');
+                    opts_list_to.sort(function(a, b) { return $(a).text() > $(b).text() ? 1 : -1; });
+                    sel_to.html('').append(opts_list_to);
+                    sel_to.val(selected_to); // set cached selected value
+
+                                      
+
+                    $(".dl_area_select_from").show();
+                    $(".dl_area_select_to").show();
+                
+                }else{
+                    alert(response.error_message);
+                }                   
+                return;
+            }
+        });
+    }
+
+
+    let selectToChange = $(".dl_area_select_from");
+    
+    //jquery script for on change of from field. 
+    selectToChange.change(function(){
+        let parentContainer = $(this).parents(".vehicle-search, .vehicle-search-multi");
+        var selected_val        = JSON.parse($(this).val());
+        selected_val = selected_val.id;
+        let url_last_segment    = location.href.substring(location.href.lastIndexOf('/') + 1); 
+        url_last_segment        = decodeURI(url_last_segment);
+        
+        if (url_last_segment.indexOf('edit_item') > -1) {
+            url_last_segment = $(".booking-form .left-panel h2").text().toLowerCase().replace(" ", "-").trim();    
+        }    
+        
+        if (url_last_segment.indexOf('private-shuttles') > -1) {
+            
+            url_last_segment = 'private-shuttles';
+
+        } else if (url_last_segment.indexOf('private-flight') > -1) {
+            
+            url_last_segment = 'private-flight';
+            
+        } else if (url_last_segment.indexOf('water-taxi') > -1) {
+            
+            url_last_segment = 'water-taxi';
+           
+        } 
+
+        if( url_last_segment === 'private-shuttles' || url_last_segment === 'private-flight' || url_last_segment === 'water-taxi'){
+            if(selected_val != ""){
+
+                //now sending this selected value to ajax page for options for `TO` field.
+                $.ajax({
+                    url:'/get/to/areas/options',
+                    type: "GET",
+                    dataType: "json",
+                    data: {
+                        "selected_value": selected_val,
+                        "transportation_type": url_last_segment,
+
+                    },
+                    async: true,
+                    success: function (data) {
+                        let response = jQuery.parseJSON( data );
+                        console.log(response);
+                        if(response.status == "OK"){
+                            
+                            let optionsToPut = response.areas_to;
+                            
+                            parentContainer.find(".dl_area_select_to").html("");
+                          
+                            $.each( optionsToPut, function( key, value ) {
+                                if(key != selected_val){
+                                 
+                                    parentContainer.find(".dl_area_select_to").append("<option value='"+key+"'>"+value+"</option>");
+                                
+                                }
+                            });
+                           
+                            var sel_to1 = parentContainer.find('.dl_area_select_to');
+                            var selected_to1 = sel_to1.val(); // cache selected value, before reordering
+                            var opts_list_to1 = sel_to1.find('option');
+                            opts_list_to1.sort(function(a, b) { return $(a).text() > $(b).text() ? 1 : -1; });
+                            sel_to1.html('').append(opts_list_to1);
+                            sel_to1.val(selected_to1); // set cached selected value
+
+                         
+                           
+                        }else{
+                            alert(response.error_message);
+                        }                   
+                        return;
+                    }
+                });
+            }
+        }
+    });
+});   
+</script>
+
+
+<script>
+// CONVERTING NORMAL SELECT INTO SELECT AND SEARCH WIDGET 
+$(document).ready(function () {
+    $( "select:not(.jbj_destination)" ).each(function( index ) {   
+        $(this).select2({
+            placeholder: "Please select",
+            width: '100%',
+        });    
+    });
+
+
+    $( "select.area_selection" ).each(function( index ) {   
+        let dataType = $(this).data("type");
+        $(this).next("span.select2").prepend("<div class='floating-label areas'>"+dataType+"</div>");
+    });
+});
+// CONVERTING NORMAL SELECT INTO SELECT AND SEARCH WIDGET 
+
+
+function remove_custom_service( that ){
+    let booking_number  = $(that).data('bookingnumber');
+    let loop_index      = $(that).data('loopindex');
+    let service_label   = $(that).data('label');
+    let service_id      = $(that).data('id');
+    if(confirm("Are you sure you want to delete this?")){
+
+
+
+        $.ajax({
+            url: '/delete/custom/service',
+            type: 'POST',
+            data: { service_id: service_id }, // Data to be sent in the request body
+            dataType: 'json', // The expected data type of the response
+            success: function(response) {
+                var response = jQuery.parseJSON( response );
+                console.log(response);
+                // Handle the success response here
+                if( response.status == 'success' ){
+                
+                    $('.custom_service_'+booking_number+'_'+loop_index).remove();
+                    eval("updateSummaryOfBookingNumber_" + booking_number + "()");
+                    $(that).parents('.single-customService-container').remove();
+                }else{
+                    alert('Can not remove the service due following error: '+ response.error);
+                }
+            },
+            error: function(xhr, status, error) {
+                // Handle the error here
+                console.error(error);
+            }
+        });
+
+    }
+    else{
+        return false;
+    }
+}
+</script>
+
+
+
+<style>
+    .search-container div.vehicle-search .column .input-box .input-pin-icon::before, 
+    .search-container div.vehicle-search-multi .column .input-box .input-pin-icon::before {
+        z-index: 999;
+    }
+
+    span.select2.select2-container,
+    span.select2.select2-container *{
+        height: 100%;
+    }
+
+    .select2-container--default span.select2-selection--single {
+        border: none;
+        padding-left: 28px;
+    }
+
+    .select2-container--default .select2-selection--single span.select2-selection__rendered {
+        line-height: 42px;
+        font-weight: 500;
+        color: black;
+        display: block;
+    }
+
+    .select2-container--default .select2-selection--single span.select2-selection__arrow {
+        height: 40px;
+    }
+
+    .select2-container--default .select2-selection--single span.select2-selection__arrow b {
+        border-color: #000 transparent transparent transparent;
+    }
+
+    .select2-container--default .select2-selection--single span.select2-selection__clear {
+        display: none;
+    }
+
+    .select2-container--default.select2-container--open .select2-selection--single span.select2-selection__arrow b {
+        border-color: transparent transparent #000 transparent;
+    }
+ 
+    span.select2-container--default .select2-selection--single {
+        background: transparent;
+    }
+    .floating-label.areas {
+        text-transform: capitalize;
+    }
+
+    span.select2-container--default .select2-selection--single span.select2-selection__rendered {
+        font-family: 'Poppins', sans-serif;
+        font-size: 13px;
+        color: #070d1c;
+        padding-top: 2px;
+        font-weight: normal;
+        padding-left: 0px;
+
+    }
+
+    span.select2-container--default span.select2-selection--single {
+        padding-left: 0px;
+        padding-top: 10px;
+    }
+
+    span.select2-container--default .select2-selection--single span.select2-selection__arrow {
+        margin-top: 5px;
+    }
+    @media screen and (max-width: 767px){
+        .booking-time-block.input-time-icon {
+            background: #f5f6f8;
+            min-height: 50px;
+            padding: 0px;
+            display: flex;
+            align-items: center;
+            justify-content: left;
+        }
+        .booking-time-block.input-time-icon input {
+            min-height: 50px;
+            background: #f5f6f8;
+            border: none;
+            width: 100%;
+            height: 100%;
+        }
+    
+        div.floating-label-w-icon .floating-label {
+            left: 10px;
+            z-index: 999;
+        }
+        .booking-time-block.input-time-icon:before {
+            content: none;
+        }
+    }
+    .date-availability-banner,
+    .lastMinute-booking-banner {
+        margin-bottom: 1em;
+        margin-top: 1em;
+        border-radius: 4px;
+        padding: 0.75rem 1.25rem;
+        color: #713e0c;
+        background-color: #f7e4d1;
+    }
+    .notices{
+        width: 100%;
+    }
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet"/>
+<script>
+    $( document ).ready(function() {
+
+        $('.addon.booking-addon-section').css('margin-right', '30px');      
+        $('body').append('<style>button.slick-next.slick-arrow{ right: -55px; z-index: 999; }</style>');
+
+        $('div.addon-table').slick({
+            prevArrow: '<button type="button" data-role="none" class="slick-prev">Previous</button>',
+            nextArrow: '<button type="button" data-role="none" class="slick-next">Next</button>',
+            autoplay: false,
+            autoplaySpeed: 3000,
+            centerMode: false,
+            slidesToScroll: 2,
+            centerPadding: '50px',
+            cssEase: 'ease',
+            customPaging: function(slider, i) {
+                return '<button type="button" data-role="none">' + (i + 3) + '</button>';
+            },
+            dots: true,
+            dotsClass: 'slick-dots',
+            draggable: true,
+            variableWidth:false,
+            easing: 'linear',
+            edgeFriction: 0.35,
+            fade: false,
+            focusOnSelect: false,
+            focusOnChange: false,
+            infinite: false,
+            initialSlide: 0,
+            lazyLoad: 'ondemand',
+            slidesToShow: 2,
+            responsive: [ {    
+                breakpoint: 991,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 1,
+                    dots: true
+                }
+            
+                }, {
+            
+                breakpoint: 767,
+                settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                    dots: true
+                }
+                }, {
+                breakpoint: 300,
+                settings: "unslick"
+            }]
+        });
+    });    
+</script>

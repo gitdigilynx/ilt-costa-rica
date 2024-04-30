@@ -1,0 +1,36 @@
+{% extends '@WicrewProduct/Product/transportationtype.html.twig' %}
+
+{% block title %}
+    {{ transportType.name }}
+{% endblock %}
+
+{% block testimonials %}{# {% include "@WicrewPage/testimonials.html.twig" %} #}{% endblock %}
+
+{% block mainContent %}
+    {% include transportType.headerPath %}
+
+    <section>
+        <div class="container">
+            <div class="search-product-header">
+                {% if transportType.id == constant('\\App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_AIRPLANE') %}
+                    <span class="fas fa-plane" style="padding-right: 2px"></span>{{ transportType.name }}
+                {% else %}
+                    <span class="fas fa-shuttle-van" style="padding-right: 2px"></span>{{ transportType.name }}
+                {% endif %}
+            </div>
+        </div>
+
+        {% include "@WicrewProduct/Product/Search/search.private-transports.html.twig"
+            with { "transportTypes": { "0": transportType.id} } only %}
+    </section>
+
+    <section class="content-transportation">
+        {% if transportType.id  == constant('\\App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_PRIVATE_SHUTTLE') %}
+            {% include "@WicrewProduct/Product/MainTransportation/product.content_private.html.twig" %}
+        {% elseif transportType.id == constant('\\App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_SHARED_SHUTTLE') %}
+            {% include "@WicrewProduct/Product/MainTransportation/product.content_shared.html.twig" %}
+        {% elseif transportType.id == constant('\\App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_AIRPLANE') %}
+            {% include "@WicrewProduct/Product/MainTransportation/product.content_flight.html.twig" %}
+        {% endif %}
+    </section>
+{% endblock %}

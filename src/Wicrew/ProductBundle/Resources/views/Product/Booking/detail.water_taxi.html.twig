@@ -1,0 +1,185 @@
+{% extends "@WicrewProduct/Product/Booking/detail.private_shuttle.base.html.twig" %}
+
+{% block bookingForm %}
+    {% set type_transportation = "water_taxi" %}
+    {{ parent() }}
+{% endblock %}
+
+{% block headerAndInfo %}
+    <div class="booking-product-info clearfix">
+        <div class="ride-header">
+            <div>
+                {% if pickArea is defined %}
+                    {% set pickAreaID = pickArea.id %}
+                    {% set pickAreaType = pickArea.type %}
+                {% else %}
+                    {% if reverseAreas[bookingNumber] %}
+                        {% set pickAreaID = product.areaTo.id %}
+                        {% set pickAreaType = product.areaTo.type %}
+                    {% else %}
+                        {% set pickAreaID = product.areaFrom.id %}
+                        {% set pickAreaType = product.areaFrom.type %}
+                    {% endif %}
+                {% endif %}
+
+                {% if dropArea is defined %}
+                    {% set dropAreaID = dropArea.id %}
+                    {% set dropAreaType = dropArea.type %}
+                {% else %}
+                    {% if reverseAreas[bookingNumber] %}
+                        {% set dropAreaID = product.areaFrom.id %}
+                        {% set dropAreaType = product.areaFrom.type %}
+                    {% else %}
+                        {% set dropAreaID = product.areaTo.id %}
+                        {% set dropAreaType = product.areaTo.type %}
+                    {% endif %}
+                {% endif %}
+
+                {% set dateFrom = pickDates[bookingNumber]|date("F d, Y") %}
+                {% set dateTo = pickDates[bookingNumber]|date("F d, Y") %}
+                {% include "@WicrewProduct/Product/Search/ride.header.html.twig"
+                with { index: loop.index, pickAreaID: pickAreaID, dropAreaID: dropAreaID, dateFrom: dateFrom, dateTo: dateTo } only %} 
+            </div>
+        </div>
+    </div>
+    <div class="row-block">
+        <div class="product-info-block" style="width: 100%;margin-bottom:15px;">
+            <div class="vehicle-type">
+                <div class="vehicleType-id" style="display: none;"> {{ product.vehicleType.id }} </div>
+                <div class="vehicle-name"><strong>Vehicle selected: </strong> {{ product.vehicleType.name }}</div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="row-block">
+        <div class="departure-location-block input-pin-icon black-icon floating-label-w-icon">
+            <div class="floating-label-wrap float-fixed">
+                <input type="text" id="departure-at"
+                       value="{{ product.areaFrom.name ~ ' - ' ~ product.areaTo.name ~ ' (' ~ product.departureTime|formatNoNull("H:i") ~ ')' }}"
+                       readonly="readonly"/>
+
+                <label class="floating-label" for="departure-at">{{ 'booking.departure'|trans() }}</label>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block dateBlockInclude %}
+    {% include "@WicrewSale/Booking/Inputs/form.booking.pickup_date.html.twig" with { "pickupDate": pickDates[bookingNumber], "readonly": false } %}
+{% endblock %}
+
+{% block timeBlock %}
+    {% if jbj is defined %}
+        {% if jbj == 'shared' %}
+
+            <div class="row-block" style="margin: 13px 0px 0px 46px;" id="departure-time">
+                {% set selectedProduct = product %}
+
+                {% set products = getOrderedProductsbyDepartureTime(jbj_products) %}
+                {% for product in products %}
+                    {% set value = '{"productID":' ~ product.id ~ ', "pickTime":"' ~ product.departureTime|formatNoNull("H:i") ~ '"}' %}
+                    <div class="form-check">
+                        <input 
+                            class="form-check-input dl departure_time_choice departure_time_{{product.areaFrom.id ~ '_' ~ product.areaTo.id}}" 
+                            type="radio" 
+                            name="products[{{bookingNumber}}][pickUpTime]"  
+                            value="{{ value }}"
+                            data-area-from-id="{{ product.areaFrom.id }}"
+                            data-area-to-id="{{ product.areaTo.id }}"
+                            id="departure_time_{{product.id}}"
+                            {% if selectedProduct is defined and selectedProduct.id == product.id %}checked{% endif %}
+                        >
+                        <label class="form-check-label" for="departure_time_{{product.id}}">
+                            {{ product.departureTime|formatNoNull("H:i") }}
+                        </label>
+                    </div>  
+                {% endfor %}
+            </div>
+        
+        {% else %}
+
+            <div class="col-block booking-time-block input-time-icon floating-label-w-icon">
+                <div class="floating-label-wrap">
+                    {% block timeBlockInclude %}
+                        {% include "@WicrewSale/Booking/Inputs/form.booking.time.html.twig" with { "alternateTitleFlightTime": "Service time", 'jbj': jbj } %}
+                    {% endblock %}
+                </div>
+            </div>
+        {% endif %}
+   
+        <script>
+        
+        $( document ).ready(function() {
+
+
+            $( "input#departure-at" ).each(function( index ) {
+                let departure_at_val    = $(this).val();
+                departure_at_val        = departure_at_val.split('(')[0];
+                $(this).val(departure_at_val);
+            });
+        });
+
+        $( ".dl.departure_time_choice" ).on( "click", function() {
+            let container_div       = $(this).parents(".booking-section-inner");
+            let selected_option_val = JSON.parse( container_div.find('.dl.departure_time_choice:checked').val() );
+            let departure_at_val    = container_div.find("input#departure-at").val();
+            departure_at_val        = departure_at_val.split('(')[0];
+            container_div.find("input#departure-at").val(departure_at_val);
+            container_div.find('input[name="products[{{bookingNumber}}][id]"]').val(selected_option_val.productID); 
+        });
+        </script>
+        <style>
+        .booking-form .col-block.booking-time-block {
+            margin-right: 0px;
+        }
+        {% if jbj is defined %}
+            .area-type-section.input-pin-icon.floating-label-w-icon.black-icon {
+                height: 50px;
+            }
+        {% endif %}
+        </style>
+    {% endif %}
+{% endblock %}
+
+{% block adultBlockInclude %}
+    {% include "@WicrewSale/Booking/Inputs/form.booking.adult.html.twig" %}
+{% endblock %}
+
+{% block childBlockInclude %}
+    {% include "@WicrewSale/Booking/Inputs/form.booking.child.html.twig" %}
+{% endblock %}
+
+{% block pickAreaInclude %}
+    {% if jbj is not defined %}
+        {% include "@WicrewSale/Booking/Inputs/form.booking.area.html.twig" with { "type": "from", "areaObj": product.areaFrom, "bookingNumber": bookingNumber } %}
+    {% else %}
+        {% include "@WicrewSale/Booking/Inputs/form.booking.area.html.twig" with { "type": "from", "areaObj": product.areaFrom, "bookingNumber": bookingNumber } %}
+
+        {% include "@WicrewSale/Booking/Inputs/form.booking.additionalFee_search.html.twig" with
+            {
+                "type": "from",
+                "areaObj": product.areaTo,
+                "bookingNumber": bookingNumber,
+                "required": false
+            } 
+        %}
+    {% endif %}
+{% endblock %}
+
+{% block dropAreaInclude %}
+    {% if jbj is not defined %}
+        {% include "@WicrewSale/Booking/Inputs/form.booking.area.html.twig" with { "type": "to", "areaObj": product.areaTo, "bookingNumber": bookingNumber } %}
+    {% else %}
+        {% include "@WicrewSale/Booking/Inputs/form.booking.area.html.twig" with { "type": "to", "areaObj": product.areaTo, "bookingNumber": bookingNumber } %}
+
+        {% include "@WicrewSale/Booking/Inputs/form.booking.additionalFee_search.html.twig" with
+            {
+                "type": "to",
+                "areaObj": product.areaTo,
+                "bookingNumber": bookingNumber,
+                "required": false
+            } 
+        %}
+    {% endif %}
+
+{% endblock %}

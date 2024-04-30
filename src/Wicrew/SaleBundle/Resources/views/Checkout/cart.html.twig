@@ -1,0 +1,551 @@
+{% extends "base.html.twig" %}
+
+{% block title %}
+    {{ 'cart.title'|trans() }}
+{% endblock %}
+
+{% block body %}
+    <section class="page-header">
+        <div class="container">
+            <div class="d-flex content">
+                <div class="align-self-center">
+                    <h2>{{ 'cart.title'|trans() }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="bg"
+             style="background-image: url('{{ absolute_url(asset('bundles/wicrewcore/images/bg-cart-checkout.jpg')) }}');"></div>
+    </section>
+
+    {% include "@WicrewSale/Booking/breadcrumbs.html.twig" with { progress: 4 } only %}
+
+    <div class="cart cart-page">
+        <div class="container">
+            <div class="row">
+                {% if bookings is not defined %}
+                    <div class="col">
+                        <h2>{{ 'sale.checkout.empty'|trans() }}</h2>
+                    </div>
+                {% else %}
+                    <div class="col-md-8 left-panel">
+                        <ul class="cart-item-listing">
+                            <div id="scrollToThis" style="background-color: #2e6eb2;color: white;padding: 10px;font-size: 16px;font-weight:bold;">Your Booking details</div>
+                            {% for index, summary in bookings %}
+                                <li class="product"> 
+                                    <div class="product-info-wrapper"> 
+                                        {# Twig doesn't have a mechanism for downcasting. #}
+                                        {% if not (summary.isProduct() and summary.transportationType == constant('App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_SHARED_SHUTTLE')) %}
+                                            <div class="img-block" style="{% if summary.isProduct() %}width: 200px; {% else %} width: 400px; {% endif %} ">
+                                                {% if summary.image is not null %}
+                                                    <img src="{{ app.request.getSchemeAndHttpHost() ~ summary.image }}"
+                                                         width="{{ getParameterValue('global_image_vehicletype_width') }}"
+                                                         height="{{ getParameterValue('global_image_vehicletype_height') }}"/>
+                                                {% else %}
+                                                    <img src="{{ absolute_url(asset('bundles/wicrewcore/images/placeholder.png')) }}">
+                                                {% endif %}
+
+                                            </div>
+ 
+                                        {% endif %}
+                                        <div class="spacer"></div>
+                                        <div class="product-info-block vehicle-info-desktop">
+                                            <strong>{{ summary.titlePrice.rowTitle }}</strong>
+                                            {% if summary.isProduct() and constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_PRIVATE_SHUTTLE") == summary.transportationType %}
+                                                <div class="product-info-block"> 
+                                                    <div class="vehicle-type">
+                                                        {% if summary.maxPassengerNumber %}
+                                                        <div class="vehicle-passenger vehicle-data">Spacious {{ summary.maxPassengerNumber }} passenger van, full A/C</div>{% endif %} 
+                                                        <div class="vehicle-data">Personalized Meet & Greet Service Upon Arrival</div>
+                                                        <div class="vehicle-data">Door-to-Door Private Service</div>
+                                                        <div class="vehicle-data">Complimentary Bottled Water & Free WiFi</div>
+                                                        <div class="vehicle-data">Price Match Guarantee</div>
+                                                        <div class="vehicle-data">All-Inclusive Rates. No Hidden Charges</div> 
+                                                        <div class="vehicle-data">Complimentary stops at your leisure</div>   
+                                                    </div>
+                                                </div> 
+                                            {% endif %}  
+                                            {% if summary.isProduct() and constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_AIRPLANE") == summary.transportationType %}
+                                                <div class="product-info-block"> 
+                                                    <div class="vehicle-type">
+                                                        {% if summary.maxPassengerNumber %}
+                                                        <div class="vehicle-passenger vehicle-data">Spacious {{ summary.maxPassengerNumber }} passenger plane</div>{% endif %} 
+                                                        <div class="vehicle-data">Personalized Meet & Greet Service Upon Arrival</div> 
+                                                        <div class="vehicle-data">Complimentary Bottled Water</div>
+                                                        <div class="vehicle-data">Airport Taxes & Fees</div>
+                                                        <div class="vehicle-data">All-Inclusive Rates. No Hidden Charges</div>    
+                                                    </div>
+                                                    <br>
+                                                    <div class="vehicle-type-title"><strong>Notes</strong></div>
+                                                    <div class="vehicle-type"> 
+                                                        <div class="vehicle-data">4 passengers up to 850 lbs between passengers & luggage.</div>   
+                                                    </div>
+                                                </div> 
+                                            {% endif %}  
+                                            {% if summary.isProduct() and (constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_JEEP_BOAT_JEEP_SHARED") == summary.transportationType or constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_JEEP_BOAT_JEEP_PRIVATE") == summary.transportationType)  %}
+                                                <div class="product-info-block"> 
+                                                    <div class="vehicle-type"> 
+                                                        <div class="vehicle-data">Door-to-Door Service</div>
+                                                        <div class="vehicle-data">All-Inclusive Rates. No Hidden Charges</div>  
+                                                    </div>
+                                                </div> 
+                                            {% endif %}
+                                            {% if summary.isProduct() and (constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_WATER_TAXI") == summary.transportationType)%}
+                                                <div class="product-info-block"> 
+                                                    <div class="vehicle-type"> 
+                                                        <div class="vehicle-data">Door-to-Door Service</div>
+                                                        <div class="vehicle-data">All-Inclusive Rates. No Hidden Charges</div>
+                                                        <div class="vehicle-data">Ground Transportation from your hotel</div>  
+                                                        <div class="vehicle-data">1 hour boat ride on the Gulf of Nicoya </div> 
+                                                        <div class="vehicle-data">Ground transportation from Herradura/Jaco to your destination</div>  
+                                                    </div>
+                                                </div> 
+                                            {% endif %}
+                                            {% if summary.isActivity() %}
+                                                <div>{{ 'booking.pickupdate'|trans() }}: {{ summary.pickUpDate|formatNoNull("d M Y") }}</div> 
+                                                <div>Tour Type: {{ summary.activityType }} </div> 
+                                                <div>Tour time: {{ summary.tourTime|formatNoNull("H:i") }} </div> 
+                                                <div>Pick-up Time: 
+                                                    <span style="color:red;">Will be provided upon confirmation</span>
+                                                </div>
+                                                <div>Adults: {{ summary.adultCount }}</div>
+                                                <div>Children: {{ summary.childCount }}</div>
+                                                {% if summary.childrenAges %}
+                                                    <div>Children Ages: {{ summary.childrenAges }}</div>
+                                                {% endif %}
+                                                <div>Pick-up Area: {{ summary.areaFrom.name }}</div> 
+                                                {% if summary.areaFrom.addFee %}
+                                                    <div>{{ 'currency.symbol'|trans() }} {{ summary.areaFrom.additionalFee.displayText }} {{ 'currency.text'|trans() }}</div>
+                                                {% endif %} 
+                                                {% if summary.areaFrom.address is defined and summary.areaFrom.address != ''  %}
+                                                    <div>Pick-up Location: {{ summary.areaFrom.address }}</div>
+                                                {% endif %}
+                                                <div>Drop-off Area: {{ summary.areaTo.name }}</div>
+                                                {% if summary.areaTo.addFee %}
+                                                    <div>{{ 'currency.symbol'|trans() }} {{ summary.areaTo.additionalFee.displayText }} {{ 'currency.text'|trans() }}</div>
+                                                {% endif %}    
+                                                {% if summary.areaTo.address is defined and summary.areaTo.address != '' %}
+                                                    <div>Drop-off Location:</strong> {{ summary.areaTo.address }}</div>
+                                                {% endif %}
+                                                {% if summary.areaFrom.flightNumber is defined and summary.areaFrom.flightNumber != '' %}
+                                                    <div>{{ 'booking.from.flight.number'|trans() }}: {{ summary.areaFrom.flightNumber }}</div>
+                                                {% endif %}
+                                                {% if summary.areaFrom.airlineCompany is defined and summary.areaFrom.airlineCompany != '' %}
+                                                    <div>{{ 'booking.from.flight.company'|trans() }}: {{ summary.areaFrom.airlineCompany }}</div>
+                                                {% endif %}
+                                                {% if summary.areaTo.flightNumber is defined and summary.areaTo.flightNumber != '' %}
+                                                    <div>{{ 'booking.from.flight.number'|trans() }}: {{ summary.areaTo.flightNumber }}</div>
+                                                {% endif %}
+                                                {% if summary.areaTo.airlineCompany is defined and summary.areaTo.airlineCompany != '' %}
+                                                    <div>{{ 'booking.from.flight.company'|trans() }}: {{ summary.areaTo.airlineCompany }}</div>
+                                                {% endif %} 
+                                                
+                                                {% set labelTextTime = 'booking.service'|trans %}
+                                                {% if summary.isProduct() and summary.transportationType == constant('App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_PRIVATE_SHUTTLE') %}
+                                                    {% set labelTextTime = 'booking.pickuptime'|trans %}
+                                                    {% if summary.areaTo.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}
+                                                        {% set labelTextTime = 'booking.pickuptime.flight.to'|trans %}
+                                                    {% endif %}
+                                                    {% if summary.areaFrom.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}
+                                                        {% set labelTextTime = 'booking.pickuptime.flight'|trans %}
+                                                    {% endif %} 
+                                                {% endif %}    
+                                            {% endif %}  
+                                        </div> 
+                                        <div class="product-info-block" style="text-align: center;width: 172px;"> 
+                                            <form id="back_to_booking_{{ index }}" action="{{ url("start_booking") }}" method="post">
+                                                {% if summary.isProduct %}
+                                                    <input type="hidden" name="pickUpTime[{{ index }}]" value="{{ summary.pickUpTime|formatNoNull("H:i") }}">
+                                                {% endif %}
+                                                
+                                                {% if summary.isProduct %}
+                                                    <input type="hidden" name="productIDs[]" value="{{ summary.identifier }}">
+                                                {% endif %}
+                                                
+                                                {% if summary.isActivity %}
+                                                    <input type="hidden" name="activityIDs[]" value="{{ summary.identifier }}">
+                                                    <input type="hidden" name="dl_tourTime[{{ index }}]" value="{{ summary.tourTime|formatNoNull("H:i") }}">
+                                                    <input type="hidden" name="dl_activityType[{{ index }}]" value="{{ summary.activityType }}">
+                                                {% endif %}
+                                                
+                                                {% if summary.isProduct and (summary.transportationType == constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_JEEP_BOAT_JEEP_SHARED") or summary.transportationType == constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_JEEP_BOAT_JEEP_PRIVATE")) %}
+                                                    <input type="hidden" name="jbjType" value="{{ summary.transportationType }}"> 
+                                                {% endif %}
+                                                
+                                                {% if summary.areaFrom.address is defined and summary.areaFrom.address != ''  %}
+                                                    <input type="hidden" name="products[{{ index }}][area_from][address]" value="{{ summary.areaFrom.identifier }}">
+                                                {% endif %}
+                                                
+                                                {% if summary.areaTo.address is defined and summary.areaTo.address != '' %}
+                                                    <input type="hidden" name="products[{{ index }}][area_to][address]" value="{{ summary.areaTo.identifier }}">
+                                                {% endif %}
+                                                
+                                                {% if summary.areaFrom.flightNumber is defined and summary.areaFrom.flightNumber != '' %}
+                                                    <input type="hidden" name="products[{{ index }}][area_from][flightNumber]" value="{{ summary.areaFrom.flightNumber }}">
+                                                {% endif %}
+                                                
+                                                {% if summary.areaFrom.airlineCompany is defined and summary.areaFrom.airlineCompany != '' %}
+                                                    <input type="hidden" name="products[{{ index }}][area_from][airlineCompany]" value="{{ summary.areaFrom.airlineCompany }}">
+                                                {% endif %}
+                                                
+                                                {% if summary.areaTo.flightNumber is defined and summary.areaTo.flightNumber != '' %}
+                                                    <input type="hidden" name="products[{{ index }}][area_to][flightNumber]" value="{{ summary.areaTo.flightNumber }}">
+                                                {% endif %}
+                                                
+                                                {% if summary.areaTo.airlineCompany is defined and summary.areaTo.airlineCompany != '' %}
+                                                    <input type="hidden" name="products[{{ index }}][area_to][airlineCompany]" value="{{ summary.areaTo.airlineCompany }}">
+                                                {% endif %}  
+                                                
+
+                                                {% if summary.areaFrom.address is defined and summary.areaFrom.address != ''  %}
+                                                    <input type="hidden" name="dl_address[{{ index }}][area_from]" value="{{ summary.areaFrom.address }}">
+                                                {% endif %}
+
+                                                {% if summary.areaTo.address is defined and summary.areaTo.address != ''  %}
+                                                    <input type="hidden" name="dl_address[{{ index }}][area_to]" value="{{ summary.areaTo.address }}">
+                                                {% endif %}
+
+                                                {% for addon in summary.addons %}
+                                                    {# @var addon \App\Wicrew\SaleBundle\Service\Summary\SummaryElement #}
+                                                    <input type="hidden" name="addons[{{ addon.index }}][addon_adult]" value="{{ addon.adultQuantity }}" />
+                                                    <input type="hidden" name="addons[{{ addon.index }}][addon_child]" value="{{ addon.childQuantity }}" />
+                                                    <input type="hidden" name="addons[{{ addon.index }}][enabled]" value="1" />
+                                                 {% endfor %}
+
+                                                {% for extra in summary.extras %}
+                                                    {# @var addon \App\Wicrew\SaleBundle\Service\Summary\SummaryElement #}
+                                                    <input type="hidden" name="extras[{{ extra.index }}][extra_price]" value="{{ extra.quantity }}" />
+                                                    <input type="hidden" name="extras[{{ extra.index }}][enabled]" value="1" />
+                                                {% endfor %}
+    
+
+                                                <input  type="hidden" name="pickDates[{{ index }}]" value="{{ summary.pickUpDate|formatNoNull("d M Y") }}">
+                                                <input  type="hidden" name="actiontype" value="modify">
+                                                <input  type="hidden" name="adultCounts[{{ index }}]" value="{{ summary.adultCount }}">
+                                                <input  type="hidden" name="childCounts[{{ index }}]" value="{{ summary.childCount }}">
+                                                {% if summary.childrenAges is defined %}
+                                                    <input  type="hidden" name="childrenAges[{{ index }}]" value="{{ summary.childrenAges }}">
+                                                {% endif %}
+                                                <button type="submit" class="modify" >{{ 'sale.cart.modify'|trans() }}</button>
+                                                <button class="remove-item" data-booking-number="{{ index }}" type="button">{{ 'booking.remove'|trans() }}</button>
+                                            </form>
+                                            
+                                        </div>
+                                    </div>
+                                    <div class="product-info-wrapper">    
+                                        <div class="product-info-block vehicle-info-mobile">
+                                            <strong>{{ summary.titlePrice.rowTitle }}</strong>
+                                            {% if summary.isProduct() and constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_PRIVATE_SHUTTLE") == summary.transportationType %}
+                                                <div class="product-info-block"> 
+                                                    <div class="vehicle-type">
+                                                        {% if summary.maxPassengerNumber %}
+                                                        <div class="vehicle-passenger vehicle-data">Spacious {{ summary.maxPassengerNumber }} passenger van, full A/C</div>{% endif %} 
+                                                        <div class="vehicle-data">Personalized Meet & Greet Service Upon Arrival</div>
+                                                        <div class="vehicle-data">Door-to-Door Private Service</div>
+                                                        <div class="vehicle-data">Complimentary Bottled Water & Free WiFi</div>
+                                                        <div class="vehicle-data">Price Match Guarantee</div>
+                                                        <div class="vehicle-data">All-Inclusive Rates. No Hidden Charges</div> 
+                                                        <div class="vehicle-data">Complimentary stops at your leisure</div>   
+                                                    </div>
+                                                </div> 
+                                            {% endif %}  
+                                            {% if summary.isProduct() and constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_AIRPLANE") == summary.transportationType %}
+                                                <div class="product-info-block"> 
+                                                    <div class="vehicle-type">
+                                                        {% if summary.maxPassengerNumber %}
+                                                        <div class="vehicle-passenger vehicle-data">Spacious {{ summary.maxPassengerNumber }} passenger plane</div>{% endif %} 
+                                                        <div class="vehicle-data">Personalized Meet & Greet Service Upon Arrival</div> 
+                                                        <div class="vehicle-data">Complimentary Bottled Water</div>
+                                                        <div class="vehicle-data">Airport Taxes & Fees</div>
+                                                        <div class="vehicle-data">All-Inclusive Rates. No Hidden Charges</div>    
+                                                    </div>
+                                                    <br>
+                                                    <div class="vehicle-type-title"><strong>Notes</strong></div>
+                                                    <div class="vehicle-type"> 
+                                                        <div class="vehicle-data">4 passengers up to 850 lbs between passengers & luggage.</div>   
+                                                    </div>
+                                                </div> 
+                                            {% endif %}  
+                                            {% if summary.isActivity() %}
+                                                <div>{{ 'booking.pickupdate'|trans() }}: {{ summary.pickUpDate|formatNoNull("d M Y") }}</div> 
+                                                <div>Tour time: {{ summary.tourTime|formatNoNull("H:i") }} </div> 
+                                                <div>Pick-up Time: 
+                                                    <span style="color:red;">Will be provided upon confirmation</span>
+                                                </div>
+                                                <div>Adults: {{ summary.adultCount }}</div>
+                                                <div>Children: {{ summary.childCount }}</div>
+                                                {% if summary.childrenAges %}
+                                                    <div>Children Ages: {{ summary.childrenAges }}</div>
+                                                {% endif %}
+                                                <div>Pick-up: {{ summary.areaFrom.name }}</div> 
+                                                {% if summary.areaFrom.addFee %}
+                                                    <div>{{ 'currency.symbol'|trans() }} {{ summary.areaFrom.additionalFee.displayText }} {{ 'currency.text'|trans() }}</div>
+                                                {% endif %} 
+                                                {% if summary.areaFrom.address is defined and summary.areaFrom.address != ''  %}
+                                                    <div>Pick-up Location: {{ summary.areaFrom.address }}</div>
+                                                {% endif %}
+                                                <div>Drop-off Area: {{ summary.areaTo.name }}</div>
+                                                {% if summary.areaTo.addFee %}
+                                                    <div>{{ 'currency.symbol'|trans() }} {{ summary.areaTo.additionalFee.displayText }} {{ 'currency.text'|trans() }}</div>
+                                                {% endif %}    
+                                                {% if summary.areaTo.address is defined and summary.areaTo.address != '' %}
+                                                    <div>Drop-off Location:</strong> {{ summary.areaTo.address }}</div>
+                                                {% endif %}
+                                                {% if summary.areaFrom.flightNumber is defined and summary.areaFrom.flightNumber != '' %}
+                                                    <div>{{ 'booking.from.flight.number'|trans() }}: {{ summary.areaFrom.flightNumber }}</div>
+                                                {% endif %}
+                                                {% if summary.areaFrom.airlineCompany is defined and summary.areaFrom.airlineCompany != '' %}
+                                                    <div>{{ 'booking.from.flight.company'|trans() }}: {{ summary.areaFrom.airlineCompany }}</div>
+                                                {% endif %}
+                                                {% if summary.areaTo.flightNumber is defined and summary.areaTo.flightNumber != '' %}
+                                                    <div>{{ 'booking.from.flight.number'|trans() }}: {{ summary.areaTo.flightNumber }}</div>
+                                                {% endif %}
+                                                {% if summary.areaTo.airlineCompany is defined and summary.areaTo.airlineCompany != '' %}
+                                                    <div>{{ 'booking.from.flight.company'|trans() }}: {{ summary.areaTo.airlineCompany }}</div>
+                                                {% endif %} 
+                                                
+                                                {% set labelTextTime = 'booking.service'|trans %}
+                                                {% if summary.isProduct() and summary.transportationType == constant('App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_PRIVATE_SHUTTLE') %}
+                                                    {% set labelTextTime = 'booking.pickuptime'|trans %}
+                                                    {% if summary.areaTo.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}
+                                                        {% set labelTextTime = 'booking.pickuptime.flight.to'|trans %}
+                                                    {% endif %}
+                                                    {% if summary.areaFrom.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}
+                                                        {% set labelTextTime = 'booking.pickuptime.flight'|trans %}
+                                                    {% endif %} 
+                                                {% endif %}    
+                                            {% endif %}  
+                                        </div>
+                                    </div>
+                                    <div class="product-info-wrapper cart-info-item-container"> 
+                                    {% if summary.isProduct() %} 
+                                        <div class="product-info-block">   
+                                            {% if constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_PRIVATE_SHUTTLE") == summary.transportationType %}
+                                                {# Twig doesn't have a mechanism for downcasting. #}
+                                                <div>{{ summary.vehicleName }}</div> 
+                                                <div><strong>{{ 'from'|trans() }}:</strong> {{ summary.areaFrom.name }}</div> 
+                                                {% if summary.areaFrom.addFee %}
+                                                    <div>{{ 'currency.symbol'|trans() }} {{ summary.areaFrom.additionalFee.displayText }} {{ 'currency.text'|trans() }}</div>
+                                                {% endif %} 
+                                                <div><strong>{{ 'to'|trans() }}:</strong> {{ summary.areaTo.name }}</div>
+                                                {% if summary.areaTo.addFee %}
+                                                    <div>{{ 'currency.symbol'|trans() }} {{ summary.areaTo.additionalFee.displayText }} {{ 'currency.text'|trans() }}</div>
+                                                {% endif %} 
+                                                {% if summary.isProduct() %}
+                                                    <div>
+                                                        <strong>Travel time:</strong>
+                                                        <span >
+                                                            {% set hour = summary.duration|round(0, 'floor')  %}
+                                                            {% set min = (60 * (summary.duration - hour))|round  %}
+                                                            {% if hour <= 0 %}
+                                                                {{ min ~ ' Minutes ' }}
+                                                            {% elseif hour == 1 %}
+                                                                {% if min <= 0 %}
+                                                                    {{ hour ~ ' Hour ' }}
+                                                                {% elseif min >= 1 %}
+                                                                    {{ hour ~ ' Hour ' ~ min ~ ' Minutes ' }}
+                                                                {% endif %}
+                                                            {% elseif hour > 1 %}
+                                                                {% if min <= 0 %}
+                                                                    {{ hour ~ ' Hours ' }}
+                                                                {% elseif min >= 1 %}
+                                                                    {{ hour ~ ' Hours ' ~ min ~ ' Minutes ' }}
+                                                                {% endif %}
+                                                            {% endif %}
+                                                        </span>
+                                                    </div>
+                                                {% endif %} 
+                                                <div><strong>{{ 'booking.pickupdate'|trans() }}:</strong> {{ summary.pickUpDate|formatNoNull("d M Y") }}</div> 
+                                                <div><strong>Adults:</strong> {{ summary.adultCount }}</div>
+                                                <div><strong>Children:</strong> {{ summary.childCount }}</div>
+                                                {% if summary.areaFrom.address is defined and summary.areaFrom.address != ''  %}
+                                                    <div><strong>Pick-up Location:</strong> {{ summary.areaFrom.address }}</div>
+                                                {% endif %}
+                                                {% if summary.areaTo.address is defined and summary.areaTo.address != '' %}
+                                                    <div><strong>Drop-off Location:</strong> {{ summary.areaTo.address }}</div>
+                                                {% endif %}
+                                                {% if summary.areaFrom.flightNumber is defined and summary.areaFrom.flightNumber != '' %}
+                                                    <div><strong>{{ 'booking.from.flight.number'|trans() }}:</strong> {{ summary.areaFrom.flightNumber }}</div>
+                                                {% endif %}
+                                                {% if summary.areaFrom.airlineCompany is defined and summary.areaFrom.airlineCompany != '' %}
+                                                    <div><strong>{{ 'booking.from.flight.company'|trans() }}:</strong> {{ summary.areaFrom.airlineCompany }}</div>
+                                                {% endif %}
+                                                {% if summary.areaTo.flightNumber is defined and summary.areaTo.flightNumber != '' %}
+                                                    <div><strong>{{ 'booking.from.flight.number'|trans() }}:</strong> {{ summary.areaTo.flightNumber }}</div>
+                                                {% endif %}
+                                                {% if summary.areaTo.airlineCompany is defined and summary.areaTo.airlineCompany != '' %}
+                                                    <div><strong>{{ 'booking.from.flight.company'|trans() }}:</strong> {{ summary.areaTo.airlineCompany }}</div>
+                                                {% endif %} 
+                                                
+                                                {% set labelTextTime = 'booking.service'|trans %}
+                                                {% if summary.isProduct() and summary.transportationType == constant('App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_PRIVATE_SHUTTLE') %}
+                                                    {% set labelTextTime = 'booking.pickuptime'|trans %}
+                                                    {% if summary.areaTo.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}
+                                                        {% set labelTextTime = 'booking.pickuptime.flight.to'|trans %}
+                                                    {% endif %}
+                                                    {% if summary.areaFrom.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}
+                                                        {% set labelTextTime = 'booking.pickuptime.flight'|trans %}
+                                                    {% endif %} 
+                                                {% endif %}
+
+                                                <div><strong>{{labelTextTime}}:</strong> 
+                                                    {{ summary.pickUpTime|formatNoNull("H:i") }}
+                                                </div>  
+                                                {% if summary.areaTo.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}
+                                                    <div><strong>Pick-up Time: </strong>
+                                                        <span style="color:red;">Will be added on confirmation email</span>
+                                                    </div>
+                                                {% endif %}
+                                            {% elseif constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_JEEP_BOAT_JEEP_SHARED") == summary.transportationType or constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_JEEP_BOAT_JEEP_PRIVATE") == summary.transportationType or constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_WATER_TAXI") == summary.transportationType %} 
+                                                <div><strong>{{ 'booking.pickupdate'|trans() }}:</strong> {{ summary.pickUpDate|formatNoNull("d M Y") }}</div> 
+                                                <div><strong>{{ 'from'|trans() }}:</strong> {{ summary.areaFrom.name }}</div> 
+                                                {% if summary.areaFrom.addFee %}
+                                                    <div>{{ 'currency.symbol'|trans() }} {{ summary.areaFrom.additionalFee.displayText }} {{ 'currency.text'|trans() }}</div>
+                                                {% endif %} 
+                                                <div><strong>{{ 'to'|trans() }}:</strong> {{ summary.areaTo.name }}</div>
+                                                {% if summary.areaTo.addFee %}
+                                                    <div>{{ 'currency.symbol'|trans() }} {{ summary.areaTo.additionalFee.displayText }} {{ 'currency.text'|trans() }}</div>
+                                                {% endif %} 
+                                                {% if summary.isProduct() %}
+                                                    <div>
+                                                        <strong>Travel time:</strong>
+                                                        <span >
+                                                            {% set hour = summary.duration|round(0, 'floor')  %}
+                                                            {% set min = (60 * (summary.duration - hour))|round  %}
+                                                            {% if hour <= 0 %}
+                                                                {{ min ~ ' Minutes ' }}
+                                                            {% elseif hour == 1 %}
+                                                                {% if min <= 0 %}
+                                                                    {{ hour ~ ' Hour ' }}
+                                                                {% elseif min >= 1 %}
+                                                                    {{ hour ~ ' Hour ' ~ min ~ ' Minutes ' }}
+                                                                {% endif %}
+                                                            {% elseif hour > 1 %}
+                                                                {% if min <= 0 %}
+                                                                    {{ hour ~ ' Hours ' }}
+                                                                {% elseif min >= 1 %}
+                                                                    {{ hour ~ ' Hours ' ~ min ~ ' Minutes ' }}
+                                                                {% endif %}
+                                                            {% endif %}
+                                                        </span>
+                                                    </div>
+                                                {% endif %}    
+                                                <div><strong>Adults:</strong> {{ summary.adultCount }}</div>
+                                                {% if summary.childCount > 0 %}
+                                                    <div><strong>Children:</strong> {{ summary.childCount }}</div>
+                                                {% endif %}
+                                                {% if summary.areaFrom.address is defined and summary.areaFrom.address != ''  %}
+                                                    <div><strong>{{ 'booking.from.pickup'|trans() }}:</strong> {{ summary.areaFrom.address }}</div>
+                                                {% endif %}
+                                                {% if summary.areaTo.address is defined and summary.areaTo.address != '' %}
+                                                    <div><strong>{{ 'booking.to.dropoff'|trans() }}:</strong> {{ summary.areaTo.address }}</div>
+                                                {% endif %}
+                                                {% if summary.areaFrom.flightNumber is defined and summary.areaFrom.flightNumber != '' %}
+                                                    <div><strong>{{ 'booking.from.flight.number'|trans() }}:</strong> {{ summary.areaFrom.flightNumber }}</div>
+                                                {% endif %}
+                                                {% if summary.areaFrom.airlineCompany is defined and summary.areaFrom.airlineCompany != '' %}
+                                                    <div><strong>{{ 'booking.from.flight.company'|trans() }}:</strong> {{ summary.areaFrom.airlineCompany }}</div>
+                                                {% endif %}
+                                                {% if summary.areaTo.flightNumber is defined and summary.areaTo.flightNumber != '' %}
+                                                    <div><strong>{{ 'booking.from.flight.number'|trans() }}:</strong> {{ summary.areaTo.flightNumber }}</div>
+                                                {% endif %}
+                                                {% if summary.areaTo.airlineCompany is defined and summary.areaTo.airlineCompany != '' %}
+                                                    <div><strong>{{ 'booking.from.flight.company'|trans() }}:</strong> {{ summary.areaTo.airlineCompany }}</div>
+                                                {% endif %} 
+                                                
+                                                {% set labelTextTime = 'booking.service'|trans %}
+                                                {% if summary.isProduct() and summary.transportationType == constant('App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_PRIVATE_SHUTTLE') %}
+                                                    {% set labelTextTime = 'booking.pickuptime'|trans %}
+                                                    {% if summary.areaTo.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}
+                                                        {% set labelTextTime = 'booking.pickuptime.flight.to'|trans %}
+                                                    {% endif %}
+                                                    {% if summary.areaFrom.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}
+                                                        {% set labelTextTime = 'booking.pickuptime.flight'|trans %}
+                                                    {% endif %} 
+                                                {% endif %} 
+                                                <div><strong>{{labelTextTime}}:</strong> 
+                                                    {{ summary.pickUpTime|formatNoNull("H:i") }}
+                                                </div> 
+                                                <div><strong>Pick-up Time: </strong>
+                                                    <span style="color:red;">Will be provided upon confirmation</span>
+                                                </div>
+                                            {% endif %}
+                                        </div> 
+                                        {% if constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_JEEP_BOAT_JEEP_SHARED") == summary.transportationType or constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_JEEP_BOAT_JEEP_PRIVATE") == summary.transportationType or constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_WATER_TAXI") == summary.transportationType %} 
+                                            <div class="product-info-block product-info-block-jeep-boat-jeep" style="background-color: #e8e8e8;padding: 20px;border-left: #2e6eb2 solid 5px;">  
+                                                <h3>Notes</h3>
+                                                <textarea data-booking-number="{{ index }}" class="item-customer-notes" style="border: none;resize: none;background-color: #e8e7e7;height: 90%;" placeholder="Please add anything that we should know">{{summary.customerNotes}}</textarea>
+                                            </div>
+                                        {% endif %}
+                                    {% endif %}
+                                    </div>  
+                                        <div class="product-info-wrapper cart-addon-services-container" >  
+                                            {% if summary.anyAddons or summary.anyExtras %}
+                                            <div class="product-info-block cart-addon-services" style="background-color: #e8e8e8;padding: 20px;border-left: #2e6eb2 solid 5px;margin-right: 10px;width: 50%;">  
+                                                {% if summary.anyAddons %}
+                                                    <h3>Add-on services</h3>
+                                                    {% for addon in summary.addons %}
+                                                        {# @var addon \App\Wicrew\SaleBundle\Service\Summary\SummaryElement #}
+                                                        <div class="addon-data">
+                                                            {{ addon.addonTitle }}: Adults x {{addon.adultQuantity}} , Child x {{addon.childQuantity}}, Extra Transportation 
+                                                            {# COMMENTING REMOVE BUTTON BECAUSE IT WAS NOT UPDATING PRICES  #}
+                                                            {# <span style="background-color: black;border-radius: 82%;width: 23px;display: inline-block;color: white;text-align: center;position: relative;padding-left: 1px;padding-bottom: 1px;cursor:pointer;" class="remove-addon" data-booking-number="{{ index }}" data-addon-id="{{addon.index}}" data-addon-type="addon">x</span> #}
+                                                        </div>
+                                                    {% endfor %}
+                                                {% endif %}
+
+                                                {% if summary.anyExtras %}
+                                                    <h3>Extras</h3>
+                                                    {% for extra in summary.extras %}
+                                                        {# @var extra \App\Wicrew\SaleBundle\Service\Summary\SummaryElement #}
+                                                        <div class="addon-data">
+                                                            {{ extra.addonTitle }} x {{extra.quantity}} 
+                                                            {# COMMENTING REMOVE BUTTON BECAUSE IT WAS NOT UPDATING PRICES  #}
+                                                            {# <span style="background-color: black;border-radius: 82%;width: 23px;display: inline-block;color: white;text-align: center;position: relative;padding-left: 1px;padding-bottom: 1px;cursor:pointer;" class="remove-addon" data-booking-number="{{ index }}" data-addon-id="{{extra.index}}" data-addon-type="extra">x</span> #}
+                                                        </div> 
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </div> 
+                                            {% endif %}
+                                            {% if summary.isProduct() and (constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_JEEP_BOAT_JEEP_SHARED") == summary.transportationType or constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_JEEP_BOAT_JEEP_PRIVATE") == summary.transportationType or constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_WATER_TAXI") == summary.transportationType) %} 
+                                            {# do nothing #}
+                                            {% else %}
+                                            <div class="product-info-block" style="background-color: #e8e8e8;padding: 20px;border-left: #2e6eb2 solid 5px;width: 50%;">  
+                                                <h3>Notes</h3>
+                                                <textarea data-booking-number="{{ index }}" class="item-customer-notes" style="border: none;resize: none;background-color: #e8e7e7;height: 90%;width: 100%;" placeholder="Please add anything that we should know">{{summary.customerNotes}}</textarea>
+                                            </div>
+                                            {% endif %}
+                                        </div> 
+                                </li>
+                            {% endfor %}
+                        </ul> 
+                        <div class="booking-btn-block">
+                            <a href="/sale/checkout" class="btn-black lg-btn proceed-checkout">Proceed to Check Out</a>
+
+                            <div class="row-block">
+                                <a href="/" class="add-to-cart-and-continue-btn">Continue Shopping</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 right-panel">
+                        {% include "@WicrewSale/Booking/Base/summary.html.twig" with { "summaries": bookings, "discountValues": discountValues } only %}
+
+                        <div class="booking-btn-block">
+                            <a href="{{ url('sale_checkout') }}"
+                               class="btn-black lg-btn proceed-checkout">{{ 'sale.checkout'|trans() }}</a>
+
+                            <div class="row-block">
+                                <a href="{{ url('homepage') }}" class="add-to-cart-and-continue-btn">{{ 'continue_shopping'|trans() }}</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% include "@WicrewSale/Checkout/cart.js.html.twig" %}
+{% endblock %}

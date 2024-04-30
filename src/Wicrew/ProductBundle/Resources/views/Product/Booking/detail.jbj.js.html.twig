@@ -1,0 +1,122 @@
+<script type="text/javascript">
+    function changeAreaElements(selectElement, areaID) {
+        let options = selectElement.find("option");
+        options.each(function () {
+            const optionValueSet = JSON.parse($(this).val());
+            if (optionValueSet["id"] === areaID) {
+                $(this).prop("selected", true);
+                selectElement.trigger("change");
+            }
+        });
+    }
+
+    function hideAreaElements(selectElement) {
+        let areaSection = selectElement.parents(".col-block").find(".area-type-section");
+        areaSection.addClass("hidden");
+        let areaElements = areaSection.find("input");
+        areaElements.each(function () {
+            $(this).val("");
+        });
+
+        let airportSection = selectElement.parents(".col-block").find(".airport-type-section");
+        airportSection.addClass("hidden");
+        let airportElements = airportSection.find("input");
+        airportElements.each(function () {
+            $(this).val("");
+        });
+    }
+
+    // $(document).on("ready", function () {
+    $(".area-row-block").each(function () {
+        $(this).hide();
+    })
+
+    let departureOptionSelected = '';    
+
+    $('[name="departure_time"]').on('change', function() {
+        handleDepartureAtChange();
+    });
+
+    $('#departure-at').on("change", function () { console.log('change')
+        $('#departure-time').show();
+        $('.departure_time_choice').parent().hide();
+        let areaFrom_id = $('#departure-at').find("option:selected").data('areaFromId');
+        let areaTo_id = $('#departure-at').find("option:selected").data('areaToId');
+        $('.departure_time_'+areaFrom_id+'_'+areaTo_id).parent().show();
+        // change
+        $('.departure_time_'+areaFrom_id+'_'+areaTo_id).first().click(); 
+        if (!$('#departure-time').length) {
+            handleDepartureAtChange();
+        }
+    });
+
+    function handleDepartureAtChange() { 
+        let productIDElement = $('input[name="{{ postDataSection }}[id]"]');
+        let areaFromSelectElement = $("#areas_select_from_1");
+        let areaToSelectElement = $("#areas_select_to_1");
+
+        let $service = $('#departure-at').children("option:selected");
+        let service = ($service.length != 0 && $service.val() != "") ? $service.val() : '{}';
+        let $time = $('[name="departure_time"]:checked');
+        let time = ($time.length != 0 && $time.val() != "") ? $time.val() : '{}';
+
+        service = JSON.parse(service);
+        time = JSON.parse(time);
+        departureOptionSelected = _.merge(service, time);
+
+        if (departureOptionSelected.length === 0) {
+            productIDElement.val("");
+            updateSummaryOfBookingNumber_{{ bookingNumber }}();
+            hideAreaElements(areaFromSelectElement);
+            hideAreaElements(areaToSelectElement);
+            return;
+        }
+        const valueSet = departureOptionSelected;
+
+        const areaFromID = valueSet["fromID"];
+        const areaToID = valueSet["toID"];
+
+        changeAreaElements(areaFromSelectElement, areaFromID);
+        changeAreaElements(areaToSelectElement, areaToID);
+
+        const productID = valueSet["productID"];
+        productIDElement.val(productID);
+
+        updateSummaryOfBookingNumber_{{ bookingNumber }}();
+    }
+    // });
+    $('#departure-at').change();
+    
+    $(document).ready(function() {
+        $(".booking-btn-block button").click(function(event) {
+            event.preventDefault(); // Prevent the default form submission
+            let selected_date       = $("input[name='products[1][pickUpDate]']").val();
+            let selected_location   = $("select#departure-at").val();
+            let selected_time       = $("input[name='departure_time']:checked").val();
+            let selected_picktime   = $("input[name='products[1][pickUpTime]']").val();
+
+            $.ajax({
+                async: false,
+                url:'/check/jbj/availability',
+                type: "GET",
+                dataType: "json",
+                data: {
+                    "selected_date": moment( selected_date ).format(),
+                    "selected_location": selected_location,
+                    "selected_time": selected_time,
+                    "selected_picktime": selected_picktime,
+                },
+                success: function (data) {
+                    if( data == "available" ){
+                        $('form#form_booking').submit();
+                    }else{
+                        $(".notices").html('<div class="date-availability-banner">'+data+'</div>');
+                        error = true;
+                        return false;
+                    }
+                }
+            });
+        });
+    });
+
+</script>

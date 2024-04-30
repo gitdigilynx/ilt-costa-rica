@@ -1,0 +1,8 @@
+#wicrew_page:
+#    resource: '@WicrewPageBundle/Controller/PageController.php'
+#    type: annotation
+#    prefix: /page
+
+homepage:
+    path:   /
+    defaults:  { _controller: WicrewPageBundle:Page:homepage }

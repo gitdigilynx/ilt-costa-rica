@@ -1,0 +1,13 @@
+{% extends "@WicrewProduct/Product/Booking/detail.private_shuttle.base.html.twig" %}
+
+{% block timeBlockInclude %}
+    <select id="{{ pickupTimeID }}" class="updates-summary-of-{{ bookingNumber }}"
+            name="{{ postDataSection }}[pickUpTime]" required>
+        <option value="">{{ 'booking.service.time'|trans() }}</option>
+        {% for departureTime in product.departureTimes %}
+            {% set time = departureTime.time|date("H:i") %}
+            <option value="{{ time }}"
+                    {% if pickupTime is not null and pickupTime|date("H:i") == time %}selected="selected"{% endif %}>{{ time }}</option>
+        {% endfor %}
+    </select>
+{% endblock %}

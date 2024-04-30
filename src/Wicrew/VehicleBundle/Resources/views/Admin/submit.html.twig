@@ -1,0 +1,15 @@
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        jQuery('.validate-form').submit(function (e) {
+            var error = false;
+            error = validateForm();
+            if (error) {
+                setTimeout(function () {
+                    jQuery('button.action-save').removeAttr('disabled');
+                }, 100);
+
+                return false;
+            }
+        });
+    });
+</script>

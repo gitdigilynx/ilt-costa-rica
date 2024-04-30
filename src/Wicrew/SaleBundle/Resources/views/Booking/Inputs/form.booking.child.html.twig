@@ -1,0 +1,11 @@
+{% if readonly is not defined %}
+    {% set readonly = false %}
+{% endif %}
+{% set readonly = false %}
+
+<input type="number" id="{{ childCountID }}"
+       class="updates-summary-of-{{ bookingNumber }}"
+       name="{{ postDataSection }}[childCount]" value="{{ childCounts[bookingNumber] }}"
+       min="0" required="required">
+
+<label class="floating-label" for="{{ childCountID }}">{{ 'booking.passenger.number.children'|trans() }}</label>

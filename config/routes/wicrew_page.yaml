@@ -1,0 +1,2 @@
+wicrew_page:
+    resource: "@WicrewPageBundle/Resources/config/routes.yaml"

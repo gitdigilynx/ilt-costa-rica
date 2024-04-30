@@ -1,0 +1,45 @@
+{% extends "@WicrewSale/Admin/Management/list.input.select.html.twig" %}
+{% set dataset = {
+    (constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::STATUS_UNPAID')): "order_item.status.option.unpaid"|trans(),
+    (constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::STATUS_PAID')): "order_item.status.option.paid"|trans(),
+    (constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::STATUS_CANCELLED')): "order_item.status.option.cancelled"|trans()
+} %}
+{% set noNone = true %}
+
+{% block input_select %}
+    {% set request_url =  app.request.requesturi  %}
+    {% set display_status_val = 'Unassigned' %}
+    {% for key, data in dataset %}
+        {% if value is same as constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::STATUS_UNPAID') %}
+            {% set display_status_val = 'Unpaid' %}
+        {% elseif value is same as constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::STATUS_PAID') %}
+            {% set display_status_val = 'Paid' %}
+        {% elseif value is same as constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::STATUS_CANCELLED') %}
+            {% set display_status_val = 'Cancelled' %}
+        {% endif %}
+    {% endfor %}
+    {% if 'export' in request_url %}
+        {{ display_status_val }}
+    {% else %}
+        <select
+            class="billingStatus {{ display_status_val }}" 
+            name="{{
+            entity_config['nameInputArrayWrapper'] is defined ?
+            entity_config['nameInputArrayWrapper'] ~ '[' ~ field_options['arrayWrapperIndex'] ~ ']' ~ '[' ~ field_options['property'] ~ ']'
+            : field_options['property'] }}">
+        {% if noNone is not defined %}<option value="">{{ (emptyText is defined ? emptyText : 'booking.please.select')|trans() }}</option>{% endif %}
+            {% for key, data in dataset %}
+                {% if key is same as constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::STATUS_UNPAID') %}
+                    {% set color = '#EF4444' %}
+                {% elseif key is same as constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::STATUS_PAID') %}
+                    {% set color = '#22C55E' %}
+                {% elseif key is same as constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::STATUS_CANCELLED') %}
+                    {% set color = '#F97316' %}
+                {% endif %}
+                <option value="{{ key }}" {% if value is same as(key) %}selected{% endif %} style="color: {{ color }};">
+                    {{ data }}
+                </option>
+            {% endfor %}
+        </select>
+    {% endif %}
+{% endblock %}

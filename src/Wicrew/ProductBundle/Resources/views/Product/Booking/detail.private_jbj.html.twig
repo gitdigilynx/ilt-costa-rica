@@ -1,0 +1,110 @@
+{% extends "@WicrewProduct/Product/Booking/detail.private_shuttle.base.html.twig" %}
+
+{% block bookingForm %}
+    {% set type_transportation = "private_jbj" %}
+    {{ parent() }}
+{% endblock %}
+
+{% block idInput %}
+    {# Hidden inputs can't actually trigger a change so the class on this element is symbolic. #}
+    <input type="hidden" name="{{ postDataSection }}[id]" class="updates-summary-of-{{ bookingNumber }}"
+           {% if selectedProduct is defined %}value="{{ selectedProduct.id }}"{% endif %} />
+{% endblock %}
+
+{% block summaryTotalInputs %}
+    <input type="hidden" id="subtotal-for-{{ bookingNumber }}"
+           {% if selectedProduct is defined %}value="{{ summaries[bookingNumber].subtotalPrice.rackPrice.toCents() }}"{% endif %} />
+    <input type="hidden" id="taxes-for-{{ bookingNumber }}"
+           {% if selectedProduct is defined %}value="{{ summaries[bookingNumber].totalTaxes.rackPrice.toCents() }}"{% endif %} />
+{% endblock %}
+
+{% block headerAndInfo %}
+    <div class="row-block">
+        <div class="departure-location-block input-pin-icon black-icon">
+            <select id="departure-at" class="jbj_destination" required>
+                {% block departureSelectOptions %}
+                    <option value="" selected="selected">{{ 'booking.jbj.select_service'|trans() }}</option>
+                    {% for product in products %}
+                        {% set value = '{"productID":' ~ product.id ~ ',"fromID":' ~ product.areaFrom.id ~ ',"toID":' ~ product.areaTo.id ~ '}' %}
+                        <option {% if selectedProduct is defined and selectedProduct.id == product.id %}selected{% endif %}
+                                value="{{ value }}">{{ product.areaFrom.name ~ ' - ' ~ product.areaTo.name }}</option>
+                    {% endfor %}
+                {% endblock %}
+            </select>
+        </div>
+    </div>
+{% endblock %}
+
+{% block dateBlockInclude %}
+    {% include "@WicrewSale/Booking/Inputs/form.booking.pickup_date.html.twig" with { "pickupDate": pickDates[bookingNumber], "readonly": false } %}
+{% endblock %}
+
+{% block timeBlockInclude %}
+    {% include "@WicrewSale/Booking/Inputs/form.booking.time.html.twig" with { 'alternateTitle': true } %}
+{% endblock %}
+
+{% block adultBlockInclude %}
+    {% include "@WicrewSale/Booking/Inputs/form.booking.adult.html.twig" %}
+{% endblock %}
+
+{% block childBlockInclude %}
+    {% include "@WicrewSale/Booking/Inputs/form.booking.child.html.twig" %}
+{% endblock %}
+
+{% block pickAreaInclude %}
+    {% if selectedProduct is defined %}
+        {% include "@WicrewSale/Booking/Inputs/form.booking.area.html.twig" with { "selectEnable": true, "areaObj": selectedProduct.areaFrom, "type": "from", "bookingNumber": bookingNumber, "required": true, "type_transportation": type_transportation } %}
+    {% else %}
+        {% include "@WicrewSale/Booking/Inputs/form.booking.area.html.twig" with { "selectEnable": true, "type": "from", "bookingNumber": bookingNumber, "required": true, "type_transportation": type_transportation } %}
+    {% endif %}
+{% endblock %}
+
+{% block dropAreaInclude %}
+    {% if selectedProduct is defined %}
+        {% include "@WicrewSale/Booking/Inputs/form.booking.area.html.twig" with { "selectEnable": true, "areaObj": selectedProduct.areaTo, "type": "to", "bookingNumber": bookingNumber, "required": true, "type_transportation": type_transportation } %}
+    {% else %}
+        {% include "@WicrewSale/Booking/Inputs/form.booking.area.html.twig" with { "selectEnable": true, "type": "to", "bookingNumber": bookingNumber, "required": true, "type_transportation": type_transportation } %}
+    {% endif %}
+{% endblock %}
+
+{% block addons %}
+    {% if custom_services is defined and custom_services|length > 0 %}
+    <div class="addon booking-addon-section">
+        <div class="addon-section-title">
+            <h4>Custom Services</h4>
+            <p>Following are the added custom services, you can also delete them from booking.</p>
+        </div>
+
+        <div id="custom_services-for-{{ bookingNumber }}" class="addon-table">
+            {% for custom_service in custom_services %}
+                <div class="single-customService-container" style='font-size: 16px;font-weight: 400;margin-bottom: 20px; padding: 15px; border: 1px #aaadb4 solid; display: flex; width: 100%; gap: 15px;'>
+                    <div class="single-customService-name" style='flex: 50%;'> {{custom_service.label}} </div>
+                    <div class="single-customService-price" style='flex: auto;'> {{'currency.symbol'|trans() ~ custom_service.rackPrice|number_format(2, '.', ',') }} </div>
+                    <div class="single-customService-action" style='flex: auto; text-align: end;'> <button type='button' data-bookingnumber='{{bookingNumber}}' data-loopindex='{{loop.index0}}' data-label='{{custom_service.label}}' data-id='{{custom_service.id}}' onclick="remove_custom_service(this)" style='background: transparent;border: none;color: #d10000;' class='remove_custom_service' title='Remove custom service from booking'> <i class="fas fa-times-circle"></i> </button> </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+{% endblock %}
+
+{% block perProductJS %}
+    {% include "@WicrewSale/Booking/Base/booking.summary_watcher.js.html.twig" with { "bookingNumber": bookingNumber, "idType": "jbj", "jbjType": "private" } %}
+    {% include "@WicrewSale/Booking/Inputs/booking.area_watcher.js.html.twig" %}
+    {% set bookingNumber = bookingNumber + 1 %}
+        <script>
+
+            $(document).ready(function(){
+                $('#{{pickupTimeID}}').timepicker( { format:'HH:mm' } );
+                let timePickerElements = $(".booking-pickup-time");
+                timePickerElements.timepicker( { format:'HH:mm' } );
+
+            });
+        </script>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% include "@WicrewProduct/Product/Booking/detail.jbj.js.html.twig" %}
+{% endblock %}

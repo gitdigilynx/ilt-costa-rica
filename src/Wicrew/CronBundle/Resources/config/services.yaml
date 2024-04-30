@@ -1,0 +1,5 @@
+#services:
+#    wicrew.cron.test:
+#        class: App\Wicrew\CoreBundle\Service\Test
+#        arguments: ["@service_container", "@doctrine.orm.entity_manager", "@translator", "@filesystem", "@session"]
+#        public: true

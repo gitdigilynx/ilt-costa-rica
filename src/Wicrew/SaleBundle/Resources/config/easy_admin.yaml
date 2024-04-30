@@ -1,0 +1,179 @@
+easy_admin:
+    design:
+        menu:
+            - { entity: 'Tax', label: 'tax.title', icon: 'funnel-dollar', permission: 'ROLE_ADMIN' }
+            - {  css_class: 'menu--tax_configuration', label: 'Tax Configuration', icon: 'tasks', permission: 'ROLE_ADMIN', url: '/admin/taxConfig' }
+            - { css_class: 'menu--discount', entity: 'Discount', label: 'discount.title', icon: 'funnel-dollar', permission: 'ROLE_ADMIN' }  
+    entities:
+        Tax:
+            permissions: 'ROLE_ADMIN'
+            label: 'tax.title'
+            icon: 'funnel-dollar'
+            class: App\Wicrew\SaleBundle\Entity\Tax
+            list:
+                title: 'tax.title'
+                fields:
+                    - { property: 'label', label: 'tax.label' }
+                    - { property: 'amount', label: 'tax.amount' }
+                    - { property: 'createdAt', label: 'tax.created_at', format: '%global.date.format%' }
+                max_results: '%global.sort.pagination.default%'
+                sort: ['createdAt', '%global.sort.desc%']
+            form:
+                fields:
+                    - { type: 'tab', label: 'tax.tab.general' }
+                    - { type: 'group', label: 'tax.group.information' }
+                    - { property: 'label', label: 'tax.label', type_options: { required: true } }
+                    - { property: 'amount', label: 'tax.amount', type_options: { required: true } }
+
+        Discount:
+            permissions: 'ROLE_ADMIN'
+            label: 'discount.title'
+            icon: 'funnel-dollar'
+            class: App\Wicrew\SaleBundle\Entity\Discount
+            list:
+                title: 'discount.title'
+                fields:
+                    - { property: 'name', label: 'discount.name' }
+                    - { property: 'description', label: 'discount.description' }
+                    - { property: 'code', label: 'discount.code' }
+                    - { property: 'usedNumber', label: 'discount.usedNumber' }
+                    - { property: 'createdAt', label: 'tax.created_at', format: '%global.date.format%' }
+                max_results: '%global.sort.pagination.default%'
+                sort: ['createdAt', '%global.sort.desc%']
+            form:
+                fields:
+                    - { type: 'tab', label: 'tax.tab.general' }
+                    - { type: 'group', label: 'tax.group.information' }
+                    - { property: 'name', label: 'discount.name', type_options: { required: true } }
+                    - { property: 'description', label: 'discount.description', type_options: { required: true } }
+                    -   property: 'code'
+                        label: 'discount.code'
+                        type_options:
+                            required: true
+                    - { property: 'quantityPerUser', label: 'discount.quantity_per_user', type_options: { required: false } }
+                    -   property: 'typeDiscount'
+                        label: 'discount.type_discount'
+                        type: 'choice'
+                        type_options:
+                            required: true
+                            choices:
+                                'discount.reduction_amount': !php/const App\Wicrew\SaleBundle\Entity\Discount::TYPE_DISCOUNT_AMOUNT
+                                'discount.reduction_percentage': !php/const App\Wicrew\SaleBundle\Entity\Discount::TYPE_DISCOUNT_PERCENTAGE
+                            expanded: false
+                    - { property: 'reductionAmount', label: 'discount.reduction_amount', type_options: { required: false } }
+                    - { property: 'reductionPercentage', label: 'discount.reduction_percentage', type_options: { required: false } }
+            templates:
+                edit: '@WicrewSale/Admin/Discount/edit.html.twig'
+                new: '@WicrewSale/Admin/Discount/new.html.twig'
+
+        Order:
+            permissions: 'ROLE_EMPLOYEE'
+            controller: App\Wicrew\SaleBundle\Controller\Admin\OrderController
+            label: 'sale.order.listing'
+            class: App\Wicrew\SaleBundle\Entity\Order
+            list:
+                actions:
+                    - { name: 'edit' }
+                    - { name: 'archive' }
+                title: "sale.order.listing"
+                fields:
+                    - { property: 'id', label: 'Booking #', mapped: false, template: '@WicrewSale/Admin/booking.html.twig'  }
+                    - { property: 'supplier.bizName', label: 'partner.type.options.partner', sortable: true, template: '@WicrewSale/Admin/field.source.html.twig' }
+                    - { property: 'createdAt', label: 'sale.order.purchase.at', format: '%global.date.format%' }
+                    - { property: 'fullName', mapped: false, label: 'sale.order.customer.name' }
+                    - { property: 'grandTotalRackPrice', mapped: false, label: 'sale.order.totalamount', template: '@WicrewSale/Admin/field.totalprice.html.twig' }
+                    - { property: 'quote', label: 'sale.order.status.quote', template: '@WicrewSale/Admin/field.quote.html.twig' }
+                    - { property: 'status', label: 'sale.order.status', template: '@WicrewSale/Admin/field.status.html.twig', sortable: false }
+                sort: ['createdAt', 'DESC']
+                dql_filter: 'entity.archiveStatus != 1'
+            form:
+                actions:
+                    - { name: '-delete' }
+                fields:
+                    # Tab order general
+                    - { type: 'tab', label: 'order.details' }  
+                    # Tab order item
+                    - { type: 'group', label: false, collapsible: true } 
+                    - { property: 'id', type_options: { block_name: 'custom_order_detail', label: false } } 
+                    - { property: 'status', type_options: { block_name: 'custom_statusitems' } } 
+                    - { property: 'items', type_options: { block_name: 'custom_orderitems', by_reference: false, label: false } } 
+                    # - { property: 'customerNotes', css_class: 'customer_notes_container', label: 'sale.checkout.notes.customer' }
+                    # Tab order general
+                    - { type: 'tab', label: 'order.tab.client.information' }
+                    # Partnership information
+                    - { type: 'group', label: 'Supplier Information', collapsible: true, expanded: true }
+                    - { property: 'quote', label: 'checkout.as.quote' }
+                    - { property: 'supplier', label: 'partner.type.options.partner', type_options: { block_name: 'custom_partner_detail' } }
+                    - { property: 'paymentType', label: 'order.information.payment.type', type_options: { block_name: 'custom_payment_type_detail' } }
+                    # Group Customer information
+                    - { type: 'group', label: 'order.customer.information', collapsible: true, expanded: true }
+                    - { property: 'firstname', label: 'sale.checkout.firstName' }
+                    - { property: 'lastname', label: 'sale.checkout.lastName' }
+                    - { property: 'email', label: 'sale.checkout.email' }
+                    - { property: 'country', label: 'sale.checkout.country' }
+                    - { property: 'tel', label: 'sale.checkout.tel' }
+                    - { property: 'whatsapp', label: 'sale.checkout.whatsapp' }
+                    # # Tab order general
+                    # - { type: 'tab', label: 'order.tab.payment.history' }
+                    # # Group Customer information
+                    # - { type: 'group', label: 'order.histories', collapsible: true, expanded: true }
+                    # - { property: 'history', type_options: { block_name: 'custom_orderhistory', by_reference: false, label: false, choice_label: id } }
+                    # Tab order general
+                    - { type: 'tab', label: 'order.tab.add.services' }
+                    - { property: 'additems', type_options: { mapped: false, block_name: 'custom_orderitems_additems', by_reference: false, label: false } }
+                    # Tab order general
+                    - { type: 'tab', label: 'order.tab.email' }  
+                    # Group Mail sending
+                    - { type: 'group', label: 'order.mail.sending', collapsible: true }
+                    - { property: 'mailSending', type_options: { mapped: false, block_name: 'custom_mailsending' } } 
+            templates:
+                list: '@WicrewSale/Admin/list.html.twig'
+                edit: '@WicrewSale/Admin/edit.html.twig' 
+            search:
+                fields: 
+                    - { property: 'id' }
+                    - { property: 'status' }
+                    - { property: 'supplier.bizName' }
+                    - { property: 'dlOrder.firstName' }
+                    - { property: 'dlOrder.lastName' }
+                    - { property: 'dlOrder.createdAt' }
+                    - { property: 'dlOrder.items.grandTotal' }
+                    - { property: 'dlOrder.quote' }
+
+        OrderArchive:
+            permissions: 'ROLE_EMPLOYEE'
+            controller: App\Wicrew\SaleBundle\Controller\Admin\OrderController
+            label: 'sale.order.listing'
+            class: App\Wicrew\SaleBundle\Entity\Order
+            list:
+                actions:
+                    - { name: 'unarchive' }
+                title: "sale.order.listing"
+                fields:
+                    - { property: 'id', label: 'Booking #', mapped: false, template: '@WicrewSale/Admin/booking.html.twig'  }
+                    - { property: 'supplier.bizName', label: 'partner.type.options.partner', sortable: true, template: '@WicrewSale/Admin/field.source.html.twig' }
+                    - { property: 'createdAt', label: 'sale.order.purchase.at', format: '%global.date.format%' }
+                    - { property: 'fullName', mapped: false, label: 'sale.order.customer.name' }
+                    - { property: 'grandTotalRackPrice', mapped: false, label: 'sale.order.totalamount', template: '@WicrewSale/Admin/field.totalprice.html.twig' }
+                    - { property: 'quote', label: 'sale.order.status.quote', template: '@WicrewSale/Admin/field.quote.html.twig' }
+                    - { property: 'status', label: 'sale.order.status', template: '@WicrewSale/Admin/field.status.html.twig', sortable: false }
+                sort: ['createdAt', 'DESC']
+                dql_filter: 'entity.archiveStatus = 1'
+           
+                    
+        OrderItemHasDriver:
+            permissions: 'ROLE_EMPLOYEE'
+            class: 'App\Wicrew\SaleBundle\Entity\OrderItemHasDriver'
+            nameInputArrayWrapper: 'additionalDrivers'
+            list:
+                fields:
+                    - { property: 'driverLink', label: false, mapped: false, css_class: 'remove-driver-btn-cell', template: '@WicrewSale/Admin/TransportationManagement/list.driver_link.html.twig' }
+                    - { property: 'fromDescription', label: 'management.pick_up_address', placeholder: 'From', template: 'WicrewSaleBundle:Admin/Management:list.input.text.html.twig' }
+                    - { property: 'toDescription', label: 'management.drop_address', placeholder: 'To', template: 'WicrewSaleBundle:Admin/Management:list.input.text.html.twig' }
+                    - { property: 'driver.id', label: 'transport_management.label.supplier', template: '@WicrewSale/Admin/TransportationManagement/list.supplier.html.twig' }
+                    - { property: 'driverAssigned', label: 'transport_management.label.driver', mapped: false, template: '@WicrewSale/Admin/Dashboard/list.driver.html.twig' }
+                    - { property: 'vehicle.id', label: 'transport_management.label.select_vehicle', template: '@WicrewSale/Admin/Dashboard/list.vehicle.html.twig' }
+                    # - { property: 'sendEmail', label: 'transport_management.label.email_driver', mapped: false, template: '@WicrewSale/Admin/TransportationManagement/list.send_email.html.twig' }
+                    - { property: 'priceSeparator', label: false, mapped: false }
+                    - { property: 'rack', label: 'management.total_rack', width: '100px', template: 'WicrewSaleBundle:Admin/Management:list.input.text.html.twig' }
+                    - { property: 'net', label: 'management.total_net', width: '100px', template: 'WicrewSaleBundle:Admin/Management:list.input.text.html.twig' } 

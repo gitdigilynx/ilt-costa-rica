@@ -1,0 +1,6 @@
+{% set currencySymbol = 'currency.symbol'|trans() %}
+{% if item.getRefundTotal is not null and item.getRefundTotal != "0" %} 
+    <span style="color: var(--red)">-{{currencySymbol}}{{ item.getRefundTotal }}</span>
+{% else %}
+    <span class="badge badge-secondary">Null</span>
+{% endif %}

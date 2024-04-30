@@ -1,0 +1,56 @@
+{% extends "easy_admin/admin.base_layout.html.twig" %}
+
+{% block page_title %}
+    {{ 'partner.view_addons.title'|trans() }} - {{ partner.bizName }}
+{% endblock %}
+
+{% block main %}
+    <div class="view_addons">
+        <h4>{{ 'partner.view_addons.count'|trans({ 'partner': partner, 'addons': addons|length }) }}</h4>
+
+        {% if addons|length > 0 %}
+            <h6>{{ 'partner.view_addons.view_them_below'|trans() }}</h6>
+            <table>
+                <tbody>
+                {% for addon in addons %}
+                    <tr>
+                        <td>
+                            <strong>{{ addon.label }}</strong>
+                        </td>
+                        <td>
+                            <strong> - <a href="{{ path('easyadmin',
+                                    {
+                                        entity: 'Addon',
+                                        action: 'edit',
+                                        id: addon.id
+                                    }) }}">{{ 'action.edit'|trans() }}</a>
+                            </strong>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
+        <div class="button-action">
+            <a class="btn btn-primary action-new" title="" href="{{ path('easyadmin',
+                {
+                    entity: 'Partner',
+                    action: 'list'
+                }) }}" target="_self">Back to listing</a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block head_stylesheets %}
+    {{ parent() }}
+    <style>
+        .view_addons {
+            padding: 40px;
+        }
+
+        .button-action {
+            padding-top: 20px;
+        }
+    </style>
+{% endblock %}

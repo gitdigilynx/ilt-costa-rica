@@ -1,0 +1,4 @@
+# wicrew_dateavailability:
+#    resource: '@WicrewDateAvailability/Controller/DashboardController.php'
+#    type: annotation
+#    prefix: /admin

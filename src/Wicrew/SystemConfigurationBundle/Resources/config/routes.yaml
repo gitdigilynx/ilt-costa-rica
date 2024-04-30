@@ -1,0 +1,4 @@
+#wicrew_systemconfiguration:
+#    resource: '@WicrewSystemConfigurationBundle/Controller/Admin/SystemConfigurationController.php'
+#    type: annotation
+#    prefix: /admin

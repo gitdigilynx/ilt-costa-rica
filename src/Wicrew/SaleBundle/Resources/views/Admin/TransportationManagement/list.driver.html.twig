@@ -1,0 +1,6 @@
+{# @var item \App\Wicrew\SaleBundle\Entity\OrderItemHasDriver #}
+{% if item != null and item.driver != null %}
+    <span style="color: green">{{ 'core.assigned'|trans|upper }}</span>
+{% else %}
+    <span style="color: red">{{ 'core.unassigned'|trans|upper }}</span>
+{% endif %}

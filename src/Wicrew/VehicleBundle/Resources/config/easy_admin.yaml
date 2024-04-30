@@ -1,0 +1,44 @@
+easy_admin:
+    entities:
+        Vehicle:
+            permissions: ROLE_ADMIN
+            controller: App\Wicrew\CoreBundle\Controller\Admin\AdminController
+            label: 'transportation.vehicle'
+            icon: 'file'
+            class: App\Wicrew\VehicleBundle\Entity\Vehicle
+            list:
+                filters:
+                    - { property: 'name' }
+                    -   property: 'vehicleType'
+                        type: 'App\Wicrew\VehicleBundle\Form\Filter\VehicleType'
+                        type_options:
+                            expanded: true
+                            multiple: true
+                actions:
+                    - { name: 'edit' }
+                    - { name: 'delete' }
+                title: "transportation.vehicle.management"
+                fields:
+                    - { property: 'name', label: 'transportation.vehicle.name' }
+                    - { property: 'vehicleType.name', label: 'product.form.vehicle', sortable: true }
+                    - { property: 'createdAt', label: 'core.created_date', format: 'M d Y' }
+                sort: ['createdAt', 'DESC']
+            #                dql_filter: "entity.status = 1"
+            form:
+                form_options: { attr: { novalidate: true, class: 'validate-form' } }
+                fields:
+                    # Tab #1
+                    - { type: 'tab' , label: 'vehicle.tab.general'}
+                    # Group
+                    - { type: 'group', label: 'vehicle.tab.vehicle' }
+                    - { property: 'vehicleType', type: 'entity', label: 'product.form.vehicle', type_options: { required: true, placeholder: false, class: 'App\Wicrew\VehicleTypeBundle\Entity\VehicleType', choice_label: 'name', expanded: false, multiple: false } }
+                    - { property: 'name', type: 'text', label: 'vehicle.form.name', type_options: { required: true, attr: { data-validate: 'maxlength:255' } } }
+                    - { property: 'plate', type: 'text', label: 'vehicle.form.plate', type_options: { attr: { data-validate: 'maxlength:32' } } }
+                    - { property: 'notes', type: 'textarea', label: 'vehicle.form.notes' }
+                actions:
+                    - { name: '-delete', icon: 'trash' }
+            templates:
+                new: '@WicrewVehicle/Admin/new.html.twig'
+                edit: '@WicrewVehicle/Admin/edit.html.twig'
+            search:
+                fields: ['name', 'vehicleType.name', 'plate']

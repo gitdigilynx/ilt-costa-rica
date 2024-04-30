@@ -1,0 +1,2 @@
+wicrew_sale:
+    resource: "@WicrewSaleBundle/Resources/config/routes.yaml"

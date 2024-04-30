@@ -1,0 +1,86 @@
+activity_location.title: Activity location
+activity_location.name: Name
+activity_location.created_at: Created at
+activity_location.tab.general: General
+activity_location.group.information: Information
+activity_location.image: Image
+activity_location.custom_order: Custom order
+
+activity.title: Activity
+activity.tab.general: General
+activity.group.information: Information
+activity.combo: Is this activity a combo?
+activity.visibility: Visibility
+activity.visibility.option.not_visible: Not visible
+activity.visibility.option.visible: Visible
+activity.status: Status
+activity.status.option.offline: Offline
+activity.status.option.online: Online
+activity.name: Activity name
+activity.area: Activity area
+activity.types: Activity Type
+activity.type.option.adventure: Adventure
+activity.type.option.nature: Nature
+activity.type.option.cultural: Cultural
+activity.type.option.water: Water
+activity.type.option.group: Group
+activity.type.option.private: Private
+activity.difficulty_levels: Difficulty Level
+activity.difficulty_level.option.easy: Easy
+activity.difficulty_level.option.morerate: Morerate
+activity.difficulty_level.option.difficult: Difficult
+activity.age_group: Minimum Age
+activity.location: Departure from
+activity.tour_time: Tour time
+activity.notes_to_display_to_the_customer: Notes for the customer
+activity.duration: Duration
+activity.duration.option.1_2_hours: 1-2 hours
+activity.duration.option.half_day: Half Day
+activity.duration.option.full_day: Full Day
+activity.supplier: Supplier
+activity.group.pricing: Activity pricing
+activity.adult_rack_price: Adult price RACK
+activity.adult_net_price: Adult price NET
+activity.kid_rack_price: Kid price RACK
+activity.kid_net_price: Kid price NET
+activity.pricing_tax: Tax
+activity.group.transportation: Transportation management
+activity.transportation_required: ILT transportation service required?
+activity.transport_adult_rack_price: Adult transportation price RACK
+activity.transport_adult_net_price: Adult transportation price NET
+activity.transport_kid_rack_price: Kid transportation price RACK
+activity.transport_kid_net_price: Kid transportation price NET
+activity.transportation_tax: Tax
+activity.transportation_price: Transportation price
+activity.group.description: Description of the activity (for the website)
+activity.description: Description
+activity.highlight: Tour highlight
+activity.included: What is included
+activity.what_to_bring: What to bring
+activity.important_notes: Important information
+activity.cancellation_policy: Cancellation policy
+activity.image: Tour picture
+activity.group.seo: SEO
+activity.tab.slides: Images
+activity.slide.image: Image
+activity.slide.position: Position
+activity.tab.childs: Suppliers Details
+activity.group.childs: Details
+activity.childs: Child activities
+activity.child.regular: Activity
+activity.child.pricing_tax: Tax
+activity.child.supplier: Supplier
+activity.created_at: Created at
+activity.information: Activity information
+activities.title: Activities
+activities.all.destination: All Destinations
+activities.view.all.activities: View all activities
+
+activity.duplicate.title: Duplicate Activity (#id)
+activity.duplicate.successful: Activity was succesfully duplicated.
+activity.duplicate.new_slug: Please choose a new slug for this duplicate.
+activity.duplicate.in_use: This slug is already in use.
+activity.duplicate.bad_name: Slug name can only contain numbers, letters, underscore or dash.
+
+activity.tab.adult_rate: Adult rate
+activity.tab.child_rate: Child rate

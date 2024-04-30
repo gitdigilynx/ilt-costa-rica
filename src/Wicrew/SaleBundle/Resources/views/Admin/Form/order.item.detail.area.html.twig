@@ -1,0 +1,15 @@
+{% if type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) and (airlineCompany != '' or flightNumber != '') %}
+    <div {# class="inside" #}>
+        {% if airlineCompany != '' %}<div><label>{{ 'order.items.flight.information'|trans() }}</label> {{ airlineCompany }}</div>{% endif %}
+        {% if flightNumber != '' %}<div><label>{{ 'order.items.flight'|trans() }}</label> {{ flightNumber }}</div>{% endif %}
+    </div>
+{% elseif type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AREA')) %}
+    <div {# class="inside" #}>
+        <label>{% if areaType == 'from' %}Pick-up Location{% else %}Drop-off Location{% endif %}</label> {{ address|defaultOnEmpty('order.items.not_specified'|trans) }}
+        {% if addFee is not null %}
+            <div>
+                <label>{{ 'order.items.location_fee'|trans() }}</label> {{ 'currency.symbol'|trans() ~ addFee }}
+            </div>
+        {% endif %}
+    </div>
+{% endif %}

@@ -1,0 +1,8 @@
+<script type="text/javascript">
+    $(document).on('click', '[id^=book-watertaxi_]', function () {
+        redirectToBookingPage({
+            productIDs: [$(this).data('pid')],
+            transportationType: $(this).data('transportationtype')
+        });
+    });
+</script>

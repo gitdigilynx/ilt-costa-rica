@@ -1,0 +1,14 @@
+{% extends "WicrewCoreBundle:Browsing:browsing.header.html.twig" %}
+{% set backgroundImageURL = absolute_url(asset('bundles/wicrewcore/images/header/private-transportation-cover.jpg')) %}
+
+{% block title %}
+    {{ ('product.private.head'|trans)|raw }}
+{% endblock %}
+
+{% block subTitle %}
+    {% if subTitle is defined %}
+        {{ subTitle }}
+    {% else %}
+        {{ ('product.private.head.desc'|trans)|raw }}
+    {% endif %}
+{% endblock %}

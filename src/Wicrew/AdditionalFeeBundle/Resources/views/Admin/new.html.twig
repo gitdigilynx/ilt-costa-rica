@@ -1,0 +1,11 @@
+{% extends "@EasyAdmin/default/new.html.twig" %}
+
+{% block main %}
+    {{ parent() }}
+
+    {% include "@WicrewCore/Google/place.html.twig" with {
+        "targetFields": [
+            { "destInputId": "additionalfee_googlePlaceId", "mapSize": { "width": "100%", "height": "300px" }, "callback": "receivePlace2", "showMap": true }
+        ]
+    } %}
+{% endblock %}

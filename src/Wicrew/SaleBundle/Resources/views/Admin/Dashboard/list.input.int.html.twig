@@ -1,0 +1,14 @@
+<input type="number"
+       name="{{
+       entity_config['nameInputArrayWrapper'] is defined ?
+       entity_config['nameInputArrayWrapper'] ~ '[' ~ field_options['arrayWrapperIndex'] ~ ']' ~ '[' ~ field_options['property'] ~ ']'
+       : field_options['property'] }}"
+       style="width: 50px; border: none;"
+       class="{{
+       entity_config['nameInputArrayWrapper'] is defined ?
+       entity_config['nameInputArrayWrapper'] ~ '[' ~ field_options['arrayWrapperIndex'] ~ ']' ~ '[' ~ field_options['property'] ~ ']'
+       : field_options['property'] }}"
+       
+       value="{{ value }}"
+     
+>

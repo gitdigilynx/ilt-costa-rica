@@ -1,0 +1,10 @@
+services:
+    wicrew.activity.controller.page_content:
+        class: App\Wicrew\ActivityBundle\Controller\ActivityController
+        calls:
+            - [setContainer, ['@service_container']]
+        public: true
+    wicrew.activity.utils:
+        class: App\Wicrew\ActivityBundle\Service\ActivityService
+        arguments: ["@wicrew.core.utils"]
+        public: true

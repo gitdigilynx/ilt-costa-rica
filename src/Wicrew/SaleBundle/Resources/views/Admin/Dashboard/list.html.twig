@@ -1,0 +1,3597 @@
+{# {% extends "@EasyAdmin/default/list.html.twig" %} #} 
+{% extends "list_dashboard.html.twig" %} {% set header_css_style = 'background: #D9E2F3' %} {# Redefine the table header to remove the sorting parameters. #} 
+{% if offset is not defined %}
+    {% set offset = 10 %}
+{% endif %}
+{% block table_head %}
+<div class="bulk_action_row" style="display: none;">
+	<select class="form-select bulk-actions" style="height: 42px; width: 130px; -webkit-appearance: none !important; -moz-appearance: none !important; background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAUCAMAAACtdX32AAAAdVBMVEUAAAD///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAhMdQaAAAAJ3RSTlMAAAECAwQGBwsOFBwkJTg5RUZ4eYCHkJefpaytrsXGy8zW3+Do8vNn0bsyAAAAYElEQVR42tXROwJDQAAA0Ymw1p9kiT+L5P5HVEi3qJn2lcPjtIuzUIJ/rhIGy762N3XaThqMN1ZPALsZPEzG1x8LrFL77DHBnEMxBewz0fJ6LyFHTPL7xhwzWYrJ9z22AqmQBV757MHfAAAAAElFTkSuQmCC); background-position: 100%; background-repeat: no-repeat; border: 1px solid #ccc; padding: 0.5rem;" aria-label="Bulk Actions">
+		<option selected>Bulk actions</option>
+		<option value="assign_driver">Assign Driver</option>
+	</select>
+	<div class="bulk_driver_assigner"></div>
+</div>
+<thead>
+	<tr>
+		<th></th> 
+		<th data-column="status" class="billing">Billing status<i class="fas fa-caret-down" id="billing"></i>
+			<div class="filter" id="billing_filter">
+				<ul>
+					<div class="sort">
+						<li>
+							<p>Sort By:</p>
+						</li>
+						<div class="sort_asc"> <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
+							<li>Sort A to Z</li>
+						</div>
+						<div class="sort_desc"> <i class="fa fa-sort-alpha-desc" aria-hidden="true"></i>
+							<li>Sort Z to A</li>
+						</div>
+					</div>
+					
+				</ul>
+			</div>
+		</th>
+		<th data-column="type" class="service_type">Service Type <i class="fas fa-caret-down" id="service_type"></i>
+			<div class="filter" id="service_type_filter">
+				<ul>
+					<div class="sort">
+						<li>
+							<p>Sort By:</p>
+						</li>
+						<div class="sort_asc"> <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
+							<li>Sort A to Z</li>
+						</div>
+						<div class="sort_desc"> <i class="fa fa-sort-alpha-desc" aria-hidden="true"></i>
+							<li>Sort Z to A</li>
+						</div>
+					</div>
+					
+				</ul>
+			</div>
+		</th>
+		<th data-column="orderId" class="booking">Booking <i class="fas fa-caret-down" id="booking"></i>
+			<div class="filter" id="Booking_filter">
+				<ul>
+					<div class="sort">
+						<li>
+							<p>Sort By:</p>
+						</li>
+						<div class="sort_asc"> <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
+							<li>Sort A to Z</li>
+						</div>
+						<div class="sort_desc"> <i class="fa fa-sort-alpha-desc" aria-hidden="true"></i>
+							<li>Sort Z to A</li>
+						</div>
+					</div>
+				</ul>
+				</div>
+		</th>
+		<th data-column="pickDate" class="pickup_date">Date <i class="fas fa-caret-down" class="caret-down" id="pickup_date"></i>
+			<div class="filter" id="pickup_date_filter">
+				<ul>
+					<div class="sort">
+						<li>
+							<p>Sort By:</p>
+						</li>
+						<div class="sort_asc"> <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
+							<li>Sort A to Z</li>
+						</div>
+						<div class="sort_desc"> <i class="fa fa-sort-alpha-desc" aria-hidden="true"></i>
+							<li>Sort Z to A</li>
+						</div>
+					</div>
+				</ul>
+			</div>
+		</th>
+		<th data-column="pickTimeTransport" class="pickTimeTransport">Time <i class="fas fa-caret-down" id="pickTimeTransport"></i>
+			<div class="filter" id="pickTimeTransport_filter">
+				<ul>
+					<div class="sort">
+						<li>
+							<p>Sort By:</p>
+						</li>
+						<div class="sort_asc"> <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
+							<li>Sort A to Z</li>
+						</div>
+						<div class="sort_desc"> <i class="fa fa-sort-alpha-desc" aria-hidden="true"></i>
+							<li>Sort Z to A</li>
+						</div>
+					</div>
+				</ul>
+			</div>
+		</th>
+		<th data-column="pickTime" class="arrival">Arrival Time <i class="fas fa-caret-down" id="arrival"></i>
+			<div class="filter" id="arrival_filter">
+				<ul>
+					<div class="sort">
+						<li>
+							<p>Sort By:</p>
+						</li>
+						<div class="sort_asc"> <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
+							<li>Sort A to Z</li>
+						</div>
+						<div class="sort_desc"> <i class="fa fa-sort-alpha-desc" aria-hidden="true"></i>
+							<li>Sort Z to A</li>
+						</div>
+					</div>
+				</ul>
+			</div>
+		</th>
+		<th class="departure">Departure Time <i class="fas fa-caret-down" id="departure"></i>
+			<div class="filter" id="departure_filter">
+				<ul>
+					<div class="sort">
+						<li>
+							<p>Sort By:</p>
+						</li>
+						<div class="sort_asc"> <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
+							<li>Sort A to Z</li>
+						</div>
+						<div class="sort_desc"> <i class="fa fa-sort-alpha-desc" aria-hidden="true"></i>
+							<li>Sort Z to A</li>
+						</div>
+					</div>
+				</ul>
+			</div>
+		</th>
+		<th data-column="adultCount" class="adultCount">PAX/QTY <i class="fas fa-caret-down" id="adultCount"></i>
+			<div class="filter" id="adultCount_filter">
+				<ul>
+					<div class="sort">
+						<li>
+							<p>Sort By:</p>
+						</li>
+						<div class="sort_asc"> <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
+							<li>Sort A to Z</li>
+						</div>
+						<div class="sort_desc"> <i class="fa fa-sort-alpha-desc" aria-hidden="true"></i>
+							<li>Sort Z to A</li>
+						</div>
+					</div>
+				</ul>
+			</div>
+		</th>
+		<th data-column="pickAddress" class="pickup_location">Pickup Area <i class="fas fa-caret-down" id="pickup_location"></i>
+			<div class="filter" id="pickup_location_filter">
+				<ul>
+					<div class="sort">
+						<li>
+							<p>Sort By:</p>
+						</li>
+						<div class="sort_asc"> <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
+							<li>Sort A to Z</li>
+						</div>
+						<div class="sort_desc"> <i class="fa fa-sort-alpha-desc" aria-hidden="true"></i>
+							<li>Sort Z to A</li>
+						</div>
+					</div>
+				</ul>
+			</div>
+		</th>
+		<th data-column="dropArea" class="from">From <i class="fas fa-caret-down" id="from"></i>
+			<div class="filter" id="from_filter">
+				<ul>
+					<div class="sort">
+						<li>
+							<p>Sort By:</p>
+						</li>
+						<div class="sort_asc"> <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
+							<li>Sort A to Z</li>
+						</div>
+						<div class="sort_desc"> <i class="fa fa-sort-alpha-desc" aria-hidden="true"></i>
+							<li>Sort Z to A</li>
+						</div>
+					</div>
+				</ul>
+			</div>
+		</th>
+		<th data-column="dropAddress" class="drop_off_location">Drop-off Area <i class="fas fa-caret-down" id="drop_off_location"></i>
+			<div class="filter" id="drop_off_location_filter">
+				<ul>
+					<div class="sort">
+						<li>
+							<p>Sort By:</p>
+						</li>
+						<div class="sort_asc"> <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
+							<li>Sort A to Z</li>
+						</div>
+						<div class="sort_desc"> <i class="fa fa-sort-alpha-desc" aria-hidden="true"></i>
+							<li>Sort Z to A</li>
+						</div>
+					</div>
+				</ul>
+			</div>
+		</th>
+		<th data-column="pickArea" class="to">To <i class="fas fa-caret-down" id="to"></i>
+			<div class="filter" id="to_filter">
+				<ul>
+					<div class="sort">
+						<li>
+							<p>Sort By:</p>
+						</li>
+						<div class="sort_asc"> <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
+							<li>Sort A to Z</li>
+						</div>
+						<div class="sort_desc"> <i class="fa fa-sort-alpha-desc" aria-hidden="true"></i>
+							<li>Sort Z to A</li>
+						</div>
+					</div>
+				</ul>
+			</div>
+		</th>
+		<th data-column="supplier" class="supplier">Supplier<i class="fas fa-caret-down" id="supplier"></i>
+			<div class="filter" id="supplier_filter">
+				<ul>
+					<div class="sort">
+						<li>
+							<p>Sort By:</p>
+						</li>
+						<div class="sort_asc"> <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
+							<li>Sort A to Z</li>
+						</div>
+						<div class="sort_desc"> <i class="fa fa-sort-alpha-desc" aria-hidden="true"></i>
+							<li>Sort Z to A</li>
+						</div>
+					</div>
+				</ul>
+			</div>
+		</th>
+		<th data-column="vehicleType" class="vehicleType"> Type <i class="fas fa-caret-down" id="vehicleType"></i>
+			<div class="filter" id="vehicleType_filter">
+				<ul>
+					<div class="sort">
+						<li>
+							<p>Sort By:</p>
+						</li>
+						<div class="sort_asc"> <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
+							<li>Sort A to Z</li>
+						</div>
+						<div class="sort_desc"> <i class="fa fa-sort-alpha-desc" aria-hidden="true"></i>
+							<li>Sort Z to A</li>
+						</div>
+					</div>
+				</ul>
+			</div>
+		</th>
+		<th data-column="vehicle" class="vehicle">Vehicle <i class="fas fa-caret-down" id="vehicle"></i>
+			<div class="filter" id="vehicle_filter">
+				<ul>
+					<div class="sort">
+						<li>
+							<p>Sort By:</p>
+						</li>
+						<div class="sort_asc"> <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
+							<li>Sort A to Z</li>
+						</div>
+						<div class="sort_desc"> <i class="fa fa-sort-alpha-desc" aria-hidden="true"></i>
+							<li>Sort Z to A</li>
+						</div>
+					</div>
+				</ul>
+			</div>
+		</th>
+		<th data-column="confirmationStatus" class="confirmationStatus">Confirmation status<i class="fas fa-caret-down" id="confirmationStatus"></i>
+			<div class="filter" id="confirmationStatus_filter">
+				<ul>
+					<div class="sort">
+						<li>
+							<p>Sort By:</p>
+						</li>
+						<div class="sort_asc"> <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
+							<li>Sort A to Z</li>
+						</div>
+						<div class="sort_desc"> <i class="fa fa-sort-alpha-desc" aria-hidden="true"></i>
+							<li>Sort Z to A</li>
+						</div>
+					</div>
+				</ul>
+			</div>
+		</th>
+		<th data-column="passengerName" class="passengerName">Client <i class="fas fa-caret-down" id="passengerName"></i>
+			<div class="filter" id="passengerName_filter">
+				<ul>
+					<div class="sort">
+						<li>
+							<p>Sort By:</p>
+						</li>
+						<div class="sort_asc"> <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
+							<li>Sort A to Z</li>
+						</div>
+						<div class="sort_desc"> <i class="fa fa-sort-alpha-desc" aria-hidden="true"></i>
+							<li>Sort Z to A</li>
+						</div>
+					</div>
+				</ul>
+			</div>
+		</th>
+		<th data-column="pickAirlineCompany" class="pickAirlineCompany">Airline <i class="fas fa-caret-down" id="pickAirlineCompany"></i>
+			<div class="filter" id="pickAirlineCompany_filter">
+				<ul>
+					<div class="sort">
+						<li>
+							<p>Sort By:</p>
+						</li>
+						<div class="sort_asc"> <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
+							<li>Sort A to Z</li>
+						</div>
+						<div class="sort_desc"> <i class="fa fa-sort-alpha-desc" aria-hidden="true"></i>
+							<li>Sort Z to A</li>
+						</div>
+					</div>
+				</ul>
+			</div>
+		</th>
+		<th data-column="pickFlightNumber" class="pickFlightNumber">Flight <i class="fas fa-caret-down" id="pickFlightNumber"></i>
+			<div class="filter" id="pickFlightNumber_filter">
+				<ul>
+					<div class="sort">
+						<li>
+							<p>Sort By:</p>
+						</li>
+						<div class="sort_asc"> <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
+							<li>Sort A to Z</li>
+						</div>
+						<div class="sort_desc"> <i class="fa fa-sort-alpha-desc" aria-hidden="true"></i>
+							<li>Sort Z to A</li>
+						</div>
+					</div>
+				</ul>
+			</div>
+		</th>
+		<th data-column="supplierCommission" class="supplierCommission">Commissions (%) <i class="fas fa-caret-down" id="supplierCommission"></i>
+			<div class="filter" id="supplierCommission_filter">
+				<ul>
+					<div class="sort">
+						<li>
+							<p>Sort By:</p>
+						</li>
+						<div class="sort_asc"> <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
+							<li>Sort A to Z</li>
+						</div>
+						<div class="sort_desc"> <i class="fa fa-sort-alpha-desc" aria-hidden="true"></i>
+							<li>Sort Z to A</li>
+						</div>
+					</div>
+				</ul>
+			</div>
+		</th>
+	
+		<th>Rack(A) </th>
+		<th>Rack(C) </th>
+		<th>Taxes</th>
+		<th>Rack + Tax</th>
+		<th>Net</th>
+		<th>Net + Tax</th>
+		{# <th>Actions</th> #}
+	</tr>
+</thead> 
+    {% endblock table_head %} 
+    {% block table_body %} 
+    {% set lastOrderNumProcessed = 0 %} 
+    {% for item in paginator.currentPageResults %} 
+        {% if 'action=search' in app.request.requestUri %}
+            {% set item = item %} 
+        {% else %} 
+            {% set item = item[0] %} 
+        {% endif %} 
+
+        {% if not easyadmin_is_granted(_entity_config.list.item_permission, item) %} 
+            {% set _number_of_hidden_results = _number_of_hidden_results + 1 %} 
+        {% else %} 
+            {# Inject table header to be duplicated above each item. #} {# {% if not loop.first %} #} 
+            {% if true %} 
+                {% set hide_pick_up_transport = false %} 
+                {% for field, metadata in _fields_visible_by_user %} 
+                    {% set _column_label = metadata.label|trans(_trans_parameters) %} 
+                    {% if metadata.label == 'management.pick_up_time' %} 
+                        {% if item.pickArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) and item.dropArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AREA')) %} 
+                            {% set _column_label = 'management.arrival_time'|trans(_trans_parameters) %} 
+                            {% set hide_pick_up_transport = true %} 
+                        {% elseif item.pickArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) and item.dropArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}
+                            {% set _column_label = 'management.arrival_time'|trans(_trans_parameters) %} 
+                            {% set hide_pick_up_transport = true %} 
+                        {% elseif item.pickArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AREA')) and item.dropArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %} 
+                            {% set _column_label = 'management.departure_time'|trans(_trans_parameters) %} 
+                        {% else %} 
+                            {% set _column_label = 'management.pick_up_time'|trans(_trans_parameters) %} 
+                            {% set hide_pick_up_transport = true %} 
+                        {% endif %} 
+                    {% endif %} 
+                    {% if hide_pick_up_transport and (metadata.label == 'management.pick_up_time_transport') %} 
+                        {% set _column_label = '' %} 
+                    {% endif %} 
+                    {% if metadata.label == 'management.order.partner.commission' %} 
+                    {% endif %} 
+                {% endfor %} 
+            {% endif %} {# the empty string concatenation is needed when the primary key is an object (e.g. an Uuid object) #} 
+            {% set _item_id = '' ~ attribute(item, _entity_config.primary_key_field_name) %} 
+            {% if lastOrderNumProcessed == item.order.id %}
+                <tr data-id="{{ _item_id }}" data-orderid="{{ item.order.id }}" class="needsToHide"> 
+                            {% endif %}
+                    <td class="table_checkbox">
+                        <input id="bulkActionsCheckbox_{{ _item_id }}"  type="checkbox" class="bulk_actions_checkbox" value="{{ _item_id }}"> </td> {% for field, metadata in _fields_visible_by_user %} {#
+                    <div>{{ field }}</div> #} {% set _column_label = (metadata.label ?: field|humanize)|trans(_trans_parameters) %} {% set style_hidden = '' %} {% if hide_pick_up_transport and (metadata.label == 'management.pick_up_time_transport') %} {% set style_hidden = 'style="visibility:hidden"' %} {% endif %} {% if field is same as "totalTax" %}
+                    <td data-name="{{metadata.columnName}}" class="{{metadata.columnName}} {{ metadata.dataType|lower }} {{ metadata.css_class }}" {{ easyadmin_config( 'design.rtl') ? 'dir="rtl"' }} {{style_hidden|raw}}> ${{ easyadmin_render_field_for_list_view(_entity_config.name, item, metadata)|trim }} </td> {% elseif field is same as "titleNetPrice" %}
+                    <td data-name="{{metadata.columnName}}" class="{{metadata.columnName}} {{ metadata.dataType|lower }} {{ metadata.css_class }}" {{ easyadmin_config( 'design.rtl') ? 'dir="rtl"' }} {{style_hidden|raw}}> ${{ easyadmin_render_field_for_list_view(_entity_config.name, item, metadata)|trim }} </td> {% elseif field is same as "pickTime" %}
+                    <td data-name="arrivalTime" class="arrivalTime" {{ easyadmin_config( 'design.rtl') ? 'dir="rtl"' }} {{style_hidden|raw}}> {{ include('@WicrewSale/Admin/Dashboard/list.input.arrivaltime.html.twig') }} </td> {% elseif field is same as "_easyadmin_form_design_element_7" %}
+                    <td data-name="detartureTime" class="detartureTime" {{ easyadmin_config( 'design.rtl') ? 'dir="rtl"' }} {{style_hidden|raw}}> {{ include('@WicrewSale/Admin/Dashboard/list.input.departuretime.html.twig') }} </td> {% elseif field is same as "type" %} {# DO NOTHING #} {% else %}
+                    <td data-name="{{metadata.columnName}}" class="{{metadata.columnName}} {{ metadata.dataType|lower }} {{ metadata.css_class }}" {{ easyadmin_config( 'design.rtl') ? 'dir="rtl"' }} {{style_hidden|raw}}> {{ easyadmin_render_field_for_list_view(_entity_config.name, item, metadata) }} </td> {% endif %} {% endfor %} {% if _list_item_actions|length > 0 %} {% set _column_label = 'list.row_actions'|trans(_trans_parameters, 'EasyAdminBundle') %}
+                    <td class="actions"> {% block item_actions %} {% set _actions_template = _entity_config.list.collapse_actions ? '@EasyAdmin/default/includes/_actions_dropdown.html.twig' : '@EasyAdmin/default/includes/_actions.html.twig' %} {{ include(_actions_template, { actions: _list_item_actions, entity_config: _entity_config, request_parameters: _request_parameters, translation_domain: _entity_config.translation_domain, trans_parameters: _trans_parameters, item_id: _item_id, item: item }, with_context = false) }} {% endblock item_actions %} </td> {% endif %} </tr> {% set lastOrderNumProcessed = item.order.id %} {% set item_type = item.toTranslateString()|trans %} {% if item_type == 'Activity regular' %}
+                <tr data-id="{{ _item_id }}" data-orderId="{{ item.order.id }}" class="combiBookingRow needsToHide">
+                    <td></td>
+                    <td data-name="type"></td>
+                    <td colspan="18"> {{item.activity.name}}
+                        <br> 
+                        <small class="small_activity_text">
+                            (Activity Type: {{item.activityType}})
+                            (Service Time: {{ item.tourTime|formatNoNull("H:i") }} )
+                            {% if item.activityType == "Group" %}
+                                (Adults: {{item.adultCount}}   x {{ item.activity.groupAdultRackPrice }}  = ${{item.adultCount * item.activity.groupAdultRackPrice}} )
+                                (Children: {{item.childCount}} x {{ item.activity.groupKidRackPrice }}  = ${{item.childCount * item.activity.groupKidRackPrice}} )
+                            {% else %}
+                                (Adults: {{item.adultCount}}   x {{ item.activity.adultRackPrice }}  = ${{item.adultCount * item.activity.adultRackPrice}} )
+                                (Children: {{item.childCount}} x {{ item.activity.childRackPrice }}  = ${{item.childCount * item.activity.childRackPrice}} )
+                            {% endif %}
+                            {% if item.pickAddFeeRack is not null and item.pickAddFeeRack != 0.00 %}
+                                (Pick-up Additional Fee: ${{ item.pickAddFeeRack }})
+                            {% endif %}
+                            {% if item.dropAddFeeRack is not null and item.dropAddFeeRack != 0.00 %}
+                                (Drop-off Additional Fee: ${{ item.dropAddFeeRack }})
+                            {% endif %}
+                        <small>
+                    </td>
+                    <td></td>
+                    <td colspan="6"></td>
+                    <td></td>
+                </tr>
+            {% endif %}
+            
+            {{ block('discounts') }}
+            {{ block('time_fee_ranges') }}
+            {{ block('custom_service_section') }}
+            {{ block('addons_section') }}
+            {{ block('extras_section') }}
+            {{ block('driver_section') }}
+
+        {% endif %}
+    {% else %}
+        <tr>
+            <td class="no-results" colspan="{{ _fields_visible_by_user|length + 1 }}">
+                {{ 'search.no_results'|trans(_trans_parameters, 'EasyAdminBundle') }}
+            </td>
+        </tr>
+    {% endfor %}
+
+    {% if _number_of_hidden_results > 0 %}
+        <tr class="datagrid-row-empty">
+            <td class="text-center" colspan="{{ _fields_visible_by_user|length + 1 }}">
+                <span class="datagrid-row-empty-message"><i class="fa fa-lock mr-1"></i> {{ 'security.list.hidden_results'|trans({}, 'EasyAdminBundle') }}</span>
+            </td>
+        </tr>
+    {% endif %}
+{% endblock table_body %}
+
+{# custom_service section #}
+{% block custom_service_section %}  
+    {% if item.customServices is not null %}
+        {% set currencySymbol = 'currency.symbol'|trans() %}
+        {% set currencyText = 'currency.text'|trans() %}
+        {% for customService in item.customServices %} 
+            <tr data-id="{{ _item_id }}" class="itemExtrasAddonsRow needsToHide addon"  data-orderid="{{ item.order.id }}" >
+                <td></td>
+                <td colspan="6">
+                    {% if loop.index == 1 %}
+                        <div class="extraAddonHeading">Custom Service(s)</div>
+                    {% endif %}
+                    <div class="singleAddon Label">
+                        {{ customService.label }} 
+                    </div>
+                </td>   
+                <td colspan="14">  </td>
+                <td> 
+                    <div class="singleAddon rackPrice">
+                        ${{ customService.rackPrice|number_format(2, '.', ',') }} 
+                    </div>
+                </td>
+                <td> </td>
+                <td> ${{ ( customService.rackPrice * 0.13 )|number_format(2, '.', ',') }} </td>
+                <td> ${{ ( ( customService.rackPrice * 0.13 ) + customService.rackPrice )|number_format(2, '.', ',') }} </td>
+                <td> </td>
+                <td> </td>
+                <td> </td>
+
+            </tr>
+        
+        {% endfor %} 
+    {% endif %}
+{% endblock custom_service_section %}  
+{# CustomService section #}
+
+{# time_fee_ranges section #}
+{% block time_fee_ranges %}  
+    {% if item.anyTimeRangeFees %}
+        <div>
+            {% if item.regularTimeFeeRack is not null %}
+                <tr data-id="{{ _item_id }}" class="itemExtrasAddonsRow needsToHide addon"  data-orderid="{{ item.order.id }}" >
+                    <td></td>
+                    <td colspan="6">
+                        <div class="singleAddon Label" style="display: flex;">
+                            {{ 'product.section.regular_time_range'|trans }}
+                        </div>
+                    </td>   
+                    <td colspan="14">  </td>
+                    <td> 
+                        <div class="singleAddon rackPrice">
+                            {{ 'currency.symbol'|trans() ~ item.regularTimeFeeRack|number_format(2, '.', ',') }} 
+                        </div>
+                    </td>
+                    <td> </td>
+                    <td> {{ 'currency.symbol'|trans() ~ ( item.regularTimeFeeRack * 0.13 )|number_format(2, '.', ',') }} </td>
+                    <td> {{ 'currency.symbol'|trans() ~ ( ( item.regularTimeFeeRack * 0.13 ) + item.regularTimeFeeRack )|number_format(2, '.', ',') }} </td>
+                    <td> </td>
+                    <td> </td>
+                    <td> </td>
+
+                </tr>
+            {% endif %}
+            {% if item.flightPickTimeFeeRack is not null %}
+                <tr data-id="{{ _item_id }}" class="itemExtrasAddonsRow needsToHide addon"  data-orderid="{{ item.order.id }}" >
+                    <td></td>
+                    <td colspan="6">
+                        <div class="singleAddon Label" style="display: flex;">
+                            {{ 'product.section.flight_pickup_time_range'|trans }}
+                        </div>
+                    </td>   
+                    <td colspan="14">  </td>
+                    <td> 
+                        <div class="singleAddon rackPrice">
+                            {{ 'currency.symbol'|trans() ~ item.flightPickTimeFeeRack|number_format(2, '.', ',') }} 
+                        </div>
+                    </td>
+                    <td> </td>
+                    <td> {{ 'currency.symbol'|trans() ~ ( item.flightPickTimeFeeRack * 0.13 )|number_format(2, '.', ',') }} </td>
+                    <td> {{ 'currency.symbol'|trans() ~ ( ( item.flightPickTimeFeeRack * 0.13 ) + item.flightPickTimeFeeRack )|number_format(2, '.', ',') }} </td>
+                    <td> </td>
+                    <td> </td>
+                    <td> </td>
+
+                </tr>               
+            {% endif %}
+            {% if item.flightDropTimeFeeRack is not null %}
+                <tr data-id="{{ _item_id }}" class="itemExtrasAddonsRow needsToHide addon"  data-orderid="{{ item.order.id }}" >
+                    <td></td>
+                    <td colspan="6">
+                        <div class="singleAddon Label" style="display: flex;">
+                            {{ 'product.section.flight_drop_off_time_range'|trans }}
+                        </div>
+                    </td>   
+                    <td colspan="14">  </td>
+                    <td> 
+                        <div class="singleAddon rackPrice">
+                            {{ 'currency.symbol'|trans() ~ item.flightDropTimeFeeRack|number_format(2, '.', ',') }} 
+                        </div>
+                    </td>
+                    <td> </td>
+                    <td> {{ 'currency.symbol'|trans() ~ ( item.flightDropTimeFeeRack * 0.13 )|number_format(2, '.', ',') }} </td>
+                    <td> {{ 'currency.symbol'|trans() ~ ( ( item.flightDropTimeFeeRack * 0.13 ) + item.flightDropTimeFeeRack )|number_format(2, '.', ',') }} </td>
+                    <td> </td>
+                    <td> </td>
+                    <td> </td>
+
+                </tr>
+            {% endif %}
+        </div> 
+    {% endif %} 
+{% endblock time_fee_ranges %}  
+{# time_fee_ranges section #}
+
+{% block discounts %}  
+    {% if item.order.discountValues %} 
+        {% set currencySymbol = 'currency.symbol'|trans() %}
+        {% set currencyText = 'currency.text'|trans() %}
+        {% for discount in item.order.discountValues %}
+            <tr data-id="{{ _item_id }}" class="itemExtrasAddonsRow discounts needsToHide extras addon"  data-orderid="{{ item.order.id }}" >
+                <td></td>
+                <td colspan="6">
+                    {% if loop.index == 1 %}
+                        <div class="extraAddonHeading">Discount(s)</div>
+                    {% endif %}
+                        <div class="singleExtra Label">
+                           {{ discount.discount.name }}
+                        </div>
+                </td>
+                <td colspan="17">  </td>
+                <td> 
+                    <div class="singleExtra rackPrice">
+                        $-{{ discount.discountRack }} 
+                    </div>
+                </td>
+                <td colspan="3"></td>
+            </tr>
+        {% endfor %} 
+    {% endif %}
+{% endblock discounts %}  
+{# addon section #}
+{% block addons_section %}  
+    {% if item.anyAddons %} 
+        {% set currencySymbol = 'currency.symbol'|trans() %}
+        {% set currencyText = 'currency.text'|trans() %}
+        {% for addon in item.addons %}
+            <tr data-id="{{ _item_id }}" class="itemExtrasAddonsRow needsToHide addon"  data-orderid="{{ item.order.id }}" >
+                <td></td>
+                {# <td data-name="type"></td> #}
+                <td colspan="6">
+                    {% if loop.index == 1 %}
+                        <div class="extraAddonHeading">Addon(s)</div>
+                    {% endif %}
+                    <div class="singleAddon Label">
+                        {{ addon.label|raw }} 
+                    </div>
+                </td>   
+                <td colspan="1"> </td>
+                <td colspan="1"> 
+                    <div class="singleAddon childQty">
+                        {{addon.adultQuantity + addon.childQuantity}}
+                    </div>
+                </td>
+                <td colspan="4">  </td>
+                <td>
+                    <div class="singleAddon select_supplier">
+                        {% set dataset = getDrivers() %}
+                        {% if addon.supplier %}
+                            {% set value = addon.supplier.id %}
+                        {% else %}
+                            {% set value = "" %}
+                        {% endif %}
+                        <select name="addon_supplier" data-itemid="{{item.id}}" data-addonid="{{addon.id}}" class="selectSupplier addon" >
+                            <option value="">Please Select</option>                    
+                            {% for key, data in dataset %}
+                                <option  value="{{ key }}" {% if value is same as(key) %}selected{% endif %}>
+                                    {{ data }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </td>
+                <td colspan="7"> </td>
+                <td> 
+                    <div class="singleAddon rackPrice">
+                        ${{ ( addon.adultRackPrice + addon.extraTransportation )|number_format(2, '.', ',') }} 
+                    </div>
+                </td>
+                <td> 
+                    <div class="singleAddon rackPrice">
+                        {% if addon.childQuantity == 0 %}
+                            $0.00
+                        {% else %}
+                            ${{ ( addon.childRackPrice )|number_format(2, '.', ',') }} 
+                        {% endif %}
+                    </div>
+                </td>
+                <td>
+                    <div class="singleAddon tax">
+                        ${{ ( addon.tax )|number_format(2, '.', ',') }} 
+                    </div>
+                </td>
+                <td>
+                    <div class="singleAddon totalRack">
+                        {% if addon.childQuantity == 0 %}
+                            ${{ ( addon.adultRackPrice + addon.extraTransportation + addon.tax )|number_format(2, '.', ',') }} 
+                        {% else %}
+                            ${{ ( addon.adultRackPrice + addon.childRackPrice + addon.extraTransportation + addon.tax )|number_format(2, '.', ',') }} 
+                        {% endif %}
+                    </div>
+                </td>
+                <td> 
+                    <div class="singleAddon netPrice">
+                        ${{ addon.netPrice }}
+                    </div>
+                </td>
+                <td> 
+                    <div class="singleAddon totalNet">
+                        ${{  ( ( ("13.00" / 100) * addon.netPrice ) + ( addon.netPrice ) )|number_format(2, '.', ',') }}
+                    </div>
+                </td>
+                <td></td>
+
+            </tr>
+        
+        {% endfor %} 
+    {% endif %}
+{% endblock addons_section %}  
+{# addon section #}
+{# ext section #}
+{% block extras_section %}  
+    {% if item.anyExtras %} 
+        {% set currencySymbol = 'currency.symbol'|trans() %}
+        {% set currencyText = 'currency.text'|trans() %}
+        {% for extra in item.extras %}
+            <tr data-id="{{ _item_id }}" class="itemExtrasAddonsRow needsToHide extras addon"  data-orderid="{{ item.order.id }}" >
+                <td></td>
+                {# <td data-name="type"></td> #}
+                <td colspan="6">
+                    {% if loop.index == 1 %}
+                        <div class="extraAddonHeading">Extra(s)</div>
+                    {% endif %}
+                        <div class="singleExtra Label">
+                            {% if extra.addonTitle %}
+                                {{ extra.addonTitle }}
+                            {% else %}
+                                {{ extra.label|raw }} 
+                            {% endif %}
+                        </div>
+                </td>
+                <td colspan="1"> </td>
+                <td colspan="1"> 
+                    <div>
+                    {{extra.quantity}}
+                    </div>
+                </td>
+                <td colspan="4">  </td>
+                <td>
+                    <div class="singleExtra select_supplier">
+                        {% set dataset = getDrivers() %}
+                        {% if extra.supplier %}
+                            {% set value = extra.supplier.id %}
+                        {% else %}
+                            {% set value = "" %}
+                        {% endif %}
+                        <select name="extra_supplier" data-itemid="{{item.id}}" data-extraid="{{extra.id}}" class="selectSupplier extra" >
+                            <option value="">Please Select</option>                    
+                            {% for key, data in dataset %}
+                                <option  value="{{ key }}" {% if value is same as(key) %}selected{% endif %}>
+                                    {{ data }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </td>
+                
+                <td colspan="7"> </td>
+                <td> 
+                    <div class="singleExtra rackPrice">
+                        ${{ ( extra.rackPrice )|number_format(2, '.', ',') }} 
+                    </div>
+                </td>
+                <td> -- </td>
+                <td>
+                    <div class="singleExtra tax">
+                        ${{ ( extra.tax )|number_format(2, '.', ',') }} 
+                    </div>
+                </td>
+                <td>
+                    <div class="singleExtra totalRack">
+                        ${{ ( extra.rackPrice + extra.tax )|number_format(2, '.', ',') }} 
+                    </div>
+                </td>
+                <td> 
+                    <div class="singleExtra netPrice">
+                        ${{ extra.netPrice }}
+                    </div>
+                </td>
+                <td> 
+                    <div class="singleExtra totalNet">
+                        ${{  ( ( ("13.00" / 100) * extra.netPrice ) + ( extra.netPrice ) )|number_format(2, '.', ',') }}
+                    </div>
+                </td>
+                <td></td>
+
+            </tr>
+        {% endfor %} 
+       
+    {% endif %}
+{% endblock extras_section %}  
+{# ext section #}
+
+{# Give each driver its own column. #}
+{% block driver_section %}
+
+    {# @var item \App\Wicrew\SaleBundle\Entity\OrderItem #}
+    {% if item.additionalDrivers|length > 0 %}
+        {# @var driver \App\Wicrew\SaleBundle\Entity\OrderItemHasDriver #}
+        {% for driver in item.additionalDrivers %}
+            {% set continue = false %}
+            {% if driver.driver == null and driver.fromDescription == "" and driver.toDescription == "" and driver.vehicle == null and driver.pickTime == null and driver.pickDate == null  %}
+                {% set continue = true %}
+			{% endif %}
+            {% if not continue %}
+
+                <tr data-orderid="{{ item.order.id }}" data-dlorderid="{{ item.order.id }}" data-id="{{ _item_id }}" {{ loop.first ? 'class="first-driver-row additional-driver-row needsToHide"' : 'class="additional-driver-row needsToHide"' }}>
+                    {% set driverLoopIndex = loop.index0 %}
+                    {{ block('driver_row') }}
+                </tr>
+            {% else %}
+                <tr data-orderid="{{ item.order.id }}" data-id="{{ _item_id }}" class="first-driver-row additional-driver-row empty">
+                    {% set driverLoopIndex = '0' %}
+                    {{ block('driver_row') }}
+                </tr>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+
+        <tr data-orderid="{{ item.order.id }}" data-id="{{ _item_id }}" class="first-driver-row additional-driver-row empty">
+            {% set driverLoopIndex = '0' %}
+            {{ block('driver_row') }}
+        </tr>
+    {% endif %}
+{% endblock driver_section %}
+ 
+{% block driver_row %}
+    {% if driver is not defined %}
+        {% set driver = null %}
+    {% endif %}
+    
+    {% if driverFields is not defined or driverFields is null %}
+    
+        {% set driverFields = [] %}
+        
+        {% set _tempDriverLink = [] %}
+        {% set _tempDriverLink = _tempDriverLink|merge( {  'css_class': "remove-driver-btn-cell"   } ) %}
+        {% set _tempDriverLink = _tempDriverLink|merge( {  'format': null   } ) %}
+        {% set _tempDriverLink = _tempDriverLink|merge( {  'help': null   } ) %}
+        {% set _tempDriverLink = _tempDriverLink|merge( {  'label': ""   } ) %}
+        {% set _tempDriverLink = _tempDriverLink|merge( {  'type': "text"   } ) %}
+        {% set _tempDriverLink = _tempDriverLink|merge( {  'fieldType': null   } ) %}
+        {% set _tempDriverLink = _tempDriverLink|merge( {  'dataType': "text"   } ) %}
+        {% set _tempDriverLink = _tempDriverLink|merge( {  'virtual': true   } ) %}
+        {% set _tempDriverLink = _tempDriverLink|merge( {  'sortable': false   } ) %}
+        {% set _tempDriverLink = _tempDriverLink|merge( {  'template': "@WicrewSale/Admin/TransportationManagement/list.driver_link.html.twig"   } ) %}
+        {% set _tempDriverLink = _tempDriverLink|merge( {  'form_group':  null   } ) %}
+        {% set _tempDriverLink = _tempDriverLink|merge( {  'permission':  null   } ) %}
+        {% set _tempDriverLink = _tempDriverLink|merge( {  'prepend_html':  null   } ) %}
+        {% set _tempDriverLink = _tempDriverLink|merge( {  'append_html':  null   } ) %}
+        {% set _tempDriverLink = _tempDriverLink|merge( {  'columnName':  "driverLink"   } ) %}
+        {% set _tempDriverLink = _tempDriverLink|merge( {  'fieldName':  "driverLink"   } ) %}
+        {% set _tempDriverLink = _tempDriverLink|merge( {  'id':  false   } ) %}
+        {% set _tempDriverLink = _tempDriverLink|merge( {  'length':  null   } ) %}
+        {% set _tempDriverLink = _tempDriverLink|merge( {  'nullable':  false   } ) %}
+        {% set _tempDriverLink = _tempDriverLink|merge( {  'precision':  0   } ) %}
+        {% set _tempDriverLink = _tempDriverLink|merge( {  'scale':  0   } ) %}
+        {% set _tempDriverLink = _tempDriverLink|merge( {  'unique':  false   } ) %}
+        {% set _tempDriverLink = _tempDriverLink|merge( {  'property':  "driverLink"   } ) %}
+        {% set _tempDriverLink = _tempDriverLink|merge( {  'mapped':  false   } ) %}
+        {% set _tempDriverLink = _tempDriverLink|merge( {  'type_options':  { 'required': false  } } ) %}
+        {% set driverFields = driverFields|merge( { 'driverLink': _tempDriverLink } ) %}
+
+        {% set _tempFromDescription = [] %}
+        {% set _tempFromDescription = _tempFromDescription|merge( { 'css_class': ""  } ) %}
+        {% set _tempFromDescription = _tempFromDescription|merge( { 'format': null  } ) %}
+        {% set _tempFromDescription = _tempFromDescription|merge( { 'help': null  } ) %}
+        {% set _tempFromDescription = _tempFromDescription|merge( { 'label': "management.pick_up_address"  } ) %}
+        {% set _tempFromDescription = _tempFromDescription|merge( { 'type': "string"  } ) %}
+        {% set _tempFromDescription = _tempFromDescription|merge( { 'fieldType': "text"  } ) %}
+        {% set _tempFromDescription = _tempFromDescription|merge( { 'dataType': "string"  } ) %}
+        {% set _tempFromDescription = _tempFromDescription|merge( { 'virtual': false  } ) %}
+        {% set _tempFromDescription = _tempFromDescription|merge( { 'sortable': true  } ) %}
+        {% set _tempFromDescription = _tempFromDescription|merge( { 'template': "@WicrewSale/Admin/Management/list.input.text.html.twig"  } ) %}
+        {% set _tempFromDescription = _tempFromDescription|merge( { 'form_group':  null  } ) %}
+        {% set _tempFromDescription = _tempFromDescription|merge( { 'permission':  null  } ) %}
+        {% set _tempFromDescription = _tempFromDescription|merge( { 'prepend_html':  null  } ) %}
+        {% set _tempFromDescription = _tempFromDescription|merge( { 'append_html':  null  } ) %}
+        {% set _tempFromDescription = _tempFromDescription|merge( { 'columnName':  "from_description"  } ) %}
+        {% set _tempFromDescription = _tempFromDescription|merge( { 'fieldName':  "fromDescription"  } ) %}
+        {% set _tempFromDescription = _tempFromDescription|merge( { 'length':  255  } ) %}
+        {% set _tempFromDescription = _tempFromDescription|merge( { 'unique':  false  } ) %}
+        {% set _tempFromDescription = _tempFromDescription|merge( { 'nullable':  true  } ) %}
+        {% set _tempFromDescription = _tempFromDescription|merge( { 'precision':  0  } ) %}
+        {% set _tempFromDescription = _tempFromDescription|merge( { 'scale':  0  } ) %}
+        {% set _tempFromDescription = _tempFromDescription|merge( { 'property':  "fromDescription"  } ) %}
+        {% set _tempFromDescription = _tempFromDescription|merge( { 'placeholder':  "From"  } ) %}
+        {% set _tempFromDescription = _tempFromDescription|merge( { 'type_options':  { 'required': false }  } ) %}
+        {% set driverFields = driverFields|merge( { 'fromDescription': _tempFromDescription } ) %}
+
+        {% set _tempToDescription = [] %}
+        {% set _tempToDescription = _tempToDescription|merge(  { "css_class":  ""   }  ) %}
+        {% set _tempToDescription = _tempToDescription|merge(  { "format":  null   }  ) %}
+        {% set _tempToDescription = _tempToDescription|merge(  { "help":  null   }  ) %}
+        {% set _tempToDescription = _tempToDescription|merge(  { "label":  "management.drop_address"   }  ) %}
+        {% set _tempToDescription = _tempToDescription|merge(  { "type":  "string"   }  ) %}
+        {% set _tempToDescription = _tempToDescription|merge(  { "fieldType":  "text"   }  ) %}
+        {% set _tempToDescription = _tempToDescription|merge(  { "dataType":  "string"   }  ) %}
+        {% set _tempToDescription = _tempToDescription|merge(  { "virtual":  false   }  ) %}
+        {% set _tempToDescription = _tempToDescription|merge(  { "sortable":  true   }  ) %}
+        {% set _tempToDescription = _tempToDescription|merge(  { "template":  "@WicrewSale/Admin/Management/list.input.text.html.twig"   }  ) %}
+        {% set _tempToDescription = _tempToDescription|merge(  { "form_group":   null   }  ) %}
+        {% set _tempToDescription = _tempToDescription|merge(  { "permission":   null   }  ) %}
+        {% set _tempToDescription = _tempToDescription|merge(  { "prepend_html":   null   }  ) %}
+        {% set _tempToDescription = _tempToDescription|merge(  { "append_html":   null   }  ) %}
+        {% set _tempToDescription = _tempToDescription|merge(  { "columnName":   "to_description"   }  ) %}
+        {% set _tempToDescription = _tempToDescription|merge(  { "fieldName":   "toDescription"   }  ) %}
+        {% set _tempToDescription = _tempToDescription|merge(  { "length":   255   }  ) %}
+        {% set _tempToDescription = _tempToDescription|merge(  { "unique":   false   }  ) %}
+        {% set _tempToDescription = _tempToDescription|merge(  { "nullable":   true   }  ) %}
+        {% set _tempToDescription = _tempToDescription|merge(  { "precision":   0   }  ) %}
+        {% set _tempToDescription = _tempToDescription|merge(  { "scale":   0   }  ) %}
+        {% set _tempToDescription = _tempToDescription|merge(  { "property":   "toDescription"   }  ) %}
+        {% set _tempToDescription = _tempToDescription|merge(  { "placeholder":   "To"   }  ) %}
+        {% set _tempToDescription = _tempToDescription|merge(  { 'type_options':  { 'required': false }  } ) %}
+        {% set driverFields = driverFields|merge( { 'toDescription': _tempToDescription } ) %}
+
+        {% set _tempDriverId = [] %}
+        {% set _tempDriverId = _tempDriverId|merge( { "css_class" :  ""  } ) %}
+        {% set _tempDriverId = _tempDriverId|merge( { "format" :  null  } ) %}
+        {% set _tempDriverId = _tempDriverId|merge( { "help" :  null  } ) %}
+        {% set _tempDriverId = _tempDriverId|merge( { "label" :  "transport_management.label.supplier"  } ) %}
+        {% set _tempDriverId = _tempDriverId|merge( { "type" :  "text"  } ) %}
+        {% set _tempDriverId = _tempDriverId|merge( { "fieldType" :  null  } ) %}
+        {% set _tempDriverId = _tempDriverId|merge( { "dataType" :  "text"  } ) %}
+        {% set _tempDriverId = _tempDriverId|merge( { "virtual" :  true  } ) %}
+        {% set _tempDriverId = _tempDriverId|merge( { "sortable" :  false  } ) %}
+        {% set _tempDriverId = _tempDriverId|merge( { "template" :  "@WicrewSale/Admin/TransportationManagement/list.supplier.html.twig"  } ) %}
+        {% set _tempDriverId = _tempDriverId|merge( { "form_group" :   null  } ) %}
+        {% set _tempDriverId = _tempDriverId|merge( { "permission" :   null  } ) %}
+        {% set _tempDriverId = _tempDriverId|merge( { "prepend_html" :   null  } ) %}
+        {% set _tempDriverId = _tempDriverId|merge( { "append_html" :   null  } ) %}
+        {% set _tempDriverId = _tempDriverId|merge( { "columnName" :   "driver.id"  } ) %}
+        {% set _tempDriverId = _tempDriverId|merge( { "fieldName" :   "driver.id"  } ) %}
+        {% set _tempDriverId = _tempDriverId|merge( { "id" :   false  } ) %}
+        {% set _tempDriverId = _tempDriverId|merge( { "length" :   null  } ) %}
+        {% set _tempDriverId = _tempDriverId|merge( { "nullable" :   false  } ) %}
+        {% set _tempDriverId = _tempDriverId|merge( { "precision" :   0  } ) %}
+        {% set _tempDriverId = _tempDriverId|merge( { "scale" :   0  } ) %}
+        {% set _tempDriverId = _tempDriverId|merge( { "unique" :   false  } ) %}
+        {% set _tempDriverId = _tempDriverId|merge( { "property" :   "driver.id"  } ) %}
+        {% set _tempDriverId = _tempDriverId|merge( { 'type_options':  { 'required': false } } ) %}
+        {% set driverFields = driverFields|merge( { 'driver.id': _tempDriverId } ) %}
+
+        {% set _tempDriverAssigned = [] %}
+        {% set _tempDriverAssigned = _tempDriverAssigned|merge( { "css_class": "" }  ) %}
+        {% set _tempDriverAssigned = _tempDriverAssigned|merge( { "format": null }  ) %}
+        {% set _tempDriverAssigned = _tempDriverAssigned|merge( { "help": null }  ) %}
+        {% set _tempDriverAssigned = _tempDriverAssigned|merge( { "label": "transport_management.label.driver" }  ) %}
+        {% set _tempDriverAssigned = _tempDriverAssigned|merge( { "type": "text" }  ) %}
+        {% set _tempDriverAssigned = _tempDriverAssigned|merge( { "fieldType": null }  ) %}
+        {% set _tempDriverAssigned = _tempDriverAssigned|merge( { "dataType": "text" }  ) %}
+        {% set _tempDriverAssigned = _tempDriverAssigned|merge( { "virtual": true }  ) %}
+        {% set _tempDriverAssigned = _tempDriverAssigned|merge( { "sortable": false }  ) %}
+        {% set _tempDriverAssigned = _tempDriverAssigned|merge( { "template": "@WicrewSale/Admin/Dashboard/list.driver.html.twig" }  ) %}
+        {% set _tempDriverAssigned = _tempDriverAssigned|merge( { "form_group":  null }  ) %}
+        {% set _tempDriverAssigned = _tempDriverAssigned|merge( { "permission":  null }  ) %}
+        {% set _tempDriverAssigned = _tempDriverAssigned|merge( { "prepend_html":  null }  ) %}
+        {% set _tempDriverAssigned = _tempDriverAssigned|merge( { "append_html":  null }  ) %}
+        {% set _tempDriverAssigned = _tempDriverAssigned|merge( { "columnName":  "driverAssigned" }  ) %}
+        {% set _tempDriverAssigned = _tempDriverAssigned|merge( { "fieldName":  "driverAssigned" }  ) %}
+        {% set _tempDriverAssigned = _tempDriverAssigned|merge( { "id":  false }  ) %}
+        {% set _tempDriverAssigned = _tempDriverAssigned|merge( { "length":  null }  ) %}
+        {% set _tempDriverAssigned = _tempDriverAssigned|merge( { "nullable":  false }  ) %}
+        {% set _tempDriverAssigned = _tempDriverAssigned|merge( { "precision":  0 }  ) %}
+        {% set _tempDriverAssigned = _tempDriverAssigned|merge( { "scale":  0 }  ) %}
+        {% set _tempDriverAssigned = _tempDriverAssigned|merge( { "unique":  false }  ) %}
+        {% set _tempDriverAssigned = _tempDriverAssigned|merge( { "property":  "driverAssigned" }  ) %}
+        {% set _tempDriverAssigned = _tempDriverAssigned|merge( { "mapped":  false }  ) %}
+        {% set _tempDriverAssigned = _tempDriverAssigned|merge( { 'type_options':  { 'required': false } } ) %}
+        {% set driverFields = driverFields|merge( { 'driverAssigned': _tempDriverAssigned } ) %}
+
+        {% set _tempVehicleId = [] %}
+        {% set _tempVehicleId = _tempVehicleId|merge( {"css_class": ""  } ) %}
+        {% set _tempVehicleId = _tempVehicleId|merge( {"format": null  } ) %}
+        {% set _tempVehicleId = _tempVehicleId|merge( {"help": null  } ) %}
+        {% set _tempVehicleId = _tempVehicleId|merge( {"label": "transport_management.label.select_vehicle"  } ) %}
+        {% set _tempVehicleId = _tempVehicleId|merge( {"type": "text"  } ) %}
+        {% set _tempVehicleId = _tempVehicleId|merge( {"fieldType": null  } ) %}
+        {% set _tempVehicleId = _tempVehicleId|merge( {"dataType": "text"  } ) %}
+        {% set _tempVehicleId = _tempVehicleId|merge( {"virtual": true  } ) %}
+        {% set _tempVehicleId = _tempVehicleId|merge( {"sortable": false  } ) %}
+        {% set _tempVehicleId = _tempVehicleId|merge( {"template": "@WicrewSale/Admin/Dashboard/list.vehicle.html.twig"  } ) %}
+        {% set _tempVehicleId = _tempVehicleId|merge( {"form_group":  null  } ) %}
+        {% set _tempVehicleId = _tempVehicleId|merge( {"permission":  null  } ) %}
+        {% set _tempVehicleId = _tempVehicleId|merge( {"prepend_html":  null  } ) %}
+        {% set _tempVehicleId = _tempVehicleId|merge( {"append_html":  null  } ) %}
+        {% set _tempVehicleId = _tempVehicleId|merge( {"columnName":  "vehicle.id"  } ) %}
+        {% set _tempVehicleId = _tempVehicleId|merge( {"fieldName":  "vehicle.id"  } ) %}
+        {% set _tempVehicleId = _tempVehicleId|merge( {"id":  false  } ) %}
+        {% set _tempVehicleId = _tempVehicleId|merge( {"length":  null  } ) %}
+        {% set _tempVehicleId = _tempVehicleId|merge( {"nullable":  false  } ) %}
+        {% set _tempVehicleId = _tempVehicleId|merge( {"precision":  0  } ) %}
+        {% set _tempVehicleId = _tempVehicleId|merge( {"scale":  0  } ) %}
+        {% set _tempVehicleId = _tempVehicleId|merge( {"unique":  false  } ) %}
+        {% set _tempVehicleId = _tempVehicleId|merge( {"property":  "vehicle.id"  } ) %}
+        {% set _tempVehicleId = _tempVehicleId|merge( {"mapped":  false  } ) %}
+        {% set _tempVehicleId = _tempVehicleId|merge( { 'type_options':  { 'required': false } } ) %}
+        {% set driverFields = driverFields|merge( { 'vehicle.id': _tempVehicleId } ) %}
+
+        {% set _tempPriceSeparator = [] %}
+        {% set _tempPriceSeparator = _tempPriceSeparator|merge( { "css_class": ""  } ) %}
+        {% set _tempPriceSeparator = _tempPriceSeparator|merge( { "format": null  } ) %}
+        {% set _tempPriceSeparator = _tempPriceSeparator|merge( { "help": null  } ) %}
+        {% set _tempPriceSeparator = _tempPriceSeparator|merge( { "label": ""  } ) %}
+        {% set _tempPriceSeparator = _tempPriceSeparator|merge( { "type": "text"  } ) %}
+        {% set _tempPriceSeparator = _tempPriceSeparator|merge( { "fieldType": null  } ) %}
+        {% set _tempPriceSeparator = _tempPriceSeparator|merge( { "dataType": "text"  } ) %}
+        {% set _tempPriceSeparator = _tempPriceSeparator|merge( { "virtual": true  } ) %}
+        {% set _tempPriceSeparator = _tempPriceSeparator|merge( { "sortable": false  } ) %}
+        {% set _tempPriceSeparator = _tempPriceSeparator|merge( { "template": "@EasyAdmin/default/field_text.html.twig"  } ) %}
+        {% set _tempPriceSeparator = _tempPriceSeparator|merge( { "form_group":  null  } ) %}
+        {% set _tempPriceSeparator = _tempPriceSeparator|merge( { "permission":  null  } ) %}
+        {% set _tempPriceSeparator = _tempPriceSeparator|merge( { "prepend_html":  null  } ) %}
+        {% set _tempPriceSeparator = _tempPriceSeparator|merge( { "append_html":  null  } ) %}
+        {% set _tempPriceSeparator = _tempPriceSeparator|merge( { "columnName":  "priceSeparator"  } ) %}
+        {% set _tempPriceSeparator = _tempPriceSeparator|merge( { "fieldName":  "priceSeparator"  } ) %}
+        {% set _tempPriceSeparator = _tempPriceSeparator|merge( { "id":  false  } ) %}
+        {% set _tempPriceSeparator = _tempPriceSeparator|merge( { "length":  null  } ) %}
+        {% set _tempPriceSeparator = _tempPriceSeparator|merge( { "nullable":  false  } ) %}
+        {% set _tempPriceSeparator = _tempPriceSeparator|merge( { "precision":  0  } ) %}
+        {% set _tempPriceSeparator = _tempPriceSeparator|merge( { "scale":  0  } ) %}
+        {% set _tempPriceSeparator = _tempPriceSeparator|merge( { "unique":  false  } ) %}
+        {% set _tempPriceSeparator = _tempPriceSeparator|merge( { "property":  "priceSeparator"  } ) %}
+        {% set _tempPriceSeparator = _tempPriceSeparator|merge( { "mapped":  false  } ) %}
+        {% set _tempPriceSeparator = _tempPriceSeparator|merge( {'type_options':  { 'required': false } } ) %}
+        {% set driverFields = driverFields|merge( { 'priceSeparator': _tempPriceSeparator } ) %}
+
+        {% set _tempRack = [] %}
+        {% set _tempRack = _tempRack|merge( { "css_class" : ""  }  ) %}
+        {% set _tempRack = _tempRack|merge( { "format" : null  }  ) %}
+        {% set _tempRack = _tempRack|merge( { "help" : null  }  ) %}
+        {% set _tempRack = _tempRack|merge( { "label" : "management.total_rack"  }  ) %}
+        {% set _tempRack = _tempRack|merge( { "type" : "decimal"  }  ) %}
+        {% set _tempRack = _tempRack|merge( { "fieldType" : "number"  }  ) %}
+        {% set _tempRack = _tempRack|merge( { "dataType" : "decimal"  }  ) %}
+        {% set _tempRack = _tempRack|merge( { "virtual" : false  }  ) %}
+        {% set _tempRack = _tempRack|merge( { "sortable" : true  }  ) %}
+        {% set _tempRack = _tempRack|merge( { "template" : "WicrewSaleBundle:Admin/Management:list.input.text.html.twig"  }  ) %}
+        {% set _tempRack = _tempRack|merge( { "form_group" :  null  }  ) %}
+        {% set _tempRack = _tempRack|merge( { "permission" :  null  }  ) %}
+        {% set _tempRack = _tempRack|merge( { "prepend_html" :  null  }  ) %}
+        {% set _tempRack = _tempRack|merge( { "append_html" :  null  }  ) %}
+        {% set _tempRack = _tempRack|merge( { "fieldName" :  "rack"  }  ) %}
+        {% set _tempRack = _tempRack|merge( { "scale" :  2  }  ) %}
+        {% set _tempRack = _tempRack|merge( { "length" :  null  }  ) %}
+        {% set _tempRack = _tempRack|merge( { "unique" :  false  }  ) %}
+        {% set _tempRack = _tempRack|merge( { "nullable" :  false  }  ) %}
+        {% set _tempRack = _tempRack|merge( { "precision" :  10  }  ) %}
+        {% set _tempRack = _tempRack|merge( { "columnName" :  "rack"  }  ) %}
+        {% set _tempRack = _tempRack|merge( { "property" :  "rack"  }  ) %}
+        {% set _tempRack = _tempRack|merge( { "width" :  "100px"  }  ) %}
+        {% set _tempRack = _tempRack|merge( { 'type_options':  { 'input': "string", 'required': true } } ) %}
+        {% set driverFields = driverFields|merge( { 'rack': _tempRack } ) %}
+
+        {% set _tempNet = [] %}
+        {% set _tempNet = _tempNet|merge( { "css_class" : ""  } ) %}
+        {% set _tempNet = _tempNet|merge( { "format" : null  } ) %}
+        {% set _tempNet = _tempNet|merge( { "help" : null  } ) %}
+        {% set _tempNet = _tempNet|merge( { "label" : "management.total_net"  } ) %}
+        {% set _tempNet = _tempNet|merge( { "type" : "decimal"  } ) %}
+        {% set _tempNet = _tempNet|merge( { "fieldType" : "number"  } ) %}
+        {% set _tempNet = _tempNet|merge( { "dataType" : "decimal"  } ) %}
+        {% set _tempNet = _tempNet|merge( { "virtual" : false  } ) %}
+        {% set _tempNet = _tempNet|merge( { "sortable" : true  } ) %}
+        {% set _tempNet = _tempNet|merge( { "template" : "WicrewSaleBundle:Admin/Management:list.input.text.html.twig"  } ) %}
+        {% set _tempNet = _tempNet|merge( { "form_group" :  null  } ) %}
+        {% set _tempNet = _tempNet|merge( { "permission" :  null  } ) %}
+        {% set _tempNet = _tempNet|merge( { "prepend_html" :  null  } ) %}
+        {% set _tempNet = _tempNet|merge( { "append_html" :  null  } ) %}
+        {% set _tempNet = _tempNet|merge( { "fieldName" :  "net"  } ) %}
+        {% set _tempNet = _tempNet|merge( { "scale" :  2  } ) %}
+        {% set _tempNet = _tempNet|merge( { "length" :  null  } ) %}
+        {% set _tempNet = _tempNet|merge( { "unique" :  false  } ) %}
+        {% set _tempNet = _tempNet|merge( { "nullable" :  false  } ) %}
+        {% set _tempNet = _tempNet|merge( { "precision" :  10  } ) %}
+        {% set _tempNet = _tempNet|merge( { "columnName" :  "net"  } ) %}
+        {% set _tempNet = _tempNet|merge( { "property" :  "net"  } ) %}
+        {% set _tempNet = _tempNet|merge( { "width" :  "100px"  } ) %}
+        {% set _tempNet = _tempNet|merge( { 'type_options':  { 'input': "string", 'required': true } } ) %}
+        {% set driverFields = driverFields|merge( { 'net': _tempNet } ) %}
+
+    {% endif %}
+
+    <td></td>
+    <td colspan="1">
+        <div style="font-weight: 600; font-size: 14px; line-height: 150%; letter-spacing: 0.5px; color: #0F172A;">
+            <span ><i class="fas fa-user-plus"></i> Additional Supplier</span>
+        </div>
+    </td>
+	<td></td>
+    <td></td>
+
+    <td colspan="1" class="date">
+        <input type="text" name="additionalDrivers[{{loop.index0}}][pickup_date]" style="border: none;" class="form_datepicker" placeholder="Please Select" {% if driver is not null and driver.pickDate is not null %} value="{{ driver.pickDate|formatNoNull("F d, Y") }}" {% endif %} readonly>
+    </td>
+    <td colspan="1" class="time">
+        <input style="width: 100%;" type="text" name="additionalDrivers[{{loop.index0}}][pickup_time]" style="border: none;" class="form_timepicker" placeholder="Please Select" {% if driver is not null and driver.pickTime is not null %} value="{{ driver.pickTime|formatNoNull("H:i") }}" {% endif %} readonly>
+    </td>
+    <td colspan="4"></td>
+
+    {% set driverMetadata = driverFields['fromDescription']|merge({ 'arrayWrapperIndex': loop.index0 }) %}
+    <td class="{{ driverMetadata.dataType|lower }} {{ driverMetadata.css_class }}" {{ easyadmin_config('design.rtl') ? 'dir="rtl"' }}>
+        <div style="font-weight: bold; font-weight: 600; font-size: 14px; line-height: 150%; letter-spacing: 0.5px; color: #0F172A;">
+            {# Pick-up Location: #}
+            <div class="fromDescription">
+                {{ easyadmin_render_field_for_list_view("OrderItemHasDriver", driver, driverMetadata) }}
+            </div>
+        </div>
+    </td>
+    <td colspan="1"></td>
+
+
+    {% set driverMetadata = driverFields['toDescription']|merge({ 'arrayWrapperIndex': loop.index0 }) %}
+    <td class="{{ driverMetadata.dataType|lower }} {{ driverMetadata.css_class }}" {{ easyadmin_config('design.rtl') ? 'dir="rtl"' }}>
+        <div style="font-weight: bold; font-weight: 600; font-size: 14px; line-height: 150%; letter-spacing: 0.5px; color: #0F172A;">
+    
+            {# Drop-off Location: #}
+            <div class="toDescription">
+                {{ easyadmin_render_field_for_list_view("OrderItemHasDriver", driver, driverMetadata) }}
+            </div>
+        </div>
+    </td>
+
+    {% set driverMetadata = driverFields['driver.id']|merge({ 'arrayWrapperIndex': loop.index0 }) %}
+
+    <td class="{{ driverMetadata.dataType|lower }} {{ driverMetadata.css_class }}" {{ easyadmin_config('design.rtl') ? 'dir="rtl"' }}>
+        <div style="font-weight: bold; font-weight: 600; font-size: 14px; line-height: 150%; letter-spacing: 0.5px; color: #0F172A;">
+    
+            {# Supplier:  #}
+            <div class="driver_id">
+                {{ easyadmin_render_field_for_list_view("OrderItemHasDriver", driver, driverMetadata) }}
+            </div>
+        </div>
+    </td>
+
+    <td colspan="1"></td>
+
+
+
+    {% set driverMetadata = driverFields['vehicle.id']|merge({ 'arrayWrapperIndex': loop.index0 }) %}
+    <td class="{{ driverMetadata.dataType|lower }} {{ driverMetadata.css_class }}" {{ easyadmin_config('design.rtl') ? 'dir="rtl"' }}>
+        <div style="font-weight: bold; font-weight: 600; font-size: 14px; line-height: 150%; letter-spacing: 0.5px; color: #0F172A;">
+    
+            {# Select vehicle: #}
+            <div class="vehicle_id">
+                {{ easyadmin_render_field_for_list_view("OrderItemHasDriver", driver, driverMetadata) }}
+            </div>
+        </div>
+    </td>
+
+    {% set driverMetadata = driverFields['driverAssigned']|merge({ 'arrayWrapperIndex': loop.index0 }) %}
+    <td colspan="1" class="" {{ easyadmin_config('design.rtl') ? 'dir="rtl"' }}>
+        <div style="font-weight: bold; font-weight: 600; font-size: 14px; line-height: 150%; letter-spacing: 0.5px; color: #0F172A;">
+    
+            {# Confirmation Status:  #}
+            <div class="driverAssigned">
+                {{ easyadmin_render_field_for_list_view("OrderItemHasDriver", driver, driverMetadata) }}
+            </div>
+        </div>
+    </td>
+        
+    <td colspan="8"></td>
+
+
+    {% set driverMetadata = driverFields['net']|merge({ 'arrayWrapperIndex': loop.index0 }) %}
+    <td class="{{ driverMetadata.dataType|lower }} {{ driverMetadata.css_class }}" {{ easyadmin_config('design.rtl') ? 'dir="rtl"' }}>
+        <div style="font-weight: bold; font-weight: 600; font-size: 14px; line-height: 150%; letter-spacing: 0.5px; color: #0F172A;">    
+            {# Net:  #}
+            <div class="net">
+                {{ easyadmin_render_field_for_list_view("OrderItemHasDriver", driver, driverMetadata) }}
+            </div>
+        </div>
+    </td>
+
+    <td class="decimal ">
+        {# <div style="font-weight: bold; font-weight: 600; font-size: 14px; line-height: 150%; letter-spacing: 0.5px; color: #0F172A;"> Net + Tx. </div> #}
+        <div class="additionalDriverNetTaxValue"> {% if driver != null %} ${{ ( ( 0.13 * driver.net ) + driver.net )|number_format(2, '.', ',') }} {% endif %} </div>
+        <input type="hidden" class="additionalDriverTaxRate" value="0.13" />
+    </td>
+
+    <td class="addMoreDriverTD">
+        <button class="btn text-danger action-remove-driver dl_btn" data-id="{{ _item_id }}" {% if driver != null %} data-driverid="{{ driver.id }}"  {% endif %} title="Remove Driver" onclick="removeAdditionalDriver( this )">
+            <i class="fa fa-times" aria-hidden="true"></i>
+        </button>
+        <span title="Add more driver" class="action-new-driver addMoreDriverLink" data-id="{{ _item_id }}" style="cursor: pointer;">  <i class="fa fa-plus-circle" aria-hidden="true"></i> </span>
+    </td>
+
+{% endblock driver_row %}
+
+{% block body_javascript %}
+    {{ parent() }}
+    <style>
+        tr.first-driver-row.additional-driver-row.empty {
+            display: none;
+        }
+
+		div#loader.transparent {background: rgb(41 45 66 / 72%) !important;}
+        tr.additional-driver-row td {
+            padding-top: 8px;
+        }
+        tr.additional-driver-row {
+            border-top: 0px !important;
+        }
+
+        table.datagrid thead th, table.datagrid tbody td {
+            padding: 16px 16px;
+            white-space: nowrap;
+        }
+
+        div.addNoteModal .modal-dialog {
+            max-width: 600px !important;
+            width: 80%;
+        }
+        textarea.addNewNoteTextArea {
+            width: 100%;
+        }
+        .previous_notes_container {
+            padding: 10px;
+            padding-left: 5px;
+            margin-bottom: 10px;
+            background: #efefef;
+            box-shadow: 0px 0px 8px 0px rgba(209,209,209,1);
+            -webkit-box-shadow: 0px 0px 8px 0px rgba(209,209,209,1);
+            -moz-box-shadow: 0px 0px 8px 0px rgba(209,209,209,1);
+        }
+        .single-note-container {
+            display: flex;
+            align-items: center;
+        }
+
+        button.editNoteBtn {
+            border: none;
+            width: 26px;
+            font-size: 12px;
+        }
+
+         .single-note-content * {
+            max-width: 100%;
+        }
+        .single-note-content {
+            flex: auto;
+            max-width: calc(100% - 40px);
+        }
+
+
+        button.editNoteBtn:hover,
+        .single-note-content:hover + button.editNoteBtn {
+            color: #6174d1;
+        }
+
+        button.editNoteBtn:hover + .single-note-content {
+            color: #6174d1;
+        }
+        .editNoteTextAreaContainer {
+
+            position: absolute;
+            background: #ffffff;
+            display: none;
+            flex-direction: column;
+            padding: 20px;
+            top: 0px;
+            left: 0px;
+            width: 100%;
+            height: 100%;
+			min-height: 300px;
+        }
+
+        button.btn.btn-editNote {
+            width: 100px;
+            align-self: flex-end;
+            margin-top: 12px;
+            background-color: var(--color-primary);
+            color: var(--text-on-primary);
+        }
+
+        .editNoteTextAreaContainer i.fa-close {
+            align-self: flex-end;
+            margin-bottom: 12px;
+            margin-right: 5px;
+        }
+        .list .content-header .d-flex.flex-row {
+            flex-direction: column !important;
+        }
+
+        .list .content-header .d-flex.flex-row .content-header-title {
+            align-self: flex-start;
+        }
+
+        .content-header div.global-actions {
+            width: 100%;
+            justify-content: flex-start;
+            margin: 0px;
+        }
+
+        .createQuote-btn {
+            margin-left: auto;
+        }
+
+        div.form-widget {
+            padding-left: 0px;
+        }
+
+        .content-header-title h1.title {
+            width: 100%;
+            display: block;
+            padding-bottom: 12px;
+            margin-bottom: 21px;
+            font-style: normal;
+            font-weight: 600;
+            font-size: 24px;
+            line-height: 150%;
+        /* identical to box height, or 36px */
+            letter-spacing: 0.2px;
+            color: #0F172A;
+            border-bottom: 1px solid #D9D9D9;
+        }
+
+        .list .content-header .d-flex.flex-row .content-header-title {
+            width: 100%;
+        }
+
+        .search_text input {
+            border: 1px solid #e3e3e3;
+            margin: 10px 0;
+            width: 140px;
+            padding: 0 5px;
+            border-radius: 5px;
+        }
+        .result button{
+                margin: 0 auto;
+            background: transparent;
+            outline: none;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            font-style: normal;
+        font-weight: 600;
+        font-size: 12px;
+        line-height: 150%;
+        text-align: center;
+        letter-spacing: 0.5px;
+        color: #292D42;
+        }
+        .search_text input {
+            border: 1px solid #e3e3e3;
+            margin: 10px 0;
+            width: 140px;
+            padding: 0 5px;
+            border-radius: 5px;
+        }
+        .result{
+            margin: 0 25%;
+        }
+        .filter {
+            z-index: 10;
+            position: absolute;
+            min-height: 100px;
+            top: 29px;
+            width: 200px;
+            border-radius: 6px;
+            display: flex;
+            display: flex;
+            justify-content: left;
+            align-items: center;
+            margin: 0 !important;
+            padding: 18px 0 !important;
+            box-shadow: 3px 2px 15px #aba5a5;
+            left: 70px;
+            background: #fff;
+        }
+        div#to_filter {
+            left: 50px;
+        }
+        #Booking_filter{
+            left: 100px;
+        }
+        div#passengerName_filter{
+            left: 83px;
+        }
+        .filter ul{
+                list-style-type: none;
+                padding: 0 !important;
+                margin: 0 !important;
+        }
+        .filter li{
+                font-size: 12px;
+                margin-left: 10px;
+                cursor: pointer;
+
+        }
+        i.fa.fa-caret-up {
+            color: #000;
+        }
+        .sort_asc i,
+        .sort_desc i{
+            margin-left: -10px !important;
+            color: #64748B !important;
+
+            }
+        .sort_asc,
+        .sort_desc{
+            display: flex;
+            margin-left: 20px;
+            align-items: center;
+            color: #64748B;
+        }
+        .filter p {
+            margin-bottom: 0;
+            font-size: 14px;
+            color: #292D42 !important;
+        }
+        .divider {
+            border-bottom: 1px solid #E2E8F0;
+            width: 200px;
+            margin-bottom: 10px;
+            margin-top: 12px;
+        }
+        .sort {
+            padding-left: 23px;
+        }
+        .search_text {
+            margin-left: 23px;
+        }
+        div#service_type_filter,
+        div#vehicle_filter {
+            left: 134px;
+        }
+        div#from_filter,
+        div#pickFlightNumber_filter{
+            left: 80px;
+        }
+        div#childCount_filter {
+            left: 104px;
+        }
+        div#adultCount_filter,
+        div#pickAirlineCompany_filter {
+            left: 88px;
+        }
+        div#supplier_filter {
+            left: 100px;
+        }
+        div#billing_filter,
+        div#vehicleType_filter {
+            left: 131px;
+        }
+        div#confirmationStatus_filter{
+            left:190px;
+        }
+        div#supplierCommission_filter {
+            left: 167px;
+        }
+        .first-driver-row.additional-driver-row.empty.data_row input.form_datepicker,
+        .first-driver-row.additional-driver-row.empty.data_row .form_datepicker.readonly.hasDatepicker{
+            margin: 0px;
+        }
+        th.pickup_date {
+            padding-left: 28px !important;
+        }
+
+        td.addMoreDriverTD{
+            position: sticky !important;
+            right: 0;
+        }
+        div#arrival_filter {
+            left: 90px;
+        }
+        div#departure_filter {
+            left: 115px;
+        }
+        div#pickup_location_filter {
+            left: 161px;
+        }
+        div#drop_off_location_filter {
+            left: 173px;
+        }
+        .filter_checkbox input {
+            width: 20px;
+        }
+        .filter_checkbox {
+            overflow-x: hidden;
+            height: 113px;
+            width: 164px;
+            overflow-y: auto;
+            color: #64748B;
+        }
+        .data_row{
+            height: 87px;
+        }
+        .filter_checkbox label {
+            width: 113px;
+            white-space: nowrap;
+            margin-bottom: -6px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .active_order{
+            color:#FC7C5C !important;
+        }
+        .datagrid thead i{
+            color: #0F172A; 
+			margin-left: 8px !important;
+        }
+        .rotate-180 {
+            transform: rotate(180deg);
+            color:#FC7C5C !important;
+        }
+        img.ui-datepicker-trigger {
+            width: 20px;
+        }
+		.ui-widget-header{
+			background: #fff !important;
+			border: none !important;
+		}
+		{# .ui-widget-header .ui-icon{
+			background-image: url("data:image/svg+xml,%3Csvg width='50' height='31' viewBox='0 0 7 11' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5.5 5.5L1 10' stroke='%2364748B'/%3E%3C/svg%3E") !important;		
+		} #}
+		.ui-state-default, .ui-widget-content .ui-state-default{
+			background: #fff;
+			border: none !important;
+			text-align: center;
+			width: 25px;
+		}
+		.ui-datepicker .ui-datepicker-buttonpane,
+		.ui-datepicker .ui-datepicker-buttonpane button{
+			display: none;
+		}
+
+		.ui-state-active, .ui-widget-content .ui-state-active{
+			background: #FC7C5C !important;
+			font-weight: normal;
+			color: #ffffff;
+			border-radius: 20px;
+			text-align: center;
+		}
+		.daterangepicker {
+			background: #2d2d2e;
+			border: 1px solid #5f5f5f;
+			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.29);
+		}
+		.daterangepicker .calendar-table {
+			background: #2d2d2e;
+			color: #e2e2e2;
+			border: none;
+		}
+		.daterangepicker .drp-buttons {
+			border-color: transparent;
+		}
+		.daterangepicker .drp-buttons .drp-selected {
+			display: none;
+		}
+		.daterangepicker .drp-buttons .applyBtn {
+			background: #FC7C5C;
+			box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+			font-size: 12px;
+			display: inline-block;
+			line-height: 30px;
+			color: #e2e2e2;
+			border: none;
+			padding: 0 20px;
+			border-radius: 4px;
+		}
+		.daterangepicker .drp-calendar.left {
+			position: relative;
+		}
+		.daterangepicker .drp-calendar.left:before {
+			content: "";
+			position: absolute;
+			right: 3px;
+			top: 50%;
+			transform: translateY(-50%);
+			width: 1px;
+			height: 88%;
+			background: #5f5f5f;
+		}
+		.daterangepicker .date-header {
+			margin: 8px;
+			font-size: 0;
+		}
+		.daterangepicker .date-header > div {
+			display: inline-block;
+			font-size: 12px;
+			width: calc(50% - 24px);
+			margin-right: 8px;
+			background: #242424;
+			border-radius: 4px;
+			border-radius: 4px;
+			padding: 7.5px 7.5px;
+		}
+		.daterangepicker .date-header > div > span {
+			display: inline-block;
+			vertical-align: middle;
+			position: relative;
+			color: #b1b1b1;
+		}
+		.daterangepicker .date-header > div > span:nth-child(2) {
+			color: #ffa900;
+			padding-left: 15px;
+		}
+		.daterangepicker .date-header > div > span:nth-child(2)::before {
+			content: "";
+			position: absolute;
+			left: 3px;
+			top: 50%;
+			width: 1px;
+			height: 70%;
+			transform: translateY(-50%);
+			background-color: #b1b1b1;
+		}
+		.daterangepicker .date-header > div.date-to-area {
+			margin-right: 0;
+			margin-left: 8px;
+		}
+		.daterangepicker td.off, .daterangepicker td.off.in-range, .daterangepicker td.off.start-date, .daterangepicker td.off.end-date {
+			background-color: transparent !important;
+			color: #e2e2e2;
+			opacity: 0;
+		}
+		.daterangepicker td.active, .daterangepicker td.active:hover {
+			background-color: #d88600;
+		}
+		.daterangepicker .calendar-table th, .daterangepicker .calendar-table td {
+			width: 32px;
+			height: 32px;
+			border-radius: 50%;
+			border-top: 2px solid #2d2d2e;
+		}
+		.daterangepicker td.available:hover, .daterangepicker th.available:hover {
+			background-color: #FCF0DA;
+		}
+		.daterangepicker td.in-range {
+			background-color: #FCF0DA !important;
+			color: #e2e2e2;
+			border-radius: 0;
+		}
+		.daterangepicker td.end-date {
+			background-color: #FCF0DA;
+			border-radius: 50%;
+			position: relative;
+			z-index: 0;
+			border-top-left-radius: 0;
+			border-bottom-left-radius: 0;
+		}
+		.daterangepicker td.end-date::before {
+			content: "";
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 32px;
+			height: 32px;
+			background-color: #FC7C5C;
+			z-index: -5;
+			border-radius: 50%;
+		}
+		.daterangepicker td.start-date {
+			background-color: #FCF0DA;
+			position: relative;
+			border-top-right-radius: 0;
+			border-bottom-right-radius: 0;
+			z-index: 1;
+		}
+		.daterangepicker td.start-date::before {
+			content: "";
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 32px;
+			height: 32px;
+			background-color: #FC7C5C;
+			z-index: -5;
+			border-radius: 50%;
+		}
+		.daterangepicker table td.in-range:nth-last-of-type(1) {
+			border-top-right-radius: 50%;
+			border-bottom-right-radius: 50%;
+		}
+		.daterangepicker table td.in-range:nth-of-type(1) {
+			border-top-left-radius: 50%;
+			border-bottom-left-radius: 50%;
+		}
+		.daterangepicker .calendar-table .next span, .daterangepicker .calendar-table .prev span {
+			border: solid #fff;
+			border-width: 0 2px 2px 0;
+			color: #000;
+		}
+		.daterangepicker .calendar-table th, .daterangepicker .calendar-table td{
+			color: #000 !important;
+		}
+		body {
+			background: #292D42 !important;
+		}
+		aside.main-sidebar {
+			background: #292D42;
+		}
+		.sidebar-menu li:not(.submenu-active).active a, .sidebar-menu li:not(.submenu-active).active .fa {
+    		color: #FC7C5C !important;
+		}
+		.combo_booking {
+			margin: 0 8px;
+		}
+		img.menu--activity,
+		img.menu--addon,
+		img.menu--block,
+		img.menu--discount,
+		img.menu--system  {
+			width: 20px;
+			margin: 0 auto;
+			margin-right: 5px;
+		}
+		section.content-footer {
+			width: auto;
+			margin-right: 0;
+		}
+		aside.main-sidebar a {
+			color: #fff;
+			font-weight: 400;
+			font-size: 16px;
+			line-height: 24px;
+			letter-spacing: 0.5px;
+			padding: 4px 10px 10px 0;
+		}
+		ul.sidebar-menu.tree {
+			margin-top: 20px;
+		}
+		section.content-header {
+			background: #292D42;
+		}
+		h2.dashboard-title {
+			margin: 0 0 0 10px;
+			align-self: center;
+			display: flex;
+			flex: auto;
+			background: #292D42;
+			padding: 15px 31px;
+			color: #fff;
+			letter-spacing: 0.5px;
+			font-weight: 600;
+			font-size: 28px;
+			line-height: 28px;
+		}
+		.select_all .btn {
+			background: #fff;
+			margin-right: 4px;
+		}
+		.global-actions .btn {
+			margin-left: 4px !important;
+		}
+		div.global-actions input, div.global-actions select, div.global-actions a.btn, div.global-actions button.btn {
+			border: 1px solid #E2E8F0 !important;
+			border-radius: 8px !important;
+			height: 33px !important;
+			line-height: 24px !important;
+			display: block;
+			outline: none !important;
+			border: none !important;
+			font-style: normal !important;
+			font-weight: 600 !important;
+			font-size: 16px !important;
+			letter-spacing: 0.5px !important;
+			color: #292D42 !important;
+		}
+		input.form-control::placeholder {
+			color: #292D42 !important;
+		}
+		div.form-action-search input[type=search].form-control {
+			background-color: var(--white) !important;
+			background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg viewBox='0 0 1792 1792' xmlns='http://www.w3.org/2000/svg'%3e%3cpath fill='%23000000' d='M1216 832q0-185-131.5-316.5t-316.5-131.5-316.5 131.5-131.5 316.5 131.5 316.5 316.5 131.5 316.5-131.5 131.5-316.5zm512 832q0 52-38 90t-90 38q-54 0-90-38l-343-342q-179 124-399 124-143 0-273.5-55.5t-225-150-150-225-55.5-273.5 55.5-273.5 150-225 225-150 273.5-55.5 273.5 55.5 225 150 150 225 55.5 273.5q0 220-124 399l343 343q37 37 37 90z'/%3e%3c/svg%3e");				background-repeat: no-repeat;
+			background-size: 17px 17px;
+			padding-left: 13px !important;
+			background-position: 97% 50%;
+			width: 355px !important;
+			height: 33px !important;
+		}
+		div.form-action-search .form-widget input.form-control {
+			padding: 0;
+		}
+		.calenderAvailabilityBtn.TransportationManagement a.btn{
+			background: #fff !important;
+		}
+		.calenderAvailabilityBtn.TransportationManagement{
+			margin-left: 15px;
+		}
+		.calenderAvailabilityBtn.TransportationManagement i{
+			color: #FC7C5C !important;
+		}
+		.expand_btn {
+			display: flex;
+			margin-left: 13px;
+		}
+		.expand_btn input[type="checkbox"] {
+			position: relative;
+			width: 46px;
+			height: 24px !important;
+			-webkit-appearance: none;
+			appearance: none;
+			background: #fff !important;
+			outline: none;
+			border-radius: 16.5px !important;
+			cursor: pointer;
+		}
+		.expand_btn input[type="checkbox"]::before {
+			content: "";
+			width: 20.8px;
+			height: 20.8px;
+			border-radius: 16.5px;
+			background: #FC7C5C;
+			position: absolute;
+			top: 1.5px;
+			left: 2px;
+			transition: 0.5s;
+		}
+		.expand_btn span {
+			margin-left: 8px;
+			font-weight: 600;
+			font-size: 16px;
+			line-height: 24px;
+			letter-spacing: 0.5px;
+			color: #FFFFFF;
+		}
+		.left_btns {
+			margin-left: auto;
+			display: flex;
+			align-items: center;
+		}
+		.content-header div.global-actions {
+			width: 100%;
+			justify-content: flex-start;
+			margin: 0px;
+		}
+		div.global-actions a.btn {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 10px;
+		}
+		.quote_btn .btn {
+			background: #fff;
+			margin-right: 20px;
+		}
+		h2.dashboard-title i {
+			margin-right: 9px;
+		}
+	
+		table.datagrid {
+			background: #fff;
+		}
+		tr.data_row {
+			height: 30px;
+		}
+		table.table.datagrid tbody td {
+			font-style: normal;
+			font-weight: 500;
+			font-size: 16px;
+			line-height: 150%;
+			padding: 0 0 0 18px;
+			letter-spacing: 0.5px;
+			color: #64748B;
+		}
+		.main-header #header-logo a,
+		{
+			display: none;	
+		}
+		td.status.integer {
+			display: flex;
+			flex-direction: row-reverse;
+			padding: 0 !important;
+		}
+		.table_checkbox input[type=checkbox] {
+			position: relative;
+			background: #fff !important;
+			cursor: pointer;
+			border: 1px #E2E8F0 solid;
+			line-height: 0;
+			border-radius: 0;
+			margin: 0 8px;
+			margin-right: 0;
+			outline: 0;
+			padding: 0 !important;
+			vertical-align: text-top;
+			height: 20px;
+			width: 20px;
+			-webkit-appearance: none;
+		}
+		.table_checkbox input[type=checkbox]:checked {
+			background-color: #FC7C5C !important;
+			border: 1px #fff solid;
+		}
+		input.passenger_name, input.adultCount, input.childCount, input.pickAirlineCompany, input.pickFlightNumber,input.addressInput, .form_timepicker.departureTime.timepicker, input.totalPassengersQty, .form_timepicker.arrivalTime.timepicker {
+			background: #fff;
+			color: #64748B;
+		}
+		td.editLink.text {
+			display: none;
+		}
+		
+		.expand_btn input[type="checkbox"]:checked::before {
+			transform: translateX(100%);
+			background: #FC7C5C;
+		}
+
+		.toolbar_container {
+			position: absolute;
+			z-index: 9999;
+			height: 46px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			bottom: 42px;
+			width: 100%;
+            pointer-events: none;
+		}
+		
+		.option{
+			background: #292D42;
+			width: auto;
+    		padding-left: 20px;
+    		padding-right: 20px;
+			height: 100%;
+			display: flex;
+			border-radius: 12px;
+			align-items: center;
+			box-shadow: 1px 1px 6px rgba(15, 23, 42, 0.5);
+			justify-content: center;
+            pointer-events: all;
+        }
+
+		.main-sidebar{
+			backgounrd: #292D42 !important;
+		}
+        section.content-footer{
+            position: relative;
+        }
+        .option li button,
+        .more_action li button{
+            padding: 0 11px;
+            color:#fff;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 16px;
+            text-transform: capitalize;
+            line-height: 150%;
+            letter-spacing: 0.5px;
+            background: transparent;
+            outline: none;
+            border: none;
+        }
+        .option ul,
+        .more_action ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            margin-bottom: 0;
+        }
+		.actions, .more_action, .first_options, .other_options {
+			display: flex;
+		}
+		.sidebar-menu .fa {
+			filter: opacity(1);
+			color: #fff !important;
+			font-size: 20px !important;
+		}
+		table.datagrid tbody tr:hover input.passenger_name, table.datagrid tbody tr:hover input.adultCount, table.datagrid tbody tr:hover input.childCount, table.datagrid tbody tr:hover input.pickAirlineCompany, table.datagrid tbody tr:hover input.pickFlightNumber,  table.datagrid tbody tr:hover .form_timepicker.departureTime.timepicker,table.datagrid tbody tr:hover .totalPassengersQty,table.datagrid tbody tr:hover input.addressInput, table.datagrid tbody tr:hover input.form_timepicker.arrivalTime.timepicker{
+			background: #cbc9c9 !important;
+			color: #000 !important;
+		}
+		button.btn.btn-comboBooking.rotate {
+			transform: rotate(180deg) !important;
+			margin-top: 14px !important;
+		}
+		input.addressInput {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+
+		}
+		.easyadmin-sidebar-width-normal  div#sidebar-resizer-handler {
+			width: 20px !important;
+    		height: 21px;
+			display: none;
+			position: fixed;
+			cursor: pointer;
+			bottom: 26px;
+			border-radius: 0;
+			background: #292D42;
+			background-image: url(../images/sidebar.svg);
+			background-repeat: no-repeat;
+			background-position: center !important;
+			background-size: contain;
+			z-index: 99999;
+			left: 22px;
+		}
+		.easyadmin-sidebar-width-compact div#sidebar-resizer-handler{
+			display: none;
+			left: 27px;
+			bottom: 28px;
+			height: 31px;
+			border-radius: 0;
+			background: #292D42;
+			background-image: url(../images/sidebar.svg);
+			background-repeat: no-repeat;
+			background-position: center !important;
+			width: 29px !important;
+			position: fixed;
+			cursor: pointer;
+			background-size: contain;
+			z-index: 99999;
+		}
+		.easyadmin-sidebar-width-compact .sidebar-menu>li:hover>.treeview-menu, .easyadmin-sidebar-width-compact .sidebar-menu>li:hover>a>span{
+			background: #292D42;
+			padding-left: 20px;
+			width: 200px;
+		}
+		.easyadmin-sidebar-width-compact .sidebar-menu>li:hover>.treeview-menu{
+			margin-left: 3px;
+		}
+		body.easyadmin-sidebar-width-compact .sidebar-menu li:hover{
+			background: #292D42;
+		}
+		.easyadmin-sidebar-width-normal div#sidebar-resizer-handler::after {
+			font-size: 20px;
+			content: "Close";
+			position: fixed;
+			padding-left: 20px;
+			color: #fff;
+			top: -3px;
+			width: 200px;
+			left: 20px;
+			background: #292D42;
+		}
+		.resizer-handler{
+			opacity: 1 !important;
+		}
+		nav.navbar {
+			position: relative;
+			width: 36px;
+		}
+		body.easyadmin-sidebar-width-compact img.menu--activity,
+		body.easyadmin-sidebar-width-compact img.menu--addon,
+		body.easyadmin-sidebar-width-compact img.menu--block,
+		body.easyadmin-sidebar-width-compact img.menu--discount,
+		body.easyadmin-sidebar-width-compact img.menu--system {
+			margin-left: 1.35px;
+		}
+		
+		.sidebar-menu, .sidebar-menu ul{
+			cursor: pointer;
+		}
+		.treeview .treeview-icon {
+			top: 7px;
+			position: absolute;
+			right: 34px;
+		}
+		.treeview a.menu--archives .treeview-icon{
+			right: 36%;
+		}
+		select.confirmationStatus {
+			width: 136px !important;
+			text-align: center;
+		}
+		.main-header #header-logo a {
+			width: 200px;
+			display: inline-block;
+			margin-top: 10px !important;
+		}
+		
+		
+    </style>
+
+    <!--suppress JSCheckFunctionSignatures -->
+	<script src="https://cdn.jsdelivr.net/npm/daterangepicker@3.1.0/moment.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/daterangepicker@3.1.0/daterangepicker.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker@3.1.0/daterangepicker.css" />
+	
+	{# TOOLTIP PLUGIN #}
+	<script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+   
+    <script type="text/javascript">
+		//truncate the text
+		$(document).ready(function(){
+			tippy(".addressInput",{
+				arrow:true,
+				placement: "bottom",
+				content(reference) {                              
+					const input_value = reference.getAttribute('value');
+					return input_value;
+				},
+				onShow(instance) {
+					if(instance.reference.getAttribute('value') != null && instance.reference.getAttribute('value').length > 0){
+						return true;
+					}else{
+						return false;
+					}
+				}
+			});
+		});
+
+
+		// SCRIPT CODE FOR ASSIGNING SUPPLIER TO ADDONS
+        $(document).ready(function () {
+            $(".selectSupplier.addon").change(function (e) { 
+                e.preventDefault();
+                let itemid      = $(this).data("itemid");
+                console.log(itemid);
+                let addonid     = $(this).data("addonid");
+                console.log(addonid);
+                let parentRow   = $("div.dropdown-content."+itemid).parents("tr");
+                let rows        = $(`tr[data-id='${itemid}']`);
+                let data        = {};
+                parentRow.find("input, select, button").each(function () {
+                    $(this).attr("disabled", "disabled");
+                    if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                        return;
+                    }
+                    data[$(this).attr("name")] = $(this).val();
+                });
+                rows.find("input, select, button").each(function () {
+                    $(this).attr("disabled", "disabled");
+                    if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                        return;
+                    }
+                    data[$(this).attr("name")] = $(this).val();
+                });
+                data["addon_id"] = addonid;
+                delete data["undefined"];
+
+
+                $.ajax({
+                    url: '{{ url("assignSupplierToAddon") }}',
+                    type: "POST",
+                    data: data,
+                    success: function (response) {
+                        var response = jQuery.parseJSON( response );
+
+                        if (response.status === 'success') {  
+
+
+                            rows.find("input, select, button").removeAttr("disabled");
+                            parentRow.find("input, select, button").removeAttr("disabled");
+                            
+                            $("#notification_bar .notification_container p").html("Saved");
+                            $("#notification_bar").show().css('display', 'flex');
+                            setTimeout(function() {
+                                $("section.sidebar").css("margin-top", "-70px");
+                                $("#notification_bar").fadeOut();
+                            }, 3000);
+                        } else {
+                            alert(response.message);
+                            return false;
+                        }
+                
+                    }
+                });
+
+
+            });
+        });        
+        // SCRIPT CODE FOR ASSIGNING SUPPLIER TO ADDONS
+
+         // SCRIPT CODE FOR ASSIGNING SUPPLIER TO EXTRAS
+        $(document).ready(function () {
+            $(".selectSupplier.extra").change(function (e) { 
+                e.preventDefault();
+                let itemid      = $(this).data("itemid");
+                let extraid     = $(this).data("extraid");
+                let parentRow   = $("div.dropdown-content."+itemid).parents("tr");
+                let rows        = $(`tr[data-id='${itemid}']`);
+                let data        = {};
+                parentRow.find("input, select, button").each(function () {
+                    $(this).attr("disabled", "disabled");
+                    if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                        return;
+                    }
+                    data[$(this).attr("name")] = $(this).val();
+                });
+                rows.find("input, select, button").each(function () {
+                    $(this).attr("disabled", "disabled");
+                    if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                        return;
+                    }
+                    data[$(this).attr("name")] = $(this).val();
+                });
+                data["extra_id"] = extraid;
+                delete data["undefined"];
+
+
+                $.ajax({
+                    url: '{{ url("assignSupplierToExtra") }}',
+                    type: "POST",
+                    data: data,
+                    success: function (response) {
+                        var response = jQuery.parseJSON( response );
+                        if (response.status === 'success') {  
+
+                            rows.find("input, select, button").removeAttr("disabled");
+                            parentRow.find("input, select, button").removeAttr("disabled");
+
+                            $("#notification_bar .notification_container p").html("Saved");
+                            $("#notification_bar").show().css('display', 'flex');
+                            setTimeout(function() {
+                                $("section.sidebar").css("margin-top", "-70px");
+                                $("#notification_bar").fadeOut();
+                            }, 3000);
+                        } else {
+                            alert(response.message);
+                            return false;
+                        }
+                
+                    }
+                });
+
+
+            });
+        });        
+        // SCRIPT CODE FOR ASSIGNING SUPPLIER TO EXTRAS
+
+
+
+        let body = $("body");
+
+        // Press the full-width button on the right side of the page to make it the default.
+        body.removeClass("easyadmin-content-width-normal");
+        body.addClass("easyadmin-content-width-full");
+
+        initDatePicker_dashboard(body);
+        initTimePicker(body);
+        $(".form_timepicker").mask("R0:00 SP", {
+            translation: {
+                "R": {
+                    pattern: /[012]/,
+                    optional: true
+                },
+                "S": {
+                    pattern: /[AaPp]/,
+                },
+                "P": {
+                    pattern: /[Mm]/,
+                }
+            }
+        });
+
+        $(document).ready(function(){
+            $('input.form_timepicker').timepicker( { format:'HH:mm' } );
+        });
+
+        const DRIVER_SELECT_ELEMENT_SELECTOR = "select[name*='driver.id']";
+        const DRIVER2_SELECT_ELEMENT_SELECTOR = "select[name*='supplier.id']";
+        const SEND_EMAIL_CHECKBOX_SELECTOR = "input[name*='sendEmail']";
+        const SEND_EMAIL2_CHECKBOX_SELECTOR = "input[name*='send_email']";
+
+        function updateSendEmailCheckboxVisibility() {
+            let changedInput = $(this).parents("tr").find(SEND_EMAIL_CHECKBOX_SELECTOR);
+            let driverIsDifferent = $(this).val() !== $(this).data("old-id");
+            let emailSentData = changedInput.data("sent-email").toString();
+            let emailWasSent = emailSentData !== "1";
+            if (
+                $(this).val() !== "" &&
+                (driverIsDifferent || emailWasSent)
+            ) {
+                changedInput.parent().removeAttr("hidden");
+            } else {
+                changedInput.parent().attr("hidden", "hidden");
+                changedInput.prop("checked", false);
+            }
+        }
+        function updateSendEmail2CheckboxVisibility() {
+            let changedInput = $(this).parents("tr").find(SEND_EMAIL2_CHECKBOX_SELECTOR);
+            let driverIsDifferent = $(this).val() !== $(this).data("old-id");
+            let emailSentData = changedInput.data("sent-email").toString();
+            let emailWasSent = emailSentData !== "1";
+            if (
+                $(this).val() !== "" &&
+                (driverIsDifferent || emailWasSent)
+            ) {
+                changedInput.parent().removeAttr("hidden");
+            } else {
+                changedInput.parent().attr("hidden", "hidden");
+                changedInput.prop("checked", false);
+            }
+        }
+
+        /**
+         *
+         * @param {jQuery} row
+         * @param {int} index
+         */
+        function updateRowIndex(row, index) {
+            let newName = "additionalDrivers[" + index + "][";
+            row.find("input, select").each(function () {
+                let name = $(this).attr("name");
+                if(!name){ return true; }
+                let match = name.match(/\[([^\[]*)]$/);
+                if (match !== null) {
+                    name = match[1];
+                }
+                $(this).attr("name", newName + name + "]");
+            });
+        }
+
+        /**
+         *
+         * @param {jQuery} that
+         */
+        function removeAdditionalDriver(that) {
+            if (confirm('You are deleting supplier row, are you sure?')) {
+                
+                let rowToDelete = $(that).parents("tr");
+                
+                if ($(that).hasClass("loading-button")) { return; }
+                $(that).addClass("loading-button");
+
+                if ( $(that).data('driverid') ) {
+                    let additionalDriverToRemove = $(that).data('driverid');
+                    $.ajax({
+                        url: '{{ url("remove_additional_driver") }}',
+                        type: "POST",
+                        dataType: "json",
+                        data: {'driverid': additionalDriverToRemove},
+                        success: function (response) {
+                            if (response.status === 'success') {  
+                                
+                                $("#notification_bar .notification_container p").html("Additional supplier removed!");
+                                $("#notification_bar").show().css('display', 'flex');
+                                $("section.sidebar").css("margin-top", "-150px");
+                                setTimeout(function() {
+                                    $("section.sidebar").css("margin-top", "-70px");
+                                    $("#notification_bar").fadeOut();
+                                }, 3000);
+                                rowToDelete.remove();
+        
+                            } else {
+                                alert(response.message)
+                                return false;
+                            }
+                        }
+                    });
+                }else{
+                    rowToDelete.remove();
+                }
+            
+            }
+        }
+
+        // Add a data point to know what the next driver index should be if a new driver is added.
+        let newDriverButtons = $(".action-new-driver");
+        newDriverButtons.each(function () {
+            let itemID = $(this).attr("data-id");
+            let firstDriverRow = $(`tr[data-id='${itemID}'].first-driver-row`);
+            let rows = $(`tr.additional-driver-row[data-id='${itemID}']`);
+            let table = firstDriverRow.parents("table");
+            let nextIndex = rows.length;
+            nextIndex = nextIndex.toString();
+            table.data("new-index-for-" + itemID, nextIndex);
+        });
+
+        newDriverButtons.on("click", function () {
+            let itemID = $(this).attr("data-id");
+            let firstDriverRow = $(`tr[data-id='${itemID}'].first-driver-row`);
+
+            let clone = firstDriverRow.clone();
+            clone.removeClass("first-driver-row");
+            clone.find('.action-remove-driver').removeAttr("data-id");
+            clone.find('.action-remove-driver').removeAttr("data-driverid");
+            clone.find("input, select").val("");
+            clone.find("span.action-new-driver.addMoreDriverLink").remove();
+            clone.find(".additionalDriverNetTaxValue").html("");
+            clone.find("div.net input").on("change", function() {
+                let net_price   = $(this).val();
+                let taxRate     = 0.13;
+                if($.isNumeric(net_price)){
+                    let netTaxPrice = ( parseFloat( parseFloat(net_price) * parseFloat(taxRate) ) + parseFloat(net_price));
+                    $(this).parents("tr").find(".additionalDriverNetTaxValue").html("$"+  Number(netTaxPrice).toFixed(2) );
+                
+                }else{
+                    console.log("Please Enter Numaric Value Only!")
+                }
+            });
+            clone.find(".date input").removeClass("readonly hasDatepicker").attr('value', '');  
+            let x_randomNum = Math.floor((Math.random() * 100000000) + 1);
+            let new_idToAssign = clone.find(".date input").attr('id');
+            clone.find(".date input").attr('id', new_idToAssign+x_randomNum);  
+            clone.find(".time input").removeClass("timepicker").attr('value', ''); 
+            let new_idToAssignTime = clone.find(".time input").attr('id');
+            clone.find(".time input").attr('id', new_idToAssignTime+x_randomNum);  
+            clone.find("select.confirmationStatus").removeClass("Assigned").addClass("Unassigned");
+            clone.find("select.confirmationStatus option").each(function (index, element) {
+                $(this).removeAttr('selected')
+            });
+            clone.find("select.confirmationStatus").val(0);
+            // clone.find(DRIVER_SELECT_ELEMENT_SELECTOR).on("change", updateSendEmailCheckboxVisibility);
+            clone.find(SEND_EMAIL_CHECKBOX_SELECTOR).parent().attr("hidden", "hidden");
+
+
+            let rows = $(`tr[data-id='${itemID}']`);
+            let lastRow = rows.last();
+            clone.insertAfter(lastRow);
+            
+            // Figure out the index of the new row, apply it, then increment the index.
+            let table = firstDriverRow.parents("table");
+            let newIndexStr = table.data("new-index-for-" + itemID);
+            let newIndex = parseInt(newIndexStr);
+            updateRowIndex(clone, newIndex);
+            table.data("new-index-for-" + itemID, (newIndex + 1).toString());
+                
+            initDatePicker_dashboard( $('body') );
+            initTimePicker( $('body') );
+        });
+        
+        // SAVING INTERNAL NOTE TO ORDER. 
+        $("button.btn-saveNewNote").on("click", function () {
+                        
+            let save_btn    = $(this);
+            let itemid      = $(this).val();
+            let parentRow   = $(this).parents("tr");
+
+            
+            $("#addNoteModal_"+itemid).hide();
+            parentRow.find("div.dropdown-content").css('display', 'none');
+            $("#notification_bar .notification_container p").html("Saved");
+            $("#notification_bar").show().css('display', 'flex');
+            // $("section.sidebar").css("margin-top", "-150px");
+            setTimeout(function() {
+                $("section.sidebar").css("margin-top", "-70px");
+                $("#notification_bar").fadeOut();
+            }, 3000);
+
+         
+            
+        });
+
+        // NOTIFYING DRIVER ABOUT NEW INTERNAL NOTES.
+        $(".btn-notifyDriverNewNote").on("click", function () {
+            if ($(this).hasClass("loading-button")) { return; }
+            $(this).addClass("loading-button");
+
+            let itemid      = $(this).val();
+            let parentRow   = $("div.dropdown-content."+itemid).parents("tr");
+            let itemID      = $(this).val();
+            let rows        = $(`tr[data-id='${itemID}']`);
+            let data        = {};
+            parentRow.find("input, select, button").each(function () {
+                $(this).attr("disabled", "disabled");
+                if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                    return;
+                }
+                data[$(this).attr("name")] = $(this).val();
+            });
+            rows.find("input, select, button").each(function () {
+                $(this).attr("disabled", "disabled");
+                if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                    return;
+                }
+                    data[$(this).attr("name")] = $(this).val();
+            });
+            delete data["undefined"];
+
+            let that = $(this);
+            $.ajax({
+                url: '{{ url("management_send_email_to_driver_new_notes") }}',
+                type: "POST",
+                data: data,
+                success: function (response) {
+                    if (response.status === 'success') {  
+
+                        $("#previous_notes_"+itemid).parents("form").find(".modal-body").append("<p class='noteAdded'>Driver has been Notified.</p>");
+                        setTimeout(function() {
+                            $("p.noteAdded").remove();
+                        }, 3000);
+
+
+                        that.removeClass("loading-button");
+                        that.removeAttr("disabled");
+                        rows.find("input, select, button").removeAttr("disabled");
+                        parentRow.find("input, select, button").removeAttr("disabled");
+                    } else {
+                        alert(response.message);
+                        return false;
+                    }
+                }
+            });
+        });
+
+        $(".action-inline-save").on("click", function () {
+            if ($(this).hasClass("loading-button")) { return; }
+            $(this).addClass("loading-button");
+
+            let parentRow   = $(this).parents("tr");
+            let itemID = $('input[class="bulk_actions_checkbox"]:checked').val();
+            let rows        = $(`tr[data-id='${itemID}']`);
+            let data = {};
+            parentRow.find("input, select, button").each(function () {
+                $(this).attr("disabled", "disabled");
+                if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                    return;
+                }
+                data[$(this).attr("name")] = $(this).val();
+            });
+            rows.find("input, select, button").each(function () {
+                $(this).attr("disabled", "disabled");
+                if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                    return;
+                }
+                    data[$(this).attr("name")] = $(this).val();
+            });
+            delete data["undefined"];
+            let that = $(this);
+            $.ajax({
+                url: '{{ url("management_save") }}',
+                type: "POST",
+                data: data,
+                success: function (response) {
+                    if (response.status == 'success') {
+                        for (let i = 0; i < response.messages.length; i++) {
+                            alert(response.messages[i]);
+                        }
+                        let driverSelects = $(DRIVER_SELECT_ELEMENT_SELECTOR);
+                        let sentIDs = response['sentIDs'];
+                        for (let i = 0; i < sentIDs.length; i++) {
+                            let strVal = sentIDs[i].toString();
+                            driverSelects.each(function () {
+                                if ($(this).val() === strVal) {
+                                    $(this).data("old-id", strVal);
+                                    let sendEmailCheckbox = $(this).parents("tr").find(SEND_EMAIL_CHECKBOX_SELECTOR);
+                                    sendEmailCheckbox.data("sent-email", "1");
+                                    $(this).trigger("change");
+                                }
+                            });
+                        }
+
+                        let driverRows = rows.slice(1);
+                        let index = 0;
+                        driverRows.each(function () {
+                            let driverSelect = $(this).find(DRIVER_SELECT_ELEMENT_SELECTOR);
+                            driverSelect.data("old-id", driverSelect.val());
+
+                            let sendEmailCheckbox = $(this).find(SEND_EMAIL_CHECKBOX_SELECTOR);
+                            if (sendEmailCheckbox.parent().is(":visible")) {
+                                let oldIDInt = parseInt(driverSelect.data("old-id"));
+                                if (sendEmailCheckbox.is(":checked") && sentIDs.includes(oldIDInt)) {
+                                    sendEmailCheckbox.data("sent-email", "1");
+                                } else {
+                                    sendEmailCheckbox.data("sent-email", "");
+                                }
+                            }
+
+                            // Update indices to match what's in the database now.
+                            // updateRowIndex($(this), index);
+                            index++;
+                        })
+
+                        that.removeClass("loading-button");
+                        that.removeAttr("disabled");
+                        rows.find("input, select, button").removeAttr("disabled");
+                        parentRow.find("input, select, button").removeAttr("disabled");
+                        if(response.vehicleType != null){
+                            $('tr[data-id="'+itemID+'"] select.vehicleType').val(response.vehicleType);
+                        }
+                        if(response.rack_a != null){
+                            $('tr[data-id="'+itemID+'"] td.adult_rack_price').html(response.rack_a);
+                        }
+                        if(response.itemNewStatus != null){
+                            $('tr[data-id="'+itemID+'"] select.billingStatus').val(response.itemNewStatus);
+                            if ( response.itemNewStatus == 0 ){
+                                $('tr[data-id="'+itemID+'"] select.billingStatus').removeClass("Paid").removeClass("Cancelled").addClass("Unpaid");
+                            }else if ( response.itemNewStatus == 1 ){
+                                $('tr[data-id="'+itemID+'"] select.billingStatus').removeClass("Unpaid").removeClass("Cancelled").addClass("Paid");
+                            }else if ( response.itemNewStatus == 2 ){
+                                $('tr[data-id="'+itemID+'"] select.billingStatus').removeClass("Unpaid").removeClass("Paid").addClass("Cancelled");
+                            }
+                        }
+                        if(response.rack_c != null){
+                            $('tr[data-id="'+itemID+'"] td.child_rack_price').html(response.rack_c);
+                        }
+                        if(response.tax != null){
+                            $('tr[data-id="'+itemID+'"] td.total_tax').html(response.tax);
+                        }
+                        if(response.rack_tax != null){
+                            $('tr[data-id="'+itemID+'"] td.totalRackPrice').html(response.rack_tax);
+                        }
+                        if(response.net != null){
+                            $('tr[data-id="'+itemID+'"] td.title_net_price').html(response.net);
+                        }
+                        if(response.net_tax != null){
+                            $('tr[data-id="'+itemID+'"] td.totalNetPrice').html(response.net_tax);
+                        }
+                        
+                        if(response.additional_drivers != null){
+                            $('tr.additional-driver-row[data-id="'+itemID+'"]').each(function (index, element) {
+                                if(response.additional_drivers[index] == "ASSIGNED"){
+                                    $(this).find(".driverAssigned span").html(response.additional_drivers[index]).addClass("Assigned").removeClass("Unassigned");
+                                }else{
+                                    $(this).find(".driverAssigned span").html(response.additional_drivers[index]).addClass("Unassigned").removeClass("Assigned");
+                                }
+
+                            });
+                        }
+
+                        parentRow.find("div.dropdown-content").css('display', 'none');
+
+                        $("#notification_bar .notification_container p").html("Saved");
+                        $("#notification_bar").show().css('display', 'flex');
+                        // $("section.sidebar").css("margin-top", "-150px");
+                        setTimeout(function() {
+                            $("section.sidebar").css("margin-top", "-70px");
+                            $("#notification_bar").fadeOut();
+                        }, 3000);
+                        rows.removeClass("edited")
+
+                    } else {
+                        that.removeClass("loading-button");
+                        that.removeAttr("disabled");
+                        rows.find("input, select, button").removeAttr("disabled");
+                        parentRow.find("input, select, button").removeAttr("disabled");
+                        let vehicle_to_set;
+                        parentRow.find("select.vehicle_id option").each(function() {
+                            var attr = $(this).attr('selected');
+                            if ( attr == 'selected' ) {
+                               vehicle_to_set = $(this).val();
+                            }
+
+                        });
+                        let vehicleType_to_set;
+                        parentRow.find("select.vehicleType option").each(function() {
+                            var attr = $(this).attr('selected');
+                            if ( attr == 'selected' ) {
+                               vehicleType_to_set = $(this).val();
+                            }
+
+                        });
+                        parentRow.find("div.dropdown-content").css('display', 'none');
+                        parentRow.find("select.vehicle_id").val(vehicle_to_set);
+                        parentRow.find("select.vehicleType").val(vehicleType_to_set);
+
+                        if(response.adultCount){
+                            parentRow.find("input.adultCount").val(response.adultCount);
+                            parentRow.find("input.childCount").val(response.childCount);
+                        }
+                        alert(response.message);
+                        return false;
+                    }
+                }
+            });
+        });
+
+        $("i.close_notification").on("click", function () {
+            $("#notification_bar").fadeOut();
+        });
+
+        $(".action-inline-modify").on("click", function () {
+            if ($(this).hasClass("loading-button")) { return; }
+            $(this).addClass("loading-button");
+
+            let parentRow   = $(this).parents("tr");
+            let itemID = $('input[class="bulk_actions_checkbox"]:checked').val(); 
+            let rows        = $(`tr[data-id='${itemID}']`);
+            let data = {};
+            parentRow.find("input, select, button").each(function () {
+                $(this).attr("disabled", "disabled");
+                if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                    return;
+                }
+                data[$(this).attr("name")] = $(this).val();
+            });
+            rows.find("input, select, button").each(function () {
+                $(this).attr("disabled", "disabled");
+                if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                    return;
+                }
+                    data[$(this).attr("name")] = $(this).val();
+            });
+            delete data["undefined"];
+            location.href = '/admin/order/edit_item?id='+itemID;         
+
+            $(this).removeClass("loading-button");
+            $(this).removeAttr("disabled");
+            rows.find("input, select, button").removeAttr("disabled");
+            parentRow.find("input, select, button").removeAttr("disabled");
+
+        });
+
+        $(".action-inline-resent-confirmation").on("click", function () {
+            if ($(this).hasClass("loading-button")) { return; }
+            $(this).addClass("loading-button");
+			$("#loader").fadeIn().addClass("transparent");
+
+            let parentRow   = $(this).parents("tr");
+            let itemID = $('input[class="bulk_actions_checkbox"]:checked').val();    
+			console.log(itemID);
+            let rows        = $(`tr[data-id='${itemID}']`);
+            let data = {};
+            parentRow.find("input, select, button").each(function () {
+                $(this).attr("disabled", "disabled");
+                if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                    return;
+                }
+                data[$(this).attr("name")] = $(this).val();
+            });
+            rows.find("input, select, button").each(function () {
+                $(this).attr("disabled", "disabled");
+                if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                    return;
+                }
+                    data[$(this).attr("name")] = $(this).val();
+            });
+            delete data["undefined"];
+            let that = $(this);
+            $.ajax({
+                url: '{{ url("management_resent_confirmation") }}',
+                type: "POST",
+                data: data,
+                success: function (response) {
+                    if (response.status === 'success') {  
+                        that.removeClass("loading-button");
+                        that.removeAttr("disabled");
+                        rows.find("input, select, button").removeAttr("disabled");
+                        parentRow.find("input, select, button").removeAttr("disabled");
+                        $("#notification_bar .notification_container p").html("Confirmation email was re-sent to customer.");
+                        $("#notification_bar").show().css('display', 'flex');
+                        $("section.sidebar").css("margin-top", "-150px");
+                        parentRow.find("div.dropdown-content").css('display', 'none');
+						$("#loader").fadeOut().removeClass("transparent");
+
+                        setTimeout(function() {
+                            $("section.sidebar").css("margin-top", "-70px");
+                            $("#notification_bar").fadeOut();
+                        }, 3000);
+                    } else {
+                        parentRow.find("div.dropdown-content").css('display', 'none');
+						$("#loader").fadeOut().removeClass("transparent");
+						alert(response.message);
+                        return false;
+                    }
+                }
+            });
+        });
+
+        $(".action-inline-send-email-to-driver").on("click", function () {
+            if ($(this).hasClass("loading-button")) { return; }
+            $(this).addClass("loading-button");
+
+            let parentRow   = $(this).parents("tr");
+            let itemID      = $(this).val();
+            let rows        = $(`tr[data-id='${itemID}']`);
+            let data = {};
+            parentRow.find("input, select, button").each(function () {
+                $(this).attr("disabled", "disabled");
+                if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                    return;
+                }
+                data[$(this).attr("name")] = $(this).val();
+            });
+            rows.find("input, select, button").each(function () {
+                $(this).attr("disabled", "disabled");
+                if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                    return;
+                }
+                    data[$(this).attr("name")] = $(this).val();
+            });
+            delete data["undefined"];
+            let that = $(this);
+            $.ajax({
+                url: '{{ url("management_send_email_to_driver") }}',
+                type: "POST",
+                data: data,
+                success: function (response) {
+                    if (response.status === 'success') {  
+                        that.removeClass("loading-button");
+                        that.removeAttr("disabled");
+                        rows.find("input, select, button").removeAttr("disabled");
+                        parentRow.find("input, select, button").removeAttr("disabled");
+                        $("#notification_bar .notification_container p").html("Email was sent to supplier.");
+                        $("#notification_bar").show().css('display', 'flex');
+                        $("section.sidebar").css("margin-top", "-150px");
+                        parentRow.find("div.dropdown-content").css('display', 'none');
+                        setTimeout(function() {
+                            $("section.sidebar").css("margin-top", "-70px");
+                            $("#notification_bar").fadeOut();
+                        }, 3000);
+                    } else {
+                        alert(response.message);
+                        parentRow.find("div.dropdown-content").css('display', 'none');
+                        return false;
+                    }
+                }
+            });
+        });
+
+        $(".action-inline-send-email-from-front").on("click", function () {
+            if ($(this).hasClass("loading-button")) { return; }
+            $(this).addClass("loading-button");
+
+            let parentRow   = $(this).parents("tr");
+            let itemID = $('input[class="bulk_actions_checkbox"]:checked').val();
+            let rows        = $(`tr[data-id='${itemID}']`);
+            let data = {};
+            parentRow.find("input, select, button").each(function () {
+                $(this).attr("disabled", "disabled");
+                if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                    return;
+                }
+                data[$(this).attr("name")] = $(this).val();
+            });
+            rows.find("input, select, button").each(function () {
+                $(this).attr("disabled", "disabled");
+                if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                    return;
+                }
+                    data[$(this).attr("name")] = $(this).val();
+            });
+            delete data["undefined"];
+            let that = $(this);
+            $.ajax({
+                url: '{{ url("send_email_from_front") }}',
+                type: "POST",
+                data: data,
+                success: function (response) {
+                    if (response.status === 'success') {  
+                        that.removeClass("loading-button");
+                        that.removeAttr("disabled");
+                        rows.find("input, select, button").removeAttr("disabled");
+                        parentRow.find("input, select, button").removeAttr("disabled");
+                        $("#notification_bar .notification_container p").html(response.message);
+                        $("#notification_bar").show().css('display', 'flex');
+                        $("section.sidebar").css("margin-top", "-150px");
+                        setTimeout(function() {
+                            $("section.sidebar").css("margin-top", "-70px");
+                            $("#notification_bar").fadeOut();
+                        }, 3000);
+                            
+                        // let version = response.create_draft.version.split("-");
+                        // version = version[0];
+                        // window.open('https://app.frontapp.com/inboxes/teammates/12500812/drafts/'+version, '_blank');  // live 
+                        parentRow.find("div.dropdown-content").css('display', 'none');
+                        // window.open('https://app.frontapp.com/inboxes/teammates/12540300/drafts/'+version, '_blank'); // local
+                         
+                    } else {
+                        alert(response.message);
+                        parentRow.find("div.dropdown-content").css('display', 'none');
+                        that.removeClass("loading-button");
+                        that.removeAttr("disabled");
+                        rows.find("input, select, button").removeAttr("disabled");
+                        parentRow.find("input, select, button").removeAttr("disabled");
+                        return false;
+                    }
+                }
+            });
+        });
+
+        // CREATE CONFIRMATION BUTTON ON CLICK
+        $(".action-inline-send-confirmation-from-front ").on("click", function () {
+            if ($(this).hasClass("loading-button")) { return; }
+            $(this).addClass("loading-button");
+
+           let parentRow   = $(this).parents("tr");
+            let itemID = $('input[class="bulk_actions_checkbox"]:checked').val();   
+			console.log(itemID);
+
+            let rows        = $(`tr[data-id='${itemID}']`);
+            let data = {};
+            parentRow.find("input, select, button").each(function () {
+                $(this).attr("disabled", "disabled");
+                if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                    return;
+                }
+                data[$(this).attr("name")] = $(this).val();
+            });
+            rows.find("input, select, button").each(function () {
+                $(this).attr("disabled", "disabled");
+                if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                    return;
+                }
+                    data[$(this).attr("name")] = $(this).val();
+            });
+            delete data["undefined"];
+            let that = $(this);
+            $.ajax({
+                url: '{{ url("send_confirmation_from_front") }}',
+                type: "POST",
+                data: data,
+                success: function (response) {
+                    if (response.status === 'success') {  
+                        that.removeClass("loading-button");
+                        that.removeAttr("disabled");
+                        rows.find("input, select, button").removeAttr("disabled");
+                        parentRow.find("input, select, button").removeAttr("disabled");
+                        $("#notification_bar .notification_container p").html(response.message);
+                        $("#notification_bar").show().css('display', 'flex');
+                        $("section.sidebar").css("margin-top", "-150px");
+                        setTimeout(function() {
+                            $("section.sidebar").css("margin-top", "-70px");
+                            $("#notification_bar").fadeOut();
+                        }, 3000);
+                            
+                        parentRow.find("div.dropdown-content").css('display', 'none');
+                         
+                    } else {
+                        alert(response.message);
+                        parentRow.find("div.dropdown-content").css('display', 'none');
+                        that.removeClass("loading-button");
+                        that.removeAttr("disabled");
+                        rows.find("input, select, button").removeAttr("disabled");
+                        parentRow.find("input, select, button").removeAttr("disabled");
+                        return false;
+                    }
+                }
+            });
+        });
+
+        wi_handle_status_color();
+
+        function wi_handle_status_color() {
+            wi_apply_status_color();
+            $('[name="status"]').change(function() {
+                wi_apply_status_color();
+            });
+        }
+
+        function wi_apply_status_color() {
+            $('[name="status"]').each(function() {
+                let status = $(this).val();
+                let color = '--red';
+
+                if (status == {{constant('App\\Wicrew\\SaleBundle\\Entity\\Order::STATUS_CANCELLED')}}) {
+                    color = '--red';
+                } else if (status == {{constant('App\\Wicrew\\SaleBundle\\Entity\\Order::STATUS_PAID')}}) {
+                    color = '--green';
+                } else if (status == {{constant('App\\Wicrew\\SaleBundle\\Entity\\Order::STATUS_PENDING')}}) {
+                    color = '--orange';
+                }
+
+                $(this).attr('style', 'color: var('+color+')');
+            });
+        }
+
+        wi_handle_confirmation_status_color();
+
+        function wi_handle_confirmation_status_color() {
+            wi_apply_confirmation_status_color();
+            $('[name="confirmationStatus"], [name="confirmation_status"]').change(function() {
+                wi_apply_confirmation_status_color();
+            });
+        }
+
+        function wi_apply_confirmation_status_color() {
+            $('[name="confirmationStatus"], [name="confirmation_status"]').each(function()  {
+                let status = $(this).val();
+                let color = '--red';
+
+                if (status == {{constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::CONFIRMATION_STATUS_UNASSIGNED')}}) {
+                    color = '--orange';
+                } else if (status == {{constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::CONFIRMATION_STATUS_ASSIGNED')}}) {
+                    color = '--yellow';
+                } else if (status == {{constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::CONFIRMATION_STATUS_APPROVED')}}) {
+                    color = '--blue';
+                } else if (status == {{constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::CONFIRMATION_STATUS_CONFIRMED')}}) {
+                    color = '--green';
+                }
+
+                $(this).attr('style', 'color: var('+color+')');
+            });
+        }
+
+
+    
+        // SORT COLUMN 
+        $("table.table.datagrid thead th.pickup_date i").click(function (e) { 
+            e.preventDefault();
+            let base_url = window.location.origin;
+            let currect_class = $(this).attr("class");
+            if(currect_class == "fa fa-sort-amount-asc"){
+                window.open(base_url+"/admin/?entity=Dashboard&action=list&sortField=pickDate&sortDirection=desc","_self" );
+            }else if(currect_class == "fa fa-sort-amount-desc"){
+                window.open(base_url+"/admin/?entity=Dashboard&action=list&sortField=pickDate&sortDirection=asc","_self" );
+            }
+        });
+
+		// FOLLOWING CODE IS SHOW COMBO BOOKING BUTTON. 
+		$(document).ready(function () {
+			let rowsNeededToHide    = $('table.table.datagrid tr.needsToHide');
+			let all_rows            = $('table.table.datagrid tr');
+			
+			rowsNeededToHide.hide();
+			
+			let insertedData        = [];
+			$('table.table.datagrid tr:not( .additional-driver-row.empty )').each(function (index, element) {
+				let orderid         = $(this).data("orderid");
+				let sameOrderRows_length   = $('table.table.datagrid tr[data-orderid="'+orderid+'"]:not(.additional-driver-row.empty)').length;
+				if(sameOrderRows_length > 1 && $.inArray(orderid, insertedData) === -1 ){
+					
+					insertedData.push( orderid );
+				
+					let sameOrderRows   = $('table.table.datagrid tr[data-orderid="'+orderid+'"]:not(.additional-driver-row.empty)');
+					$(sameOrderRows).each(function (index, element) {
+						if( index == 0 ){
+							//$(this).find("td.date").append('<div class="combo_booking"> <button class="btn btn-comboBooking"> <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"> <path d="M8.905 0.201683C8.73583 0.178349 8.58417 0.324183 8.58417 0.493349V4.00502C8.58417 4.44835 8.32167 4.85085 7.91333 5.03168C7.505 5.20668 7.0325 5.13085 6.70583 4.82752L6.19833 4.36085C6.0875 4.25585 5.91833 4.25585 5.80167 4.36085L5.29417 4.82752C5.08417 5.02585 4.81 5.12502 4.53583 5.12502C4.38417 5.12502 4.2325 5.09585 4.08667 5.03168C3.67833 4.85085 3.41583 4.44835 3.41583 4.00502V0.493349C3.41583 0.324183 3.26417 0.178349 3.095 0.201683C1.46167 0.405849 0.75 1.50835 0.75 3.08335V8.91668C0.75 10.6667 1.625 11.8333 3.66667 11.8333H8.33333C10.375 11.8333 11.25 10.6667 11.25 8.91668V3.08335C11.25 1.50835 10.5383 0.405849 8.905 0.201683ZM9.20833 9.93752H4.25C4.01083 9.93752 3.8125 9.73918 3.8125 9.50002C3.8125 9.26085 4.01083 9.06252 4.25 9.06252H9.20833C9.4475 9.06252 9.64583 9.26085 9.64583 9.50002C9.64583 9.73918 9.4475 9.93752 9.20833 9.93752ZM9.20833 7.60418H6.72917C6.49 7.60418 6.29167 7.40585 6.29167 7.16668C6.29167 6.92752 6.49 6.72918 6.72917 6.72918H9.20833C9.4475 6.72918 9.64583 6.92752 9.64583 7.16668C9.64583 7.40585 9.4475 7.60418 9.20833 7.60418Z" fill="#3B82F6"/> </svg> Combo Booking </button> </div>'); #}
+						}
+
+						
+					});
+				}
+			});
+			// ON CLICK OF comboBooking BTN 
+			$('table.table td.type i, .btn.btn-comboBooking').on('click', comboBookingFunction);
+
+		});        
+		// ABOVE CODE IS SHOW COMBO BOOKING BUTTON. 
+        
+          $(".action-inline-add-driver").on("click", function () {
+            let itemID = $('input.bulk_actions_checkbox:checked').parents('tr').data('id')
+            $(`tr[data-id='${itemID}'].additional-driver-row`).show();            
+        })
+
+
+
+        $(".action-inline-see-order").on("click", function () {
+            let order_id = $('input[class="bulk_actions_checkbox"]:checked').parents('tr').data('orderid')           
+             let base_url = window.location.origin;
+            window.open(base_url+'/admin/?entity=Order&action=edit&id='+order_id, '_blank');
+            $(this).parents("tr").find("div.dropdown-content").css('display', 'none');
+        });
+
+
+
+        $(".select_all").click(function() {
+            var checked = $(".table_checkbox input[type=checkbox]:checked").length;
+            if (checked >= 1) {
+                $(".table_checkbox input[type=checkbox]").prop("checked", false);
+            } else {
+                $(".table_checkbox input[type=checkbox]").prop("checked", true);
+            }
+        });
+                    
+
+		//active classes
+		$(document).ready(function(){
+			const urlParams = new URLSearchParams(window.location.search);
+			const sortField = urlParams.get('sortField');
+			$('table.table.datagrid thead th').each(function() {
+				const column = $(this);
+				const columnValue = column.attr('data-column');
+				if (columnValue === sortField) {
+					column.addClass('active_order');
+				} else {
+					column.removeClass('active_order');
+				}
+			});
+		});
+
+
+	
+		//sorting
+        $(document).on('click', '.sort_desc', function() {
+        var column = $(this).closest('th').data('column');
+        $(this).closest('.sort_desc').addClass('active_order');
+            let base_url = window.location.origin;
+            window.open(base_url+"/admin/?entity=Dashboard&action=list&sortField="+column+"&sortDirection=desc","_self" );
+        });
+        $(document).on('click', '.sort_asc', function() {
+        var column = $(this).closest('th').data('column');
+            $(this).closest('.sort_desc').removeClass('active_order');
+            $(this).closest('.sort_asc').addClass('active_order');
+            let base_url = window.location.origin;
+            window.open(base_url+"/admin/?entity=Dashboard&action=list&sortField="+column+"&sortDirection=asc","_self" );
+        });
+
+	//icon rotation
+    var urlParams = new URLSearchParams(window.location.search);
+    var sortField = urlParams.get('sortField');
+    var sortDirection = urlParams.get('sortDirection');
+    var th = $('th[data-column="' + sortField + '"]');
+	if (sortDirection === 'asc') {
+        th.find('i').addClass('rotate-180');
+	}else if(sortDirection === 'desc'){
+        th.find('i').addClass('active_order');
+    }
+
+   
+	$(document).ready(function(){
+		$("table.table.datagrid thead th i").click(function () { 
+			$(this).toggleClass("active");
+			let currentColumnFilterID = $(this).parents("th").find("div.filter").attr("id");
+			$("div.filter:not(#"+currentColumnFilterID+")").hide();
+			$(this).parents("th").find("div.filter").toggle();
+		});
+	});
+
+
+	//rotate icon
+    $(".bulk_actions_checkbox").change(function() {
+        if (!$(".bulk_actions_checkbox").is(":checked")) {
+            $(".first-driver-row.additional-driver-row.empty.data_row").hide();
+        }
+    });
+  
+    $(document).ready(function(){
+        $('.select_all_boxes').on('change', function() {
+            if(this.checked) {
+                $(this).parents("th").find('.filter_checkbox input[type=checkbox]').prop('checked', true);
+            } else {
+                $(this).parents("th").find('.filter_checkbox input[type=checkbox]').prop('checked', false);
+            }
+        });  
+                               
+        $('.filter_checkbox').on('click', '.select_all_boxes', function() {
+            let group_name = $(this).attr('name').substr(4); // get the group name (remove "all_" prefix)
+            $(this).parents("th").find('.filter_checkbox.' + group_name + ' input[type="checkbox"]').prop('checked', this.checked); // select all checkboxes in the same group
+        });
+    });
+
+    $('.datagrid tbody tr').addClass('data_row');
+
+    
+	$(document).ready(function(){
+        $('.filter').hide();
+    });
+
+
+    $(document).ready(function(){
+        $(".singleColumnFilterSeeResult").on("click", function() {
+            let selectedColumn = $(this).data("columnname");
+            var selectedCheckedBoxes = $(this).parents(".filter").find(".filter_checkbox input[type='checkbox']:checked");
+            var selectedValues = "";
+
+            selectedCheckedBoxes.each(function() {
+            var selectedValue = $(this).val().replace("#", "");
+
+            if (selectedValues === "") {
+                selectedValues = selectedValue;
+            } else {
+                selectedValues += "," + selectedValue;
+            }
+            });
+
+            let selectedColumnParam = getUrlParameter('selectedColumn');
+            let selectedValuesParam = getUrlParameter('query');
+            let selectedData = {};
+            if( selectedColumnParam ){
+                selectedData[selectedColumnParam] = selectedValuesParam;
+            }
+            selectedData[selectedColumn] = selectedValues;
+             if( selectedColumnParam ){
+
+                var selectedData_str = encodeURIComponent(JSON.stringify(selectedData));
+
+                window.open(window.location.origin + "/admin/?action=search&query=multisearch&entity=Dashboard&multiColumn=true&selectedData=" + selectedData_str, "_self");
+            }else{
+                window.open(window.location.origin + "/admin/?action=search&entity=Dashboard&query=" + selectedValues + "&selectedColumn=" + selectedColumn + "&sortDirection=desc&sortField=" + selectedColumn, "_self");
+            }
+        }); 
+    });
+
+    var getUrlParameter = function getUrlParameter(sParam) {
+        var sPageURL = window.location.search.substring(1),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+            }
+        }
+        return false;
+    };
+    $(".singleColumnFilterSeeResult_date").on("click", function() {
+        var selectedColumn = "pickDate";
+        var selectedValues          = $('.input .date_result span').text();
+        window.open(window.location.origin + "/admin/?action=search&entity=Dashboard&query=" + selectedValues + "&selectedColumn=" + selectedColumn + "&sortDirection=desc&sortField=" + selectedColumn, "_self");
+    });
+	
+	$(".singleColumnFilterSeeResult_date").on("click", function() {
+         var selectedColumn = "pickDate";
+
+			let date = $('div#pickup_date_filter .search_text input[type="text"]').val();
+			const inputDateRange = date;
+
+			const [startDate, endDate] = inputDateRange.split(' - ')
+			.map(date => moment(date, 'MM/DD/YYYY').format('YYYY-MM-DD'));
+
+			const selectedValues = `${startDate},${endDate}`;
+			let dateString = selectedValues;
+
+			let [startDate2, endDate2] = dateString.split(',');
+
+			console.log(startDate2); // outputs: 2023-06-06
+			console.log(endDate2); // outputs: 2023-11-23
+
+
+			const startDate1 = startDate2;
+			const endDate1 =  endDate2;
+			const dateRange = [];
+
+			// Loop through each day between start and end dates
+			for (let date = new Date(startDate1); date <= new Date(endDate1); date.setDate(date.getDate() + 1)) {
+			dateRange.push(date.toISOString().slice(0, 10));
+			}
+
+			console.log(dateRange);
+
+			window.open(window.location.origin + "/admin/?action=search&entity=Dashboard&query=" + dateRange + "&selectedColumn=" + selectedColumn + "&sortDirection=desc&sortField=" + selectedColumn, "_self");
+		});
+
+		$(function () {
+		$('input[name="daterange"]').daterangepicker(
+			{
+			opens: "right",
+			//maxDate: moment(),
+			isCustomDate: function (arr1) {
+				$("td").on("click", () => {
+				console.log(arr1);
+				});
+			}
+			},
+			function (start, end, label) {
+			console.log(
+				"A new date selection was made: " +
+				start.format("YYYY-MM-DD") +
+				" to " +
+				end.format("YYYY-MM-DD")
+			);
+
+			let startDate = start.format("YYYY-MM-DD"),
+				endDate = end.format("YYYY-MM-DD");
+
+			$(".date-from").html(startDate);
+			$(".date-to").html(endDate);
+
+			//$('.daterangepicker td.off').addClass('hello-world');
+			}
+		);
+
+		$(".datePickerSpan").on("show.daterangepicker", function (ev, picker) {
+			//do something
+			if ($(".date-header").length < 1) {
+			$(".daterangepicker").prepend(`
+			<div class="date-header">
+				<div class="date-from-area">
+				<span>From </span>
+				<span class="date-from"></span>
+				</div>
+				<div class="date-to-area">
+				<span>To </span>
+				<span class="date-to"></span>
+				</div>
+			</div>
+		`);
+			}
+			console.log(ev, picker);
+		});
+		//$('#daterange').data('daterangepicker').setStartDate('03/01/2014');
+
+		$(document).on("click", ".calendar-table td", function () {
+			let h = $("span").data("daterangepicker").getStartDate();
+
+			console.log(h);
+		});
+		
+	});
+
+
+    $(document).ready(function(){
+        $(".totalPassengersQty").click(function () { 
+            $(this).parents("td").find("div.passengerQty-dropdown").toggle();
+			$(this).parents("td").toggleClass("dl-relative");
+        });
+    });
+
+	$('.expand_btn').click(function(){
+		var checked = $(".expand_btn input[type=checkbox]:checked").length;
+		if(checked == 1){
+			$('tr.needsToHide, tr.combiBookingRow, tr.needsToHide.data_row.combiRow.shown').show().addClass("shown");
+			$("button.btn.btn-comboBooking").css({
+				"transform": "rotate(180deg)",
+				"margin-top": "14px"
+			});
+		} else{
+			$('tr.needsToHide, tr.combiBookingRow, tr.needsToHide.data_row.combiRow.shown').hide().removeClass("shown");
+			$("button.btn.btn-comboBooking").css({
+				"transform": "rotate(0deg)",
+				"margin-top": "0"
+			});
+		}
+	});
+
+	$(document).ready(function(){
+		$('button.btn.btn-comboBooking').removeClass("rotate");
+	});
+
+
+
+	let combo_booking_rotate_interval = setInterval(function () {
+	
+		let combo_bookingDiv_rotate        = $('button.btn.btn-comboBooking');
+		if( combo_bookingDiv_rotate.length > 0 ){
+			// DO YOUR WORK    
+				$('button.btn.btn-comboBooking').click(function() {
+				$(this).toggleClass("rotate");
+				});
+			clearInterval(combo_booking_rotate_interval);
+		}
+
+	}, 500);
+
+    //check if combo booking is exits then remove margin left
+	let combo_booking_interval = setInterval(function () {
+	
+		let combo_bookingDiv        = $('.combo_booking');
+		if( combo_bookingDiv.length > 0 ){
+			$(".combo_booking").siblings().css({"margin-left" : "0px"});  
+			clearInterval(combo_booking_interval);
+		}
+
+	}, 500);
+				
+	// textfields color change when checkbox is checked
+
+	$(".bulk_actions_checkbox").click(function () {
+		if( $(this).is(":checked") ) {
+			//$(this).parents("tr").find("input.adultCount , input.childCount ,input.passenger_name , input.pickAirlineCompany , input.pickFlightNumber, input.form_timepicker.departureTime.timepicker, input.totalPassengersQty, input.addressInput,input.addressInput, .form_timepicker.arrivalTime.timepicker").css('background-color', '#FADBC0')
+			$(this).closest("tr").find("td, select, input").css('color', '#292D42');
+			$(this).closest("tr").find("td:not(:has(td.table_checkbox)):not(:has(select.billingStatus))").css('background-color', '#cbc9c9');
+			$(this).closest("tr").find('input:not(:has(.bulk_actions_checkbox)').css('background-color', '#cbc9c9');
+
+
+
+			$(this).closest('table.table.datagrid tr').css('background-color', '#cbc9c9');
+		} else {
+			//$(this).parents("tr").find("input.adultCount , input.childCount ,input.passenger_name , input.pickAirlineCompany , input.pickFlightNumber, input.form_timepicker.departureTime.timepicker, input.totalPassengersQty, input.addressInput,input.addressInput, .form_timepicker.arrivalTime.timepicker").css('background-color', '#fff')
+			$(this).closest("tr").find("td, select, input").css('color', '#64748B');
+			$(this).closest("tr").find("td:not(:has(td.table_checkbox)):not(:has(select.billingStatus))").css('background-color', '#fff');
+			$(this).closest("tr").find('input:not(:has(.bulk_actions_checkbox)').css('background-color', '#fff');
+
+
+			$(this).closest('table.table.datagrid tr').css('background-color', '#fff')
+		}
+	});
+               
+	$(document).ready(function(){
+		$(".action-inline-add-note-to-driver").click(function(){
+			let itemID = $('input[class="bulk_actions_checkbox"]:checked').val(); 
+			$('#addNoteModal_'+itemID).show();
+			$(".toolbar_container").hide();
+			$('.first_options').hide(); 
+			$(".multi_selection").hide();
+			$(".table_checkbox input[type=checkbox]").prop("checked", false);
+
+		});
+		$(".toolbar_container").hide();
+	});
+	     
+	$('#select_all').click(function(){
+		var checked = $(".table_checkbox input[type=checkbox]:checked").length;
+		if(checked >=3){
+			$(".multi_selection").hide();
+			$(".toolbar_container").hide();
+			$('.other_options').hide();
+			$('.first_options').hide();
+		}else{
+			$(".multi_selection").show();
+			$(".toolbar_container").show();
+			$('.other_options').hide();
+			$('.first_options').hide();
+		}
+	});
+	//cancel button
+	$(document).ready(function(){
+		$('button.cancel_btn').click(function () {
+			$(".toolbar_container").hide();
+			$(".table_checkbox input[type=checkbox]").prop("checked", false);
+			$('input.bulk_actions_checkbox').closest('.data_row').css('background-color', '#fff');
+			$('.passenger_name, .pickAirlineCompany, .pickFlightNumber, .adultCount, .childCount, .totalPassengersQty, .addressInput').css('background-color', '#fff');            
+			$("td:not(:has(td.table_checkbox)):not(:has(select.billingStatus))").css('background-color', '#fff');
+			$('input:not(:has(.bulk_actions_checkbox)').css('background-color', '#fff');
+			$('table.table.datagrid tr').css('background-color', '#fff');
+
+		});
+	});
+
+	//change backgounrd after openig notes
+	$('.addNewNoteForm').click(function(){
+		$('.data_row, .totalPassengersQty, .addressInput, .passenger_name, .pickAirlineCompany, .pickFlightNumber').css('background-color', '#fff');
+	}); 
+
+	$(document).ready(function(){
+		$('.other_options').hide();
+		$('li.more_other_option').click(function(){
+			$('.other_options').toggle();
+			$('.first_options').toggle();
+		});
+	
+
+		const rowCount = $("table .data_row").length;
+		if(rowCount >= 33){
+			$('.toolbar_container').css({'position':'fixed', 'width': 'calc(100% - 288px)'});					
+			$('.easyadmin-sidebar-width-compact .toolbar_container').css({'position':'fixed', 'width': 'calc(100% - 100px)'});
+		}
+	});
+
+
+	$('table.table.datagrid tr.needsToHide').hide();
+	$('table.table.datagrid tr.needsToHide').prevUntil(':visible').prev().addClass("combiRow");
+	let previousVisibleRow = $('tr.additional-driver-row:not(.empty), tr.itemExtrasAddonsRow:not(.empty)').prev('tr:visible');
+	previousVisibleRow.addClass("combiRow");
+	$('td.serviceType:contains("Activity regular")').closest('tr').addClass("combiRow");
+	$("table.table.datagrid tr.combiRow td.status").append('<div class="combo_booking"> <button class="btn btn-comboBooking"> <svg fill="#000000" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M 16 6.59375 L 15.28125 7.28125 L 2.78125 19.78125 L 4.21875 21.21875 L 16 9.4375 L 27.78125 21.21875 L 29.21875 19.78125 L 16.71875 7.28125 Z"></path></g></svg></button> </div>');
+	// $('table.table.datagrid tr.combiRow:not(.combiBookingRow) td[data-name="type"] .itemIconContainer').html('<i class="fa fa-square" aria-hidden="true"></i> <i class="fa fa-square absolutePosition" aria-hidden="true"></i>');
+	$("table.table.datagrid tr.combiRow:not(.combiBookingRow)").find('td[data-name="type"]').append('<span class="itemHasExtras"><i class="fa fa-angle-down" aria-hidden="true"></i></span>');
+	$('table.table.datagrid tr.itemExtrasAddonsRow td[data-name="type"]').html(' ');
+
+
+	//icons
+	$(document).ready(function(){
+		//activity
+		var imageSrc = '../images/activity.svg'; 
+		var imgElement = $('<img>', {
+			src: imageSrc,
+			class: 'menu--activity'
+		});
+		$('.menu--activity i').replaceWith(imgElement);
+		
+		//addon
+		var imageSrc = '../images/addon.svg'; 
+		var imgElement = $('<img>', {
+			src: imageSrc,
+			class: 'menu--addon',
+		});
+		$('.menu--addon i').replaceWith(imgElement);
+		
+		// block
+		var imageSrc = '../images/block.svg'; 
+		var imgElement = $('<img>', {
+		src: imageSrc,
+		class: 'menu--block',
+		});
+		$('.menu--block i').replaceWith(imgElement);
+		
+		//discount
+		var imageSrc = '../images/discount.svg'; 
+		var imgElement = $('<img>', {
+		src: imageSrc,
+		class: 'menu--discount' 
+		});
+		$('.menu--discount i').replaceWith(imgElement);
+		
+		//system
+		var imageSrc = '../images/system.svg'; 
+		var imgElement = $('<img>', {
+			src: imageSrc,
+			class: 'menu--system'
+		});
+		$('.menu--system i').replaceWith(imgElement);
+	});
+
+
+	$("button#bulkSendConfirmationFromFrontBtn").on("click", function () {
+		console.log("bulkSendConfirmationFromFrontBtn");
+		if ($(this).hasClass("loading-button")) { return; }
+		$(this).addClass("loading-button");
+
+		let selectedCheckboxValues  = $('input.bulk_actions_checkbox:checked').map(function() {
+			return $(this).val();
+		}).get();
+		console.log(selectedCheckboxValues);
+
+		let final_data = [];
+
+		if (selectedCheckboxValues.length === 0) {
+			alert("Please select atleast 1 booking!");
+			$(this).removeClass("loading-button");
+			$(this).removeAttr("disabled");
+			return false;
+
+		}else{
+			
+			$.each( selectedCheckboxValues, function( index, selectedCheckboxValue ) {
+				let parentRow   = $('#bulkActionsCheckbox_'+selectedCheckboxValue).parents("tr");
+				let itemID      = selectedCheckboxValue;
+				let rows        = $(`tr[data-id='${itemID}']`);
+				parentRow.find("input, select, button").each(function () {
+					$(this).attr("disabled", "disabled");
+					if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+						return;
+					}
+				});
+				rows.find("input, select, button").each(function () {
+					$(this).attr("disabled", "disabled");
+					if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+						return;
+					}
+				});
+
+				final_data.push(itemID);
+			});
+		}
+		final_data = JSON.stringify(final_data);
+		let final_to_send = {
+			data:  final_data,
+			bulk: 1
+		};
+
+		let that = $(this);
+
+
+		$.ajax({
+			url: '{{ url("bulk_send_confirmation_from_front") }}',
+			type: "POST",
+			data: final_to_send,
+			success: function (response) {                                
+				if (response.status === 'success') {  
+
+					that.removeClass("loading-button");
+					that.removeAttr("disabled");
+					
+					$.each( selectedCheckboxValues, function( index, selectedCheckboxValue ) {
+						let parentRow   = $('#bulkActionsCheckbox_'+selectedCheckboxValue).parents("tr");
+						let itemID      = selectedCheckboxValue;
+						let rows        = $(`tr[data-id='${itemID}']`);
+						parentRow.find("input, select, button").each(function () {
+							$(this).removeAttr("disabled");
+							
+						});
+						rows.find("input, select, button").each(function () {
+							$(this).removeAttr("disabled");
+							
+						});
+					});
+
+					// location.reload();
+					$("#notification_bar .notification_container p").html("Email has been created!");
+					$("#notification_bar").show().css('display', 'flex');
+					setTimeout(function() {
+						$("#notification_bar").fadeOut();
+					}, 3000);
+
+
+				}else{
+					alert("Error: " + response.message); 
+				}
+
+				$.each( selectedCheckboxValues, function( index, selectedCheckboxValue ) {
+					let parentRow   = $( 'input.bulk_actions_checkbox[value="'+selectedCheckboxValue+'"]' ).parents("tr");
+					let itemID      = selectedCheckboxValue;
+					let rows        = parentRow;
+
+					rows.find("input, select, button").each(function () {
+						$(this).prop("disabled", false);
+					});
+				});
+				that.removeClass("loading-button");
+				that.removeAttr("disabled");
+			},
+			error: function(XMLHttpRequest, textStatus, errorThrown) { 
+				alert("Status: " + textStatus); alert("Error: " + errorThrown); 
+			}   
+		});
+	});
+
+$(document).ready(function() {
+    var seenOrderIds = {};
+
+    $('.itemExtrasAddonsRow.discounts').each(function() {
+        var orderId = $(this).data('orderid');
+        if (seenOrderIds[orderId]) {
+            $(this).remove();
+        } else {
+            seenOrderIds[orderId] = true;
+        }
+    });
+});
+</script>
+
+
+{% endblock %}
+
+{% block main %}
+    {% set _fields_visible_by_user = fields|filter((metadata, field) => easyadmin_is_granted(metadata.permission)) %}
+    {% set _number_of_hidden_results = 0 %}
+    {% set _list_item_actions = easyadmin_get_actions_for_list_item(_entity_config.name) %}
+
+    <table class="table datagrid">
+        {{ block('table_head') }}
+        <tbody>
+        {{ block('table_body') }}
+        </tbody>
+    </table>
+
+    {% block delete_form %}
+        {% set referer = paginator.currentPage == paginator.nbPages and 1 != paginator.currentPage and 1 == paginator.currentPageResults|length
+            ? path('easyadmin', app.request.query|merge({ page: app.request.query.get('page') - 1 }))
+            : app.request.requestUri
+        %}
+
+        {{ include('@EasyAdmin/default/includes/_delete_form.html.twig', {
+            view: 'list',
+            referer: referer,
+            delete_form: delete_form_template,
+            _translation_domain: _entity_config.translation_domain,
+            _trans_parameters: _trans_parameters,
+            _entity_config: _entity_config,
+        }, with_context = false) }}
+    {% endblock delete_form %}
+
+{% endblock main %}

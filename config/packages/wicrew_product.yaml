@@ -1,0 +1,2 @@
+imports:
+    - { resource: "@WicrewProductBundle/Resources/config/config.yaml" }

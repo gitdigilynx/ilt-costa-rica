@@ -1,0 +1,459 @@
+# Sale bundle
+sale.order: Orders
+sale.order.listing: Orders listing
+sale.order.id: id
+sale.order.source: Source
+sale.order.purchase.at: Purchase at
+sale.order.customer.name: Customer name
+sale.order.totalamount: Total Amount
+sale.order.servicetype: Service type
+sale.order.status: Status
+sale.order.status.pending: PENDING
+sale.order.status.quote: Quote
+sale.order.status.paid: PAID
+sale.order.status.paid_cash: Paid Cash
+sale.order.status.cancelled: CANCELLED 
+customer.booking: Website Customer
+ilt.partners.booking: ILT Customer Service Partners
+sale.order.addnew: Add new order
+
+order.item.title: Order Item
+
+order.tab.general: General
+order.details: Order Details
+order.detail.id: Order ID
+order.detail.date: Order date
+order.detail.purchase.point: Purchase point
+order.customer.information: Customer Information
+order.tab.items: Order Items
+order.items.in: Items in the order
+order.items.date: Date
+order.items.area: Area
+order.items.flight.information: Flight information
+order.items.flight: Flight
+order.items.flight.details: Flight details
+order.items.specific_location: Specific location
+order.items.not_specified: Not specified
+order.items.location_fee: Location fee
+order.items.pickup: Pick-up
+order.items.drop: Drop-off
+order.items.child_activities: Child activities
+order.details.price: Details
+order.details.adultqty: Adults Qty
+order.details.childrenqty: Children Qty
+order.details.basicprice: Basic price
+order.extra.hotel: Extra Hotels
+order.items.total: Total price
+order.items.range_fees: Pick-up time fees
+order.add.items: Add an Item in the order
+order.items.select.type.add: Select the service you want to add
+order.service.pvt.shuttles: Private shuttles
+order.service.shr.shuttles: Shared shuttles
+order.service.pvt.flight: Private flight
+order.service.jbj: Jeep boat Jeep
+order.service.watertaxi: Water taxi
+order.add.item: Add item
+sale.checkout.create.order: Created the order
+sale.checkout.order.card.payment: Credit card payment
+sale.checkout.order.add.item: Added a new item
+sale.checkout.order.update.item: Updated an item
+sale.checkout.order.cancel.item: Canceled an item
+order.add.notes: Add notes
+order.notes.list: Notes list
+order.addnotes.success: Added the notes success
+order.items.edit: Edit this item
+order.items.edit.success: Item has been successfully edited.
+order.items.delete: Delete this item
+order.items.delete.success: Order item has been successfully canceled.
+order.histories: Order histories
+order.balance.history: Balance & History
+order.history.date: Date
+order.history.action: Action
+order.history.itemid: Item ID
+order.history.producttype: Product type
+order.history.note: Note
+order.history.payment: Payment
+order.history.additional: Additional
+order.history.refund: Refund
+order.history.employee: Employee
+order.history.status.1: Create order
+order.history.status.2: Edit order
+order.history.status.3: Cancel order
+order.history.status.4: Create item
+order.history.status.5: Edit item
+order.history.status.6: Cancel item
+order.history.status.7: Charge
+order.history.status.8: Refund
+order.canceled: Order canceled
+payment.via.stripe: Payment via Stripe
+order.history.total: Totals
+order.history.totaldue: Amount Due
+order.items.totalwithtax: Total price with tax
+order.items.activity.transportation: (Transportation)
+order.balance.makepayment: Make a Payment
+order.balance.makepayment.note: Note
+order.balance.makepayment.amount: Amount
+order.balance.makepayment.process: Process
+order.balance.makerefund: Make a Refund
+order.balance.makerefund.totalrefund: Total available to refund
+order.balance.makerefund.totalcharge: Total amount that needs to be charged
+order.balance.makepayment.charge: Charge
+order.balance.makepayment.chargeasnew: Charge as new credit card
+order.balance.makepayment.refund: Refund
+order.balance.makepayment.item: Associated Item (optional)
+order.balance.makepayment.sendmail: Send mail for payment to customer
+sale.order.payment.refundnotcharge: Amount Due is wrong. Please use refund not charge.
+sale.order.payment.chargenotrefund: Amount Due is wrong. Please use charge not refund.
+order.information: Order information
+order.information.payment.type: Payment type
+order.mail.sending: Mail sending
+order.mail.subject: Subject
+order.mail.payment.subject: Order Payment 
+order.mail.type.edit: Edit
+order.mail.type.charge: Charge
+order.mail.type.refund: Refund
+order.mail.type.canceled: Canceled
+order.mail.send: Send
+order.mail.edit.subject: ILT Costa Rica - Service Updates/Changes notification
+order.mail.edit.body1: |
+    Hi {customerName},<br />
+    <br />
+    This is to confirm that we have made the changes to your service(s) as per your request below.<br />
+    Please make sure that the following changes to reservation #{orderNumber} are correct.<br />
+    <br /> 
+    {orderDetails}<br />
+order.mail.edit.body2: |
+    <br />
+    If you have any questions, please contact info@iltcostarica.com.<br />
+    <br />
+    Thank you,
+order.mail.payment.body1: |
+    Hi {customerName},<br />
+    <br />
+    Here is the link for the payment : {link} <br />
+    Reservation #RJ{orderNumber}<br />
+    <br /> 
+    {orderDetails}<br />
+order.mail.payment.body2: |
+    <br />
+    If you have any questions, please contact info@iltcostarica.com.<br />
+    <br />
+    Thank you,
+order.mail.charge.subject: ILT Costa Rica - Credit Card Charge
+order.mail.charge.body1: |
+    Hi {customerName},<br />
+    <br />
+    This is to confirm that we have processed your payment. You should see the transaction on your credit card shortly. <br />
+    Below are the details of your reservation.<br />
+    <br />
+    {orderDetails}<br />
+order.mail.charge.body2: |
+    <br />
+    If you have any questions, please contact info@iltcostarica.com.<br />
+    <br />
+    Thank you,
+order.mail.refund.subject: ILT Costa Rica - Refund reservation
+order.mail.refund.body1: |
+    Hi {customerName},<br />
+    <br />
+    This is to confirm that your refund was processed and will be applied to the same credit card that was used during your booking. Please allow between 5 – 10 business days for the amount to appear on your  statement by your bank. <br />
+    <br />
+    {orderDetails}<br />
+order.mail.refund.body2: |
+    <br />
+    If you have any questions, please contact info@iltcostarica.com.<br />
+    <br />
+    Thank you,
+order.mail.canceled.subject: ILT Costa Rica - Canceled Reservation
+order.mail.canceled.body1: |
+    Hi {customerName},<br />
+    <br />
+    This is to confirm that we have cancelled your service(s) as per your request below. <br />
+    <br />
+    {orderDetails}<br />
+order.mail.canceled.body2: |
+    <br />
+    If you have any questions, please contact info@iltcostarica.com.<br />
+    <br />
+    Thank you,
+
+subtotal.title: Subtotal
+tax.title: Tax
+tax.tab.general: General
+tax.group.information: Information
+tax.label: Label
+tax.amount: Amount
+tax.created_at: Created at
+
+order_item.status: Status
+order_item.status.option.unpaid: UNPAID
+order_item.status.option.paid: PAID
+order_item.status.option.cancelled: CANCELLED
+order_item.status.option.refunded: REFUNDED
+order_item.type.option.private_shuttle: Private shuttle
+order_item.type.option.shared_shuttle: Shared shuttle
+order_item.type.option.private_flight: Private flight
+order_item.type.option.private_jbj: Private JBJ
+order_item.type.option.shared_jbj: Shared JBJ
+order_item.type.option.riding_jbj: Riding JBJ
+order_item.type.option.water_taxi: Water taxi
+order_item.type.option.activity_regular: Activity regular
+order_item.type.option.activity_transportation: Activity transportation
+order_item.rack.price: Rack price
+order_item.net.price: Net price
+order_item.activity.child: Child
+order_item.confirm: Are you sure?
+order_item.remove.success: Item removed
+
+order.mail.assigndriver.subject: Assign Driver Email (Private Shuttle)
+order.mail.assignsupplier.subject: Supplier Email (Tours)
+email.assigndriver.head: Please find the service(s) below for your upcoming jobs assigned to you.
+email.assigndriver.ilt: ILT
+email.assigndriver.customer.head: Please look at the following changes to reservation <strong>#{orderid}</strong> and confirm changes.
+email.assigndriver.customer.updated: Updated Service Details
+email.confirm.picktime: Pick-up time confirmation
+management.order.pickTime: Arrival/Departure time
+management.order.pickTimeTransport: Pick time
+management.group.information: Information
+management.status: Billing Status
+management.order_status: Confirmation Status
+management.order.partner.biz_name: Supplier
+management.order.vehicle.type: Vehicle Type
+management.order.partner.commission: Commission (%) Promo Code
+management.pick_up_date: Pick up date
+management.pick_up_time: Pick up Time
+management.order.vehicle: Vehicle
+management.order.sendmail: Send email
+management.pick_up_time_transport: Pick up Time
+management.arrival_time: Arrival Time
+management.departure_time: Departure Time 
+management.type: Type
+management.order.id: 'Booking #'
+management.order.name: Passenger Name
+management.number_of_adult: Adults
+management.number_of_kid: Children
+management.drop_off_area.name: Drop-off Area
+management.pick_up_area.name: Pick-up Area
+management.pick_up_address: Pick-up Location
+management.drop_address: Drop-off Location
+management.total_rack: Total Rack
+management.total_net: Total Net
+management.addons: Add-ons
+management.extras: Extras
+management.client_notes: Client Notes
+management.internal_notes: Driver Notes
+management.order.confirmation_status: Confirmation
+management.tour_time: Tour time
+management.supplier_email: Supplier email
+management.select_affiliate: Affiliate
+management.affiliate: Affiliate
+management.adult_rack_price: Adult Rack Price per person
+management.child_rack_price: Child Rack Price per person
+management.adult_net_price: Adult Net Price per person
+management.child_net_price: Child Net Price per person
+management.tax_value: "Tax (%)"
+management.order.confirmation.unassigned : Unassigned
+management.order.confirmation.confirmed : Confirmed
+management.order.confirmation.assigned : Assigned
+management.order.confirmation.approved : Approved
+
+management:
+    rack_rate: Rack Rate
+    net_rate: Net Rate
+    tax: Tax
+    total_rack: Total Rack
+    total_net: Total Net
+
+
+transport_management:
+    label.title: Transport management
+    label:
+        service_type: Service type
+        airline: Airline
+        flight: 'Flight #'
+        supplier: Supplier
+        driver: Driver
+        select_vehicle: Select vehicle
+        email_driver: Email driver
+
+    add_driver: Add Driver +
+    remove_driver: Remove Driver
+    email.driver: Email driver?
+    vehicle.name: Vehicle
+    save.fee_change: The new pick-up time can affect the booking's fees. Please go edit the item in the order module so the client can pay the extra charges. The order details were updated successfully.
+    save.no_email: The driver {driverName} has no email address. The order details were updated successfully.
+    select_supplier: Supplier
+
+activity_management.label: Activity management
+
+#Frontend
+search.departing: Departing
+search.traveldate: Travel Date
+search.returning: Returning
+
+booking.title: Booking
+booking.extras: Extras
+booking.404: No booking found. Please search for an activity or product to book.
+booking.back: Back
+booking.back.to.search: Back to Search
+booking.passenger.number.adults: Adults
+booking.passenger.number.children: Children (0 - 11 yrs.)
+booking.passenger.adults: >-
+    {count, plural,
+        one   {1 Adult}
+        other {# Adults}
+    }
+booking.passenger.children: >-
+    {count, plural,
+        one   {1 Child}
+        other {# Children}
+    }
+booking.destination: Destination
+booking.pickupdate: Pick-up date 
+booking.flight.departuretime: Flight Departure
+booking.preferred.flight.time: Preferred Flight Time
+booking.pickupdate.flight: Travel date
+booking.pickupdate.flight.to: Departure date
+booking.pickuptime: Pick-up time
+booking.departuretime: Departure time
+booking.pickuptime.flight: Arrival time
+booking.pickuptime.flight.to: Departure time
+booking.service: Service time
+booking.from: Pick-Up Area
+booking.to: Drop-Off Area
+booking.from.flight.number: "Flight #"
+booking.from.flight.company: Airline
+booking.from.pickup: Enter pick-up location
+booking.to.dropoff: Enter drop-off location
+booking.tax: Tax
+booking.addons: Add-ons
+booking.addons.title: Want to add some addons to enhance your experience to <span class="addon-section-title-area">{area}</span>?
+booking.addons.subtitle: Make the most out of your time. Add some site-seeing on your transfer service to enhance your experience.
+booking.extras.title: Want to add some extras to enhance your experience to <span class="addon-section-title-area">{area}</span>?
+booking.extras.subtitle: Add some extras to enhance your experience.
+booking.ride: Ride
+booking.weight: Weight
+booking.luggage.weight: Luggages total weight in lbs
+booking.passenger.weight: Passenger total weight in lbs
+booking.back.to.select: Back to listing
+booking.addon.perperson: Per person
+booking.addon.pertrip: Per trip
+edit.order.item: Edit order item
+booking.back.to.orderitem: Back to orderitem
+booking.pickup.time: Pick-up time
+booking.service.time: Select service time
+pickup.extrafee: Pick-up extra fee
+booking.please.select: Please select
+booking.remove: Remove
+booking.late_notice: One or more of the bookings is last minute and we are not sure if we can make it happen. Please change the date or contact us to check for availability at info@iltcostarica.com. Thank you!            
+
+
+booking.departure: Departure location
+booking.jbj.select_service_time: Select Service and Time
+booking.jbj.select_service: Select service
+
+sale.cart.modify: Modify
+
+sale.summary: Summary
+sale.summary.total: Total
+sale.summary.time_fee.regular: Pick-up time fee
+sale.summary.time_fee.late_night: Late night surcharge
+sale.summary.time_fee.flight_pick: Flight pick-up time fee
+sale.summary.time_fee.flight_drop: Early Pick-up Fee
+add_to_cart: Add to Cart
+proceed.to.check.out: Proceed to Check Out
+add.to.cart.and.continue: Add to Cart & Continue
+continue_shopping: Continue Shopping
+contactus: Contact us
+contact.us.for.availability: Contact us for availability
+contact.us.message: Thank you, we are checking for availability. We’ll be contacting you to confirm availability.
+
+cart.activity.pick_time_notice: '* Your pick-up time will be provided on your confirmation email.'
+
+sale.checkout.contact.title: Contact information
+sale.checkout.payment.title: Payment information
+sale.checkout.firstName: First Name
+sale.checkout.lastName: Last Name
+sale.checkout.email: Email
+sale.checkout.country: Country
+sale.checkout.tel: Contact Number
+sale.checkout.whatsapp: WhatsApp
+sale.checkout.notes: Notes
+sale.checkout.notes.customer: Customer Notes
+checkout.as.quote: Checkout as quote
+sale.payment.type.creditcard: Creditcard
+sale.payment.type.cash: Cash
+sale.payment.type.cheque: Cheque
+sale.checkout.confirm.booking: Confirm Booking
+sale.summary.tax: Taxes
+sale.summary.totalprice: Total price
+sale.checkout: Proceed to Check Out
+sale.checkout.empty: Cart empty
+sale.checkout.title: Check Out
+sale.checkout.suppler: Choose a supplier
+sale.checkout.payment_type: Choose a payment type
+sale.tripadvisor.reminder: Please review on TripAdvisor
+sale.tripadvisor.reminder.mail.title: Trip Advisor Reminder
+sale.tripadvisor.reminder.mail.content: <h2>How was your experience with ILT Costa Rica?</h2><p>Thank you for choosing ILT Costa Rica as your service provider in Costa Rica.</br>We hope you enjoyed our service, and had an amazing time visiting our country.</br>We’d appreciate if you can share your experience with us. It only takes a minute, and thank you for taking the time.</p><p>Click on the link below, we look forward to reading your review.</p>
+sale.checkout.cardLabel.name: Name on credit card
+sale.checkout.cardLabel.card: Card
+
+booking.flight.contact.subject: Private flight booking request
+booking.request.notallow: Request to booking during the night
+please.contactus.for.booking: Please contact us for booking
+sale.checkout.title.success: Great! You’re all Set!
+sale.checkout.success: Thank you! Your order has been placed.
+
+private.flight.mail.header: Private flight request
+cart.title: Cart
+contact.us.title: Contact us
+
+email.assignment:
+    from_original: Source
+    to_original: Destination
+
+email.flight.request: Can you please let me know if you have availability for the following service(s) below.
+email.additional.note: Additional Notes
+email.please.confirm.reservation: Please confirm reservation.
+email.thankyou: Thank you,
+email.hi: Hi,
+email.allow.request: A customer made a request outside your opening hours. Please validate if you want to provide the service or not and contact the client.
+email.confirm.order: Booking confirmation
+email.confirm.order.quote: Quote confirmation
+email.confirm.orderhead: Thank you for booking with ILT Costa Rica.<br/>You’re all set, and reserved. Please find the details of your reservation below.
+email.tax: Tax
+email.total: Total
+email.detail.all.service: Details of all services
+email.havequestion: If you have any questions, please do not hesitate to contact us at info@iltcostarica.com
+email.confirm.orderhead.partner: Below are the details for your upcoming job. Please confirm receipt of this email.
+email.job: Job
+
+email.review.subject: We would like to get your feedback
+email.review.start: How was your experience with ILT Costa Rica?
+email.review.body: Thank you for choosing ILT Costa Rica as your service provider in Costa Rica.
+    We hope you enjoyed our service, and had an amazing time visiting our country.
+    We’d appreciate it if you could share your experience with us. It only takes a minute, and thank you for taking the time.
+email.review.link: Click on the link below. We look forward to reading your review.
+
+order.supplier.id: supplier
+
+discount.title: Discount
+discount.name: Name
+discount.description: Description
+discount.code: Code
+discount.quantity_per_user: Quantity per use
+discount.type_discount: Quantity per use
+discount.reduction_percentage: Reduction percentage
+discount.reduction_amount: Reduction amount
+discount.usedNumber: Used
+
+do.you.have.a.discount.code: Have a Promo Code?
+
+order.tab.client.information: Client Information
+order.tab.payment.history: Payment History
+order.tab.add.services: Add Services
+order.tab.email: Email
+
+action.modify: Modify
+action.resent.confirmation: Resend Confirmation
+action.send.email.to.driver: Send Email to Driver

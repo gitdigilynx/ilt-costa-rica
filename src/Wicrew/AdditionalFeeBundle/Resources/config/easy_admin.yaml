@@ -1,0 +1,51 @@
+easy_admin:
+    design:
+        menu:
+            - { entity: 'AdditionalFee', label: 'additional_fee.title', icon: 'money-bill-alt', permission: ROLE_ADMIN }
+    entities:
+        AdditionalFee:
+            permissions:
+                    list: [ 'ROLE_ADMIN' ]
+                    new: [ 'ROLE_ADMIN' ] 
+                    edit: [ 'ROLE_ADMIN' ]
+                    delete: [ 'ROLE_ADMIN' ]
+            label: 'additional_fee.title'
+            icon: 'money-bill-alt'
+            class: App\Wicrew\AdditionalFeeBundle\Entity\AdditionalFee
+            list:
+                title: 'additional_fee.title'
+                fields:
+                    - { property: 'area', label: 'additional_fee.area' }
+                    - { property: 'hotelName', label: 'additional_fee.hotel_name' }
+                    - { property: 'googlePlaceId', label: 'additional_fee.google_place_id' }
+                    - { property: 'rackPrice', label: 'additional_fee.rack_price' }
+                    - { property: 'netPrice', label: 'additional_fee.net_price' }
+                    - { property: 'tax', label: 'additional_fee.tax' }
+                max_results: '%global.sort.pagination.default%'
+                sort: ['createdAt', '%global.sort.desc%']
+            form:
+                form_options: { attr: { novalidate: novalidate } }
+                fields:
+                    - { type: 'tab', label: 'additional_fee.tab.general' }
+                    - { type: 'group', label: 'additional_fee.group.information' }
+                    - { property: 'area', label: 'additional_fee.area', sortable: true, type_options: { required: true, placeholder: 'core.option.please_select' } }
+                    -   property: 'types'
+                        label: 'additional_fee.types'
+                        type: 'choice'
+                        type_options:
+                            required: true
+                            choices:
+                                additional_fee.type.option.transportation: !php/const App\Wicrew\AdditionalFeeBundle\Entity\AdditionalFee::TYPE_TRANSPORTATION
+                                additional_fee.type.option.activity: !php/const App\Wicrew\AdditionalFeeBundle\Entity\AdditionalFee::TYPE_ACTIVITY
+                            expanded: true
+                            multiple: true
+                    - { property: 'hotelName', label: 'additional_fee.hotel_name', type_options: { required: true } }
+                    - { property: 'googlePlaceId', label: 'additional_fee.google_place_id', type: 'text', type_options: { attr: { readonly: "readonly" } } }
+                    #                    - { property: 'googlePlaceId', type: 'text', label: 'additional_fee.google_place_id', type_options: { required: true, block_name: 'custom_google_place_id' } }
+                    - { property: 'rackPrice', label: 'additional_fee.rack_price', type_options: { required: true } }
+                    - { property: 'netPrice', label: 'additional_fee.net_price', type_options: { required: true } }
+                    - { property: 'tax', label: 'additional_fee.tax', type_options: { required: true, placeholder: 'core.option.please_select' } }
+                    - { property: 'description', label: 'additional_fee.description', type: 'FOS\CKEditorBundle\Form\Type\CKEditorType', type_options: { config_name: 'basic' } }
+            templates:
+                new: '@WicrewAdditionalFee/Admin/new.html.twig'
+                edit: '@WicrewAdditionalFee/Admin/edit.html.twig'

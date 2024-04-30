@@ -1,0 +1,134 @@
+<script type="text/javascript">
+    $(function() {
+        initTransportTimePicker();
+ 
+        $('.whats-included-toggle').click(function() {
+            $('.detail-booking-listing').toggleClass('whats-included-text-hidden');
+            $('.whats-included-toggle').toggleClass('open');
+            $('.detail-booking-listing').toggleClass('open');
+        });
+ 
+        function initTransportTimePicker() {
+            let timePickerElements = $(".booking-pickup-time");
+            initTimePicker(timePickerElements);
+            // $(".booking-pickup-time").timepicker({ timeFormat: 'H:i' });
+            // timePickerElements.each(function () {
+            //     $(this).mask("00:00 SP", {
+            //         translation: {
+            //             "S": {
+            //                 pattern: /[AaPp]/,
+            //             },
+            //             "P": {
+            //                 pattern: /[Mm]/,
+            //             },
+            //         },
+            //         onComplete: function(val, event, element) {
+            //             element.siblings("input[class^='updates-summary-of-']").trigger("input");
+            //         }
+            //     });
+            // })
+
+            timePickerElements.on("changeTime", function () {
+                $(this).trigger("input");
+            });
+
+            initDatePicker($("body"));
+        }
+
+       
+
+        setInterval(function () { 
+            $( ".time-container-hour div.hour" ).each(function( index ) { $(this).text($(this).data("value")); }); 
+            
+            $(".time-container-minute .minute").click(function (e) { 
+            // $( ".time-container-minute .minute" ).on( "click", function() {
+                $(".time-container-minute").hide();
+                $(".time-container-clock").css("display", "grid");
+            });
+            
+            
+            $('.time-container-clock div[data-action="showHours"]').each(function(e) {
+                
+                let hoursText = $(this).text();
+                if( hoursText.indexOf('PM') >= 0){
+                    // Found world
+                    let hoursText_arr = hoursText.split(" ");
+                    let hour = hoursText_arr[0];
+                    if( hour == "12" ){
+                        $(this).text(hour);
+                    }else{
+                        $(this).text(parseInt(hour)+12);
+                    }
+    
+                }else if( hoursText.indexOf('AM') >= 0){
+                    let hoursText_arr = hoursText.split(" ");
+                    let hour = hoursText_arr[0];
+                    if( hour == "12" ){
+                        $(this).text(parseInt(hour)+12);
+                    }else{
+                       $(this).text(hour);
+                    }
+                }
+            });
+            
+        }, 5);
+            
+        
+        handleConnectingFlightCondition();
+
+        function handleConnectingFlightCondition() {
+            $('.connecting_flight').each(function(e) {
+                $(this).click(function(e) {  
+                    var value = $(this).val();
+                    var booking_number = $(this).data('bookingNumber'); 
+                    var arrival_text = $('#pickup_time_'+booking_number).data('arrivalText'); 
+                    var preferred_flight_time_text = $('#pickup_time_'+booking_number).data('preferredFlightTimeText'); 
+                  
+                    var flight_field_selector = '#flight_company_from_'+booking_number+', #flight_number_from_'+booking_number+', #flight_company_to_'+booking_number+', #flight_number_to_'+booking_number;
+                    if (value == 'yes') { 
+                        $(flight_field_selector).closest('.mr-2').show();
+                        $('.filling_ride_block').hide();
+                        $('[for="pickup_time_'+booking_number+'"]').text(arrival_text); 
+                        if ($(this).attr('id') == 'connecting_flight_yes_1') {
+                            $('#flight_company_from_1:visible, #flight_number_from_1:visible').attr('required', 'required');
+                        }
+                        if ($(this).attr('id') == 'connecting_flight_yes_2') {
+                            $('#flight_company_from_2:visible, #flight_number_from_2:visible').attr('required', 'required');
+                        }
+                        $(".booking-form .ride-header").css('flex-direction', 'row');
+
+                    } else { 
+                        $(".booking-form .ride-header").css('flex-direction', 'column');
+                        $(flight_field_selector).closest('.mr-2').hide();
+                        $('.filling_ride_block').show();
+                        $('[for="pickup_time_'+booking_number+'"]').text(preferred_flight_time_text);
+                        if ($(this).attr('id') == 'connecting_flight_no_1') {
+                            $('#flight_company_from_1, #flight_number_from_1').removeAttr('required');
+                        }
+                        if ($(this).attr('id') == 'connecting_flight_no_2') {
+                            $('#flight_company_from_2, #flight_number_from_2').removeAttr('required');
+                        } 
+                    }
+                })
+            });
+        }
+
+        // begin : When doing a multiple transfers can the name hotel go automatically in the box for the next service but can be edited if needed by the client.
+        var drop_off_input_number = $('[id^="additionalFee_search_to"]').length;
+
+        for (var i = 0; i < drop_off_input_number; i++) {
+            $('[id^="additionalFee_search_to_'+i+'"]:visible').on('keyup', function(event) {
+                var id = $(this).attr('id');
+                var val = $(this).val(); 
+                var index = id.replace('additionalFee_search_to_', '');
+                var index_int = parseInt(index);
+                index_int++;
+                
+                $('[id="additionalFee_search_from_'+index_int+'"]:visible').val(val);
+                $('[id="additionalFee_search_from_'+index_int+'"]:visible').addClass('has-val');
+            });
+        }
+        // end : When doing a multiple transfers can the name hotel go automatically in the box for the next service but can be edited if needed by the client.
+    });
+
+</script>

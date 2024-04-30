@@ -1,0 +1,51 @@
+{# @var areaObj \App\Wicrew\ProductBundle\Entity\Area #}
+
+{% if readonly is not defined %}
+    {% set readonly = false %}
+{% endif %}
+{% set readonly = false %}
+{# {% set selectEnable = true %} #}
+
+<div class="{% if remove_row_block is not defined %}row-block{% endif %} area-row-block">
+    <div class="input-pin-icon floating-label-w-icon black-icon">
+        <div class="{% if selectEnable is not defined %}floating-label-wrap {% endif %}float-fixed">
+            {% set areaPostName = postDataSection ~ '[area_' ~ type ~ ']' %}
+            {% if selectEnable is defined %}
+                <select id="areas_select_{{ type }}_{{ bookingNumber }}" class="updates-summary-of-{{ bookingNumber }}"
+                        name="{{ areaPostName }}[nameAndType]">
+                    {% if areas is defined %}
+                        {% for area in areas %}
+                            {# @var area \App\Wicrew\ProductBundle\Entity\Area #}
+                            {% set value = '{"name":"' ~ area.name ~ '","type":' ~ area.type ~ ',"id":' ~ area.id ~ '}' %}
+                            <option value="{{ value }}"
+                                    {% if areaObj is defined and area.id == areaObj.id %}selected="selected"{% endif %}>{{ area.name }}</option>
+                        {% endfor %}
+                    {% endif %}
+
+                </select>
+            {% else %}
+
+                <select id="areas_select_{{ type }}_{{ bookingNumber }}" data-type="{{ type }}" class="area_selection dl_area_select_{{ type }} updates-summary-of-{{ bookingNumber }}" name="{{ areaPostName }}[nameAndType]">    
+                        {# @var area \App\Wicrew\ProductBundle\Entity\Area #}
+                        {% set value = '{"name":"' ~ areaObj.name ~ '","type":' ~ areaObj.type ~ ',"id":' ~ areaObj.id ~ '}' %}
+                        <option value="{{ value }}" {% if areaObj is defined and areaObj.id == areaObj.id %}selected="selected"{% endif %}>{{ areaObj.name }}</option>
+                </select>
+            {% endif %}
+        </div>
+    </div>
+</div>
+ 
+
+{% if (type_transportation is defined and (type_transportation == 'private_shuttle' or type_transportation == 'private_flight')) %}
+    {% set is_required = false %}
+{% else %}
+    {% set is_required = true %}
+{% endif %}
+ 
+<div class="dl_autocompleteFields" {% if (type_transportation is defined and (type_transportation == 'private_shuttle' or type_transportation == 'private_flight')) %}style="display:none;"{% endif %}>
+    {% if areaObj is defined %}
+        {% include "@WicrewSale/Booking/Inputs/desttype.option.html.twig" with { "type": type, "areaObj": areaObj, "bookingNumber": bookingNumber, "areaPostName": areaPostName,  "required": is_required} %}
+    {% else %}
+        {% include "@WicrewSale/Booking/Inputs/desttype.option.html.twig" with { "type": type, "bookingNumber": bookingNumber, "areaPostName": areaPostName,  "required": is_required } %}
+    {% endif %}
+</div>

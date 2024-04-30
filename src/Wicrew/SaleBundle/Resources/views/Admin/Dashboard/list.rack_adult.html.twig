@@ -1,0 +1,57 @@
+
+
+{% set november1st = '2023-11-01' %}
+{% if item.pickDate|date('Y-m-d') >= november1st %}
+    {% if item.type is same as "private_jbj" %}
+        {% set total_passengers         = item.adultCount + item.childCount %}
+        {% if total_passengers > 5 %}
+            {% set additional_passengers    = total_passengers - 5 %}
+        {% else %}
+            {% set additional_passengers    = 0 %}        
+        {% endif %}
+        {% set additional_p_cost        = additional_passengers * 45 %}
+        ${{ ( item.product.novemberFixedRackPrice + additional_p_cost )|number_format(2, '.', ',') }}
+    {% elseif item.type is same as "shared_jbj" %}
+        ${{ ( (item.adultCount * item.product.novemberAdultRackPrice) )|number_format(2, '.', ',') }}
+
+    {% elseif item.type is same as "activity_regular"  %}
+        {% if item.activityType == "Group" %}
+            ${{ ( (item.adultCount * item.activity.groupAdultRackPrice) + item.pickAddFeeRack + item.dropAddFeeRack )|number_format(2, '.', ',') }}
+        {% else %}
+            ${{ ( (item.adultCount * item.activity.adultRackPrice) + item.pickAddFeeRack + item.dropAddFeeRack )|number_format(2, '.', ',') }}
+        {% endif %}
+    {% elseif item.adultRackPrice is same as "0.00" or item.type is same as "private_shuttle" %}
+        {% if item.product.novemberFixedRackPrice != 0  %}
+            ${{item.product.novemberFixedRackPrice}}
+        {% else %}
+            ${{ (item.titleRackPrice)|number_format(2, '.', ',') }} 
+        {% endif %}
+    {% else %}
+        ${{ (item.titleRackPrice)|number_format(2, '.', ',') }} 
+    {% endif %}
+
+{% else %}
+    {% if item.type is same as "private_jbj" %}
+        {% set total_passengers         = item.adultCount + item.childCount %}
+        {% if total_passengers > 5 %}
+            {% set additional_passengers    = total_passengers - 5 %}
+        {% else %}
+            {% set additional_passengers    = 0 %}        
+        {% endif %}
+        {% set additional_p_cost        = additional_passengers * 45 %}
+        ${{ ( item.product.fixedRackPrice + additional_p_cost )|number_format(2, '.', ',') }}
+    {% elseif item.type is same as "shared_jbj" %}
+        ${{ ( (item.adultCount * item.product.adultRackPrice) )|number_format(2, '.', ',') }}
+
+    {% elseif item.type is same as "activity_regular"  %}
+        {% if item.activityType == "Group" %}
+            ${{ ( (item.adultCount * item.activity.groupAdultRackPrice) + item.pickAddFeeRack + item.dropAddFeeRack )|number_format(2, '.', ',') }}
+        {% else %}
+            ${{ ( (item.adultCount * item.activity.adultRackPrice) + item.pickAddFeeRack + item.dropAddFeeRack )|number_format(2, '.', ',') }}
+        {% endif %}
+    {% elseif item.adultRackPrice is same as "0.00" or item.type is same as "private_shuttle" %}
+        ${{item.product.fixedRackPrice}}
+    {% else %}
+        ${{ (item.titleRackPrice)|number_format(2, '.', ',') }} 
+    {% endif %}
+{% endif %}

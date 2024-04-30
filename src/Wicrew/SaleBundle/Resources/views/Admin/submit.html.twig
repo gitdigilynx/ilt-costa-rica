@@ -1,0 +1,223 @@
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        jQuery('.validate-form').submit(function (e) {
+            var error = false;
+            error = validateForm();
+            if (error) {
+                setTimeout(function () {
+                    jQuery('button.action-save').removeAttr('disabled');
+                }, 100);
+
+                return false;
+            }
+        });
+
+        jQuery('#service_type_order').on('change', function () {
+            if (jQuery(this).val()) {
+                jQuery('#add_item_button').attr('href', jQuery(this).val());
+                jQuery('.add-order-item .btn-primary').show();
+            } else {
+                jQuery('.add-order-item .btn-primary').hide();
+            }
+        });
+
+        jQuery(document).on('click', '#save_order_notes', function () {
+            let that = $(this);
+            if (that.hasClass("loading-button")) { return; }
+            that.addClass("loading-button");
+            $.ajax({
+                url: '{{ url("save_order_notes") }}',
+                type: "POST",
+                data: {notes: $('#add_order_notes').val(), oid: "{{ app.request.get('id') }}"},
+                success: function (response) {
+                    if (response.status == 'success') {
+                        location.reload();
+                    } else {
+                        alert(response.msg);
+                        return false;
+                    }
+             
+                    that.removeClass("loading-button");
+                }
+            });
+        });
+
+        jQuery(document).on('click', '#payment_charge_as_new', function () {
+            if (jQuery('#payment_charge_marknewcard').val()) {
+                jQuery('#payment_charge_marknewcard').val('');
+                jQuery('.charge-form').addClass('hidden');
+            } else {
+                jQuery('#payment_charge_marknewcard').val(1);
+                jQuery('.charge-form').removeClass('hidden');
+            }
+        });
+
+        jQuery(document).on('click', '#payment_charge_as_cash', function () {
+            let that                = $(this);
+            let data                = {};
+            const url               = '{{ url("order_payment_transaction") }}';
+            let chargeAmountElement = jQuery("#payment_charge_amount");
+            if( chargeAmountElement.val() <= 0 ){
+                alert("Please enter amount greater than 0 to charge!");
+                that.removeClass("loading-button");
+                return false;
+            } 
+            if (confirm('Are you sure you have got cash or wire deposit of $'+ chargeAmountElement.val() +'?')) {
+                data["paymentType"]     = $(this).data("type");
+                data["orderID"]         = $("#payment_orderid").val();
+                data["orderItemID"]     = $("#payment_order_itemid").val();
+                data['note']            = $("#payment_charge_note").val();
+                
+                if (that.hasClass("loading-button")) { return; }
+                that.addClass("loading-button");
+                
+                removeFlagElementError(chargeAmountElement, "required");
+
+                if (!chargeAmountElement.val()) {
+                    flagElementError(chargeAmountElement, "required");
+                    that.removeClass("loading-button");
+                    return false;
+                }
+
+                const regex = /^\d+(|\.[\d]{2})$/;
+                if (!regex.test(chargeAmountElement.val().toString())) {
+                    alert("Invalid amount.");
+                    that.removeClass("loading-button");
+                    return false;
+                }
+                data["amount"] = chargeAmountElement.val();
+                data['chargeAsCash'] = true;
+                
+                submitTransactionForm(url, data, that);
+            }
+            
+        });
+
+        jQuery(document).on("click", ".payment_process_btn", function () {
+            let that = $(this);
+            if (that.hasClass("loading-button")) { return; }
+            that.addClass("loading-button");
+            let data= {};
+            data["paymentType"] = $(this).data("type");
+            data["orderID"] = $("#payment_orderid").val();
+            data["orderItemID"] = $("#payment_order_itemid").val();
+
+            const url = '{{ url("order_payment_transaction") }}';
+
+            let chargeAmountElement = jQuery("#payment_charge_amount");
+            let refundAmountElement = jQuery("#payment_refund_amount");
+
+            removeFlagElementError(chargeAmountElement, "required");
+            removeFlagElementError(refundAmountElement, "required");
+
+            if ($(this).data("type") === "charge") {
+                data['note'] = $("#payment_charge_note").val();
+                if (!chargeAmountElement.val()) {
+                    flagElementError(chargeAmountElement, "required");
+                    that.removeClass("loading-button");
+                    return false;
+                }
+
+                const regex = /^\d+(|\.[\d]{2})$/;
+                if (!regex.test(chargeAmountElement.val().toString())) {
+                    alert("Invalid amount.");
+                    that.removeClass("loading-button");
+                    return false;
+                }
+                data["amount"] = chargeAmountElement.val();
+
+                if (jQuery("#payment_charge_marknewcard").val()) {
+                    data['makeNewCard'] = true;
+                    stripe.createToken(card).then(function (result) {
+                        if (result.error) {
+                            // Inform the user if there was an error.
+                            let errorElement = document.getElementById("card-errors");
+                            errorElement.textContent = result.error.message;
+                        } else {
+                            // Send the token to your server.
+                            let tknResult = stripeTokenHandler(result.token, "edit-order-form");
+                            data['stripeToken'] = tknResult;
+                            if (tknResult) {
+                                submitTransactionForm(url, data, that);
+                            }
+                        }
+                    });
+                } else {
+                    submitTransactionForm(url, data, that);
+                }
+            } else if ($(this).data("type") === "refund") {
+                if (!refundAmountElement.val()) {
+                    flagElementError(refundAmountElement, "required");
+                    that.removeClass("loading-button");
+                    return false;
+                }
+
+                const regex = /^\d+(|\.[\d]{2})$/;
+                if (!regex.test(refundAmountElement.val().toString())) {
+                    alert("Invalid amount.");
+                    that.removeClass("loading-button");
+                    return false;
+                }
+                data["amount"] = refundAmountElement.val();
+                data['amountRefundable'] = $("#payment_amountRefundable").val();
+                data['note'] = $("#payment_refund_note").val();
+                submitTransactionForm(url, data, that);
+                
+
+            }
+        });
+
+        jQuery(document).on('click', '#send_mail_payment', function () {
+            let that = $(this);
+            if (that.hasClass("loading-button")) { return; }
+            that.addClass("loading-button");
+        
+            $('#send_mail_payment_loading').show();
+            $('#send_mail_payment_loading').prop('disabled', true);
+            let order_status = $('input[name="order[prestatus]"]').val();
+            if( order_status != 0 ){
+                alert("Order status should be pending before sending payment email.");
+                $('#send_mail_payment_loading').hide();
+                that.removeClass("loading-button");
+                $('#send_mail_payment_loading').prop('disabled', false);
+                return false;
+            }
+            var base_url = window.location.origin;
+            $.ajax({
+                url: '{{ url("order_payment_mail") }}',
+                type: "POST",
+                data: {
+                    orderID: "{{ app.request.get('id') }}",
+                    siteURL: base_url,
+                },
+                success: function (response) { 
+                    alert(response.msg);
+                    $('#send_mail_payment_loading').hide();
+                    $('#send_mail_payment_loading').prop('disabled', false);
+                    that.removeClass("loading-button");
+                }
+            });
+        });
+    });
+
+    function submitTransactionForm(url, data, that) {
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: data,
+            success: function (response) {
+                if (response.status === 'success') {
+                    $('.order-history').html(response.html);
+                    $( "div#_easyadmin_form_design_element_18" ).load( location.href + " div#_easyadmin_form_design_element_18" );
+                    $( "div#_easyadmin_form_design_element_17" ).load( location.href + " div#_easyadmin_form_design_element_17" );
+                }
+                alert(response.msg);
+                that.removeClass("loading-button");
+            },
+            error: function () {
+                $( "div#_easyadmin_form_design_element_17" ).load( location.href + " div#_easyadmin_form_design_element_17" );
+                that.removeClass("loading-button");
+            }
+        });
+    }
+</script>

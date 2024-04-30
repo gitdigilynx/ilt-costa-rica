@@ -1,0 +1,44 @@
+{% form_theme form _self %}
+
+{% block _order_custom_order_detail_widget %}
+    {# <div class="order-detail">
+        <div>{{ 'order.detail.id'|trans() }} {{ easyadmin.item.id }}</div>
+        <div>{{ 'order.detail.date'|trans() }} {{ easyadmin.item.createdAt|date("d M Y") }}</div>
+        <div>{{ 'order.detail.purchase.point'|trans() }} {% if easyadmin.item.supplier %}{{ 'ilt.partners.booking'|trans() }}{% else %}{{ 'customer.booking'|trans() }}{% endif %}</div>
+        <input type="hidden" name="order[prestatus]" value="{{ easyadmin.item.status }}"/>
+    </div> #}
+{% endblock %}
+
+{% block _order_custom_partner_detail_widget %}
+    {% set typePartner = [constant('\\App\\Wicrew\\PartnerBundle\\Entity\\Partner::TYPE_PARTNER'), constant('\\App\\Wicrew\\PartnerBundle\\Entity\\Partner::TYPE_TRAVEL_AGENT'), constant('\\App\\Wicrew\\PartnerBundle\\Entity\\Partner::TYPE_AFFILIATE')] %}
+    <div class="partner-detail">
+        <div class="form-group field-choice">
+            <div class="form-widget">
+                <select id="order_driver" name="order[supplier]" class="form-control">
+                    <option value="">{{ 'booking.please.select'|trans() }}</option>
+                    {% for partner in getPartners(typePartner) %}
+                        <option value="{{ partner.id }}"
+                                {% if easyadmin.item.supplier and easyadmin.item.supplier.id == partner.id %}selected="selected"{% endif %}>{{ partner.bizName }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block _order_custom_payment_type_detail_widget %}
+    {% set typePayment = {('sale.payment.type.creditcard'|trans()): constant('\\App\\Wicrew\\SaleBundle\\Entity\\Order::PAYMENT_TYPE_CREDIT_CARD'), ('sale.payment.type.cash'|trans()): constant('\\App\\Wicrew\\SaleBundle\\Entity\\Order::PAYMENT_TYPE_CASH')} %}
+    <div class="payment-detail">
+        <div class="form-group field-choice">
+            <div class="form-widget">
+                <select id="order_payment" name="order[paymentType]" class="form-control">
+                    <option value="">{{ 'booking.please.select'|trans() }}</option>
+                    {% for key, payment in typePayment %}
+                        <option value="{{ payment }}"
+                                {% if easyadmin.item.paymentType and easyadmin.item.paymentType == payment %}selected="selected"{% endif %}>{{ key }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+{% endblock %}

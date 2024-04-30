@@ -1,0 +1,2489 @@
+{% set _entity_config = easyadmin_entity(app.request.query.get('entity')) %}
+{% trans_default_domain _entity_config.translation_domain %}
+{% set _trans_parameters = { '%entity_name%': _entity_config.name|trans, '%entity_label%': _entity_config.label|trans } %}
+
+{% extends _entity_config.templates.layout %}
+
+{% set _request_parameters = app.request.query.all|merge(_request_parameters|default({}))|merge({
+    action: app.request.get('action'),
+    entity: _entity_config.name,
+    sortField: app.request.get('sortField'),
+    sortDirection: app.request.get('sortDirection'),
+    page: app.request.get('page', 1),
+    filters: app.request.get('filters', []),
+    referer: null
+}) %}
+
+{% if 'search' == app.request.get('action') %}
+    {% set _request_parameters = _request_parameters|merge({
+        query: app.request.get('query')|default(''),
+    }) %}
+{% endif %}
+
+{% set _request_parameters = _request_parameters|merge({ referer: path('easyadmin', _request_parameters)|url_encode }) %}
+{% set _has_batch_actions = batch_form is defined and batch_form.vars.batch_actions|length > 0 %}
+{% set _has_filters = _entity_config.list.filters|default(false) %}
+
+{% block body_id 'easyadmin-list-' ~ _entity_config.name %}
+{% block body_class 'list list-' ~ _entity_config.name|lower %}
+
+{% block global_actions %}
+{% if easyadmin_action_is_enabled_for_list_view('search', _entity_config.name) %}
+    {% set _action = easyadmin_get_action_for_list_view('search', _entity_config.name) %}
+
+    {% block search_action %}
+
+    <div class="bulk_action_row">
+        <select class="form-select bulk-actions" style="height: 42px; width: 214px; -webkit-appearance: none !important; -moz-appearance: none !important; background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAUCAMAAACtdX32AAAAdVBMVEUAAAD///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAhMdQaAAAAJ3RSTlMAAAECAwQGBwsOFBwkJTg5RUZ4eYCHkJefpaytrsXGy8zW3+Do8vNn0bsyAAAAYElEQVR42tXROwJDQAAA0Ymw1p9kiT+L5P5HVEi3qJn2lcPjtIuzUIJ/rhIGy762N3XaThqMN1ZPALsZPEzG1x8LrFL77DHBnEMxBewz0fJ6LyFHTPL7xhwzWYrJ9z22AqmQBV757MHfAAAAAElFTkSuQmCC); background-position: 100%; background-repeat: no-repeat; border: 1px solid #ccc; padding: 0.5rem;" aria-label="Bulk Actions">
+            <option selected>
+                Bulk actions
+            </option>
+            {# <option value="assign_driver">Assign Driver</option> #}
+            <option value="send_confirmation_from_front">
+                Create Confirmation email
+            </option>
+            <option value="send_from_front">
+                Create email
+            </option>
+        </select>
+        <div class="bulk_driver_assigner"></div>
+    </div>
+    <div class="select_all">
+        <button class="btn" id="select_all" href="javascript:void(0);">
+            Select All
+            				
+        </button>
+    </div>
+    <div class="form-action form-action-search {{ _action.css_class|default('') }}">
+        <form method="get" action="{{ path('easyadmin') }}">
+            {% block search_form %}
+            <input type="hidden" name="action" value="search">
+                <input type="hidden" name="entity" value="{{ _request_parameters.entity }}">
+                    {# if the Request query doesn't define 'sortField' and 'sortDirection', we add them in the
+                           controller (but they don't appear in the request URI). When users click on a column to
+                           sort results, 'sortField' and 'sortDirection' are added to the Request query and they
+                            appear in the request URI too. So, checking if 'sortField' and 'sortDirection' is the
+                            only way to differentiate between sorting made by user and sorting made by us. We only
+                            need to persist the sorting if it's explicitly made by the user. #}
+                        {% if 'sortField' in app.request.uri %}
+                            <input type="hidden" name="sortField" value="{{ _request_parameters.sortField }}">
+                        {% endif %}
+                        {% if 'sortDirection' in app.request.uri %}
+                            <input type="hidden" name="sortDirection" value="{{ _request_parameters.sortDirection }}">
+                        {% endif %}
+                        {% for name, value in _request_parameters.filters|easyadmin_form_hidden_params('filters') %}
+                        <input type="hidden" name="{{ name }}" value="{{ value }}">
+                        {% endfor %}
+                        <div class="form-group">
+                            <div class="form-widget">
+                                <input class="form-control" type="search" name="query" value="{{ app.request.get('query')|default('') }}" placeholder="{{ _action.label|default('action.search')|trans(_trans_parameters) }}">
+                            </div>
+                        </div>
+                    {% endblock %}
+                </form>
+            </div>
+            <div class="btn-group action-filters">
+				<a href="/admin/?action=filters&amp;entity=Dashboard&amp;sortField=orderId&amp;sortDirection=DESC&amp;page=1&amp;referer=%252Fadmin%252F%253Faction%253Dlist%2526entity%253DDashboard%2526sortField%253DorderId%2526sortDirection%253DDESC%2526page%253D1&amp;referer_action=list" class="btn btn-secondary btn-labeled btn-labeled-right action-filters-button " data-modal="#modal-filters">
+					Filters
+                        <img src="../images/VIEWS.svg">
+                    </a>
+            </div>
+            <div class="expand_btn">
+                <input type="checkbox">
+                <span>Expand</span>
+		    </div>
+            
+        {% endblock search_action %}
+        
+        
+
+    {% endif %}
+    
+    {% if 'Dashboard' == app.request.get('entity') %}
+             
+        <div class="max_result_selector">
+            <div class="perPageText">Afficher</div>
+            <div class="divid"></div>
+           <select id="max_result">
+                <option value="25" selected="selected">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="250">250</option>                
+            </select>
+        </div>     
+    {% endif %}
+    {% if 'Dashboard' == app.request.get('entity') %}
+            <div class="calenderAvailabilityBtn TransportationManagement">
+                <a class="btn" href="/admin/date/availability/calender">
+                    <span>Date Availability</span>
+                    <img src="../images/calendar.svg"/>
+                </a>
+            </div> 
+        {% endif %}
+
+    {% if 'Dashboard' == app.request.get('entity') %}
+
+       	<div class="left_btns">
+		<div class="quote_btn">
+			<a class="btn" href="/product/transportation/private-shuttles?quote=creation&entity=Order&action=list&sortField=createdAt&sortDirection=DESC&page=1&referer=%252Fadmin%252F%253Fentity%253DOrder%2526action%253Dlist%2526sortField%253DcreatedAt%2526sortDirection%253DDESC%2526page%253D1" style="color: #0F172A !important;">
+					Create Quote
+                    <img src="../images/qout.svg"/>
+			</a>
+		</div>
+		<div class="exportInExcelBtn TransportationManagement">
+			<a class="btn" href="javascript:void(0);">
+				<span>Export in Excel</span>
+				{# <i class="fas fa-file-excel" style="color: var(--text-color-light);"></i> #}
+				<img src="../images/excel.svg"/>
+			</a>
+		</div>
+		<div>   
+    {% endif %}
+
+    {% if easyadmin_action_is_enabled_for_list_view('new', _entity_config.name) %}
+        {% set _action = easyadmin_get_action_for_list_view('new', _entity_config.name) %}
+        {% block new_action %}
+            <div class="button-action">
+                <a class="{{ _action.css_class|default('') }}" href="{{ path('easyadmin', _request_parameters|merge({ action: _action.name })) }}" target="{{ _action.target }}">
+                    {% if _action.icon %}<i class="fa fa-fw fa-{{ _action.icon }}"></i>{% endif %}
+                    {{ _action.label is defined and not _action.label is empty ? _action.label|trans(_trans_parameters) }}
+                </a>
+            </div>
+        {% endblock new_action %}
+    {% endif %}
+{% endblock global_actions %}
+
+{% block batch_actions %}
+  <div id="notification_bar">
+        <div class="notification_container">
+            <p></p>
+        </div>
+        <div class="icon_container">
+            <i style="cursor:" class="fa fa-times close_notification" aria-hidden="true"></i>
+        </div>
+    </div>
+    {% if _has_batch_actions %}
+
+        <div class="batch-actions" style="display: none">
+            {% form_theme batch_form with easyadmin_config('design.form_theme') %}
+            {{ form(batch_form) }}
+        </div>
+    {% endif %}
+{% endblock batch_actions %}
+
+{% block content_header %}
+    {{ parent() }}
+    {{ block('batch_actions') }}
+    {% if _has_filters %}
+        {{ include('@EasyAdmin/default/includes/_filters_modal.html.twig') }}
+    {% endif %}
+{% endblock content_header %}
+
+{% block main %}
+    {% set _fields_visible_by_user = fields|filter((metadata, field) => easyadmin_is_granted(metadata.permission)) %}
+    {% set _number_of_hidden_results = 0 %}
+    {% set _list_item_actions = easyadmin_get_actions_for_list_item(_entity_config.name) %}
+
+    <table class="table datagrid">
+        <thead>
+        {% block table_head %}
+            <tr data-id="{{ _item_id }}" data-orderId="{{item.order.id}}">
+                {% if _has_batch_actions %}
+                    <th width="1px"><span><input type="checkbox" class="form-batch-checkbox-all"></span></th>
+                {% endif %}
+
+                {% for field, metadata in _fields_visible_by_user %}
+                    {% set isSortingField = (metadata.property == app.request.get('sortField')) or ('association' == metadata.type and app.request.get('sortField') starts with metadata.property ~ '.') %}
+                    {% set nextSortDirection = isSortingField ? (app.request.get('sortDirection') == 'DESC' ? 'ASC' : 'DESC') : 'DESC' %}
+                    {% set _column_label = metadata.label|trans(_trans_parameters) %}
+                    {% set _column_icon = isSortingField ? (nextSortDirection == 'DESC' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-sort' %}
+
+                    <th class="{{ isSortingField ? 'sorted' }} {{ metadata.virtual ? 'virtual' }} {{ metadata.dataType|lower }} {{ metadata.css_class }}" {{ easyadmin_config('design.rtl') ? 'dir="rtl"' }}>
+                        {% if metadata.sortable %}
+                            <a href="{{ path('easyadmin', _request_parameters|merge({ page: 1, sortField: metadata.property, sortDirection: nextSortDirection })) }}">
+                                {{ _column_label|raw }} <i class="fa fa-fw {{ _column_icon }}"></i>
+                            </a>
+                        {% else %}
+                            <span>{{ _column_label|raw }}</span>
+                        {% endif %}
+                    </th>
+                {% endfor %}
+
+                {% if _list_item_actions|length > 0 %}
+                    <th {% if _entity_config.list.collapse_actions %}width="10px"{% endif %} {{ easyadmin_config('design.rtl') ? 'dir="rtl"' }}>
+                        <span class="sr-only">{{ 'list.row_actions'|trans(_trans_parameters, 'EasyAdminBundle') }}</span>
+                    </th>
+                {% endif %}
+            </tr>
+        {% endblock table_head %}
+        </thead>
+        <tbody>
+        {% block table_body %}
+            {% for item in paginator.currentPageResults %}
+                {% if not easyadmin_is_granted(_entity_config.list.item_permission, item) %}
+                    {% set _number_of_hidden_results = _number_of_hidden_results + 1 %}
+                {% else %}
+                    {# the empty string concatenation is needed when the primary key is an object (e.g. an Uuid object) #}
+                    {% set _item_id = '' ~ attribute(item, _entity_config.primary_key_field_name) %}
+                    <tr data-id="{{ _item_id }}" data-orderId="{{item.order.id}}">
+                        {% if _has_batch_actions %}
+                            <td><input type="checkbox" class="form-batch-checkbox" value="{{ _item_id }}"></td>
+                        {% endif %}
+
+                        {% for field, metadata in _fields_visible_by_user %}
+                            {% set isSortingField = metadata.property == app.request.get('sortField') %}
+                            {% set _column_label =  (metadata.label ?: field|humanize)|trans(_trans_parameters)  %}
+
+                            <td class="{{ isSortingField ? 'sorted' }} {{ metadata.dataType|lower }} {{ metadata.css_class }}" {{ easyadmin_config('design.rtl') ? 'dir="rtl"' }}>
+                                {{ easyadmin_render_field_for_list_view(_entity_config.name, item, metadata) }}
+                            </td>
+                        {% endfor %}
+
+                        {% if _list_item_actions|length > 0 %}
+                            {% set _column_label =  'list.row_actions'|trans(_trans_parameters, 'EasyAdminBundle') %}
+                            <td class="actions">
+                                {% block item_actions %}
+                                    {# Inject authorization checking for display certain actions. #}
+                                    {% set _list_item_actions = _list_item_actions|filter_admin_actions(_entity_config, true) %}
+
+                                    {% set _actions_template = _entity_config.list.collapse_actions
+                                        ? '@EasyAdmin/default/includes/_actions_dropdown.html.twig'
+                                        : '@EasyAdmin/default/includes/_actions.html.twig'
+                                    %}
+                                    {{ include(_actions_template, {
+                                        actions: _list_item_actions,
+                                        entity_config: _entity_config,
+                                        request_parameters: _request_parameters,
+                                        translation_domain: _entity_config.translation_domain,
+                                        trans_parameters: _trans_parameters,
+                                        item_id: _item_id,
+                                        item: item
+                                    }, with_context = false) }}
+                                {% endblock item_actions %}
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% endif %}
+            {% else %}
+                <tr>
+                    <td class="no-results" colspan="{{ _fields_visible_by_user|length + 1 }}">
+                        {{ 'search.no_results'|trans(_trans_parameters, 'EasyAdminBundle') }}
+                    </td>
+                </tr>
+            {% endfor %}
+
+            {% if _number_of_hidden_results > 0 %}
+                <tr class="datagrid-row-empty">
+                    <td class="text-center" colspan="{{ _fields_visible_by_user|length + 1 }}">
+                        <span class="datagrid-row-empty-message"><i class="fa fa-lock mr-1"></i> {{ 'security.list.hidden_results'|trans({}, 'EasyAdminBundle') }}</span>
+                    </td>
+                </tr>
+            {% endif %}
+        {% endblock table_body %}
+        </tbody>
+    </table>
+
+    {% block delete_form %}
+        {% set referer = paginator.currentPage == paginator.nbPages and 1 != paginator.currentPage and 1 == paginator.currentPageResults|length
+            ? path('easyadmin', app.request.query|merge({ page: app.request.query.get('page') - 1 }))
+            : app.request.requestUri
+        %}
+
+        {{ include('@EasyAdmin/default/includes/_delete_form.html.twig', {
+            view: 'list',
+            referer: referer,
+            delete_form: delete_form_template,
+            _translation_domain: _entity_config.translation_domain,
+            _trans_parameters: _trans_parameters,
+            _entity_config: _entity_config,
+        }, with_context = false) }}
+    {% endblock delete_form %}
+{% endblock main %}
+
+{% block content_footer %}
+    {% block paginator %}
+        {{ include(_entity_config.templates.paginator) }}
+    {% endblock paginator %}
+    {% block toolbar %}
+    	<div class="toolbar_container">
+            <div class="option">
+                <ul>
+                    <div class="more_action">
+                        <div class="first_options">
+                            <li>
+                                <button class="action-inline-save">
+                                    <img src="../images/save.svg"/>
+                                    save
+                                </button>
+                                    <div class="divid tool"></div>
+                            </li>
+                            <li>
+                                <button class="cancel_btn">
+                                    <img src="../images/cross.svg"/>
+                                    cancel
+                                </button>
+                                    <div class="divid tool"></div>
+                            </li>
+
+                            <li>
+                                <button class="action-inline-resent-confirmation">
+                                    <i class="fa fa-share" aria-hidden="true"></i>
+                                    Resend Confirmation
+                                </button>
+                                    <div class="divid tool"></div>
+                            </li>
+                            <li>
+                                <button class="action-inline-see-order">
+                                    <svg width="11" height="13" viewBox="0 0 11 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M5.30603 10.3619C5.09732 10.6209 4.72411 10.6209 4.4933 10.3619L2.92188 8.73691C2.69353 8.52109 2.69353 8.13516 2.92188 7.89648C3.15268 7.66035 3.52589 7.66035 3.7346 7.89648L4.91071 9.09238L7.2433 6.67773C7.47411 6.4416 7.84732 6.4416 8.05603 6.67773C8.30647 6.91641 8.30647 7.30234 8.05603 7.51816L5.30603 10.3619ZM3.14286 0C3.46942 0 3.73214 0.272949 3.73214 0.609375V1.625H7.26786V0.609375C7.26786 0.272949 7.53058 0 7.85714 0C8.18371 0 8.44643 0.272949 8.44643 0.609375V1.625H9.42857C10.2953 1.625 11 2.35244 11 3.25V11.375C11 12.2713 10.2953 13 9.42857 13H1.57143C0.70346 13 0 12.2713 0 11.375V3.25C0 2.35244 0.70346 1.625 1.57143 1.625H2.55357V0.609375C2.55357 0.272949 2.81629 0 3.14286 0ZM9.82143 4.875H1.17857V11.375C1.17857 11.5984 1.35438 11.7812 1.57143 11.7812H9.42857C9.64464 11.7812 9.82143 11.5984 9.82143 11.375V4.875Z" fill="white"/>
+                                    </svg>
+                                    See order
+                                </button>
+                                    <div class="divid tool"></div>
+                            </li>
+                            <li class="more_other_option">
+                                <button>
+                                    <i class="fas fa-ellipsis-h"></i>
+                                </button>
+                            </li>
+                        </div>  
+                        <div class="other_options">
+                            <li>
+                                <button class="action-inline-modify">
+                                <i class="fa fa-pencil-square" aria-hidden="true"></i>
+                                    Modify
+                                </button>
+                                    <div class="divid tool"></div>
+                            </li>
+                            <li>
+                                <button id="bulkSendFromFrontBtn">
+                               <svg width="15" height="13" viewBox="0 0 15 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M1.875 2.28125C1.61719 2.28125 1.40625 2.49219 1.40625 2.75V3.39746L6.45996 7.5459C7.06641 8.04395 7.93652 8.04395 8.54297 7.5459L13.5938 3.39746V2.75C13.5938 2.49219 13.3828 2.28125 13.125 2.28125H1.875ZM1.40625 5.2168V10.25C1.40625 10.5078 1.61719 10.7188 1.875 10.7188H13.125C13.3828 10.7188 13.5938 10.5078 13.5938 10.25V5.2168L9.43359 8.63281C8.30859 9.55566 6.68848 9.55566 5.56641 8.63281L1.40625 5.2168ZM0 2.75C0 1.71582 0.84082 0.875 1.875 0.875H13.125C14.1592 0.875 15 1.71582 15 2.75V10.25C15 11.2842 14.1592 12.125 13.125 12.125H1.875C0.84082 12.125 0 11.2842 0 10.25V2.75Z" fill="white"/>
+                                </svg>
+                                        create email
+                                </button> 
+                                    <div class="divid tool"></div>
+                            </li>
+                        
+                            <li>
+                                <button class="" id="bulkSendConfirmationFromFrontBtn"  value="">
+                                    <svg width="19" height="12" viewBox="0 0 19 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M1.9 1.38462H13.3C13.5612 1.38462 13.775 1.59231 13.775 1.84615V2.48365L13.1041 3.01731C13.6147 2.85577 14.1609 2.76923 14.725 2.76923C14.8853 2.76923 15.0427 2.775 15.2 2.78942V1.84615C15.2 0.827885 14.348 0 13.3 0H1.9C0.852031 0 0 0.827885 0 1.84615V9.23077C0 10.249 0.852031 11.0769 1.9 11.0769H10.6934C10.3431 10.6644 10.0581 10.1971 9.85625 9.69231H1.9C1.63875 9.69231 1.425 9.48462 1.425 9.23077V4.275L5.64062 7.63846C6.75984 8.53269 8.36594 8.54712 9.50297 7.68173C9.52969 6.83942 9.76719 6.05192 10.168 5.3625L8.65687 6.56827C8.04234 7.05865 7.16062 7.05865 6.54609 6.56827L1.425 2.48365V1.84615C1.425 1.59231 1.63875 1.38462 1.9 1.38462ZM19 7.84615C19 6.74449 18.5496 5.68794 17.7479 4.90894C16.9462 4.12994 15.8588 3.69231 14.725 3.69231C13.5912 3.69231 12.5038 4.12994 11.7021 4.90894C10.9004 5.68794 10.45 6.74449 10.45 7.84615C10.45 8.94782 10.9004 10.0044 11.7021 10.7834C12.5038 11.5624 13.5912 12 14.725 12C15.8588 12 16.9462 11.5624 17.7479 10.7834C18.5496 10.0044 19 8.94782 19 7.84615ZM16.723 6.59712C16.907 6.77596 16.907 7.07019 16.723 7.24904L14.5855 9.32596C14.4014 9.50481 14.0986 9.50481 13.9145 9.32596L12.727 8.17212C12.543 7.99327 12.543 7.69904 12.727 7.52019C12.9111 7.34135 13.2139 7.34135 13.398 7.52019L14.25 8.34808L16.052 6.59712C16.2361 6.41827 16.5389 6.41827 16.723 6.59712Z" fill="white"/>
+                                    </svg>
+                                    Create Confirmation
+                                </button> 
+                                    <div class="divid tool"></div>
+                            </li>
+                            <li>
+                                <button class="action-inline-add-note-to-driver">
+                                <i class="fa fa-comment" aria-hidden="true"></i>
+                                    Notes
+                                </button> 
+                                    <div class="divid tool"></div>
+                                
+                            </li>
+                            <li>
+                                <button class="action-inline-add-driver">
+                                <img src='../images/supplier.svg'/>
+                                    Add supplier
+                                </button>
+                                    <div class="divid tool"></div>
+                            </li>
+                            <li class="more_other_option">
+                                <button>
+                                    <i class="fas fa-ellipsis-h"></i>
+                                </button>
+                            </li>
+                        </div>
+                        <div class="multi_selection">
+                            <ul>
+                                <li>
+                                    <button class="cancel_btn">
+                                        <img src="../images/cross.svg"/>
+                                        cancel
+                                    </button>
+                                    <div class="divid tool"></div>
+                                </li>
+                                <li>
+                                    <button id="bulkSendFromFrontBtn">
+                                            <img scr="../images/create.svg" />
+                                            create email
+                                    </button> 
+                                    <div class="divid tool"></div>
+                                </li>
+                            
+                                <li>
+                                    <button  id="bulkSendConfirmationFromFrontBtn"  value="">
+                                        <svg width="19" height="12" viewBox="0 0 19 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M1.9 1.38462H13.3C13.5612 1.38462 13.775 1.59231 13.775 1.84615V2.48365L13.1041 3.01731C13.6147 2.85577 14.1609 2.76923 14.725 2.76923C14.8853 2.76923 15.0427 2.775 15.2 2.78942V1.84615C15.2 0.827885 14.348 0 13.3 0H1.9C0.852031 0 0 0.827885 0 1.84615V9.23077C0 10.249 0.852031 11.0769 1.9 11.0769H10.6934C10.3431 10.6644 10.0581 10.1971 9.85625 9.69231H1.9C1.63875 9.69231 1.425 9.48462 1.425 9.23077V4.275L5.64062 7.63846C6.75984 8.53269 8.36594 8.54712 9.50297 7.68173C9.52969 6.83942 9.76719 6.05192 10.168 5.3625L8.65687 6.56827C8.04234 7.05865 7.16062 7.05865 6.54609 6.56827L1.425 2.48365V1.84615C1.425 1.59231 1.63875 1.38462 1.9 1.38462ZM19 7.84615C19 6.74449 18.5496 5.68794 17.7479 4.90894C16.9462 4.12994 15.8588 3.69231 14.725 3.69231C13.5912 3.69231 12.5038 4.12994 11.7021 4.90894C10.9004 5.68794 10.45 6.74449 10.45 7.84615C10.45 8.94782 10.9004 10.0044 11.7021 10.7834C12.5038 11.5624 13.5912 12 14.725 12C15.8588 12 16.9462 11.5624 17.7479 10.7834C18.5496 10.0044 19 8.94782 19 7.84615ZM16.723 6.59712C16.907 6.77596 16.907 7.07019 16.723 7.24904L14.5855 9.32596C14.4014 9.50481 14.0986 9.50481 13.9145 9.32596L12.727 8.17212C12.543 7.99327 12.543 7.69904 12.727 7.52019C12.9111 7.34135 13.2139 7.34135 13.398 7.52019L14.25 8.34808L16.052 6.59712C16.2361 6.41827 16.5389 6.41827 16.723 6.59712Z" fill="white"/>
+                                        </svg>
+                                        Create Confirmation
+                                    </button> 
+                                    <div class="divid tool"></div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </ul>
+            </div>
+        </div>
+    {% endblock toolbar %}
+
+{% endblock %}
+
+{% block body_javascript %}
+    {{ parent() }}
+
+    <script type="text/javascript">
+        $(function() {
+            const toggles = document.querySelectorAll('.checkbox-switch input[type="checkbox"]');
+            for (i = 0; i < toggles.length; i++) {
+                toggles[i].addEventListener('change', function () {
+                    const toggle = this;
+                    const newValue = this.checked;
+                    const oldValue = !newValue;
+                    const propertyName = this.closest('.checkbox-switch').dataset.propertyname;
+
+                    const toggleUrl = "{{ path('easyadmin', { action: 'edit', entity: _entity_config.name, view: 'list' })|raw }}"
+                        + "&id=" + this.closest('tr').dataset.id
+                        + "&property=" + propertyName
+                        + "&newValue=" + newValue.toString();
+
+                    let toggleRequest = $.ajax({ type: "GET", url: toggleUrl, data: {} });
+
+                    toggleRequest.done(function(result) {});
+
+                    toggleRequest.fail(function() {
+                        // in case of error, restore the original value and disable the toggle
+                        toggle.checked = oldValue;
+                        toggle.disabled = true;
+                        toggle.closest('.checkbox-switch').classList.add('disabled');
+                    });
+                });
+            }
+
+            $('.action-delete').on('click', function(e) {
+                e.preventDefault();
+                const id = $(this).parents('tr').first().data('id');
+
+                $('#modal-delete').modal({ backdrop: true, keyboard: true })
+                    .off('click', '#modal-delete-button')
+                    .on('click', '#modal-delete-button', function () {
+                        let deleteForm = $('#delete-form');
+                        deleteForm.attr('action', deleteForm.attr('action').replace('__id__', id));
+                        deleteForm.trigger('submit');
+                    });
+            });
+
+            {% if _has_filters %}
+            // HTML5 specifies that a <script> tag inserted with innerHTML should not execute
+            // https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML#Security_considerations
+            // That's why we can't use just 'innerHTML'. See https://stackoverflow.com/a/47614491/2804294
+            var setInnerHTML = function(element, htmlContent) {
+                element.innerHTML = htmlContent;
+                Array.from(element.querySelectorAll('script')).forEach( oldScript => {
+                    const newScript = document.createElement('script');
+                    Array.from(oldScript.attributes)
+                        .forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                    newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                    oldScript.parentNode.replaceChild(newScript, oldScript);
+                });
+            };
+
+            document.querySelector('.action-filters-button').addEventListener('click', function(event) {
+                let filterButton = event.currentTarget;
+                let filterModal = document.querySelector(filterButton.dataset.modal);
+                let filterModalBody = filterModal.querySelector('.modal-body');
+
+                $(filterModal).modal({ backdrop: true, keyboard: true });
+                filterModalBody.innerHTML = '<div class="fa-3x px-3 py-3 text-muted text-center"><i class="fas fa-circle-notch fa-spin"></i></div>';
+
+                $.get(filterButton.getAttribute('href'), function (response) {
+                    setInnerHTML(filterModalBody, response);
+                });
+
+                event.preventDefault();
+                event.stopPropagation();
+            });
+            {% endif %}
+
+            {% if _has_batch_actions %}
+            const titleContent = $('.content-header-title > .title').html();
+            $(document).on('click', '.deselect-batch-button', function () {
+                $(this).closest('.content').find(':checkbox.form-batch-checkbox-all').prop('checked', false).trigger('change');
+            });
+            $(document).on('change', '.form-batch-checkbox-all', function () {
+                $(this).closest('.content').find(':checkbox.form-batch-checkbox').prop('checked', $(this).prop('checked')).trigger('change');
+            });
+            $(document).on('change', '.form-batch-checkbox', function () {
+                const $content = $(this).closest('.content');
+                let $input = $content.find(':hidden#batch_form_ids');
+                let ids = $input.val() ? $input.val().split(',') : [];
+                const id = $(this).val();
+
+                if ($(this).prop('checked')) {
+                    if (-1 === ids.indexOf(id)) {
+                        ids.push(id);
+                    }
+                } else {
+                    ids = ids.filter(function(value) { return value !== id });
+                    $content.find(':checkbox.form-batch-checkbox-all').prop('checked', false);
+                }
+
+                if (0 === ids.length) {
+                    $content.find('.global-actions').show();
+                    $content.find('.batch-actions').hide();
+                    $content.find('table').removeClass('table-batch');
+                } else {
+                    $content.find('.batch-actions').show();
+                    $content.find('.global-actions').hide();
+                    $content.find('table').addClass('table-batch');
+                }
+
+                $input.val(ids.join(','));
+                $content.find('.content-header-title > .title').html(0 === ids.length ? titleContent : '');
+            });
+            {% endif %}
+        });
+
+
+
+
+        // EXPORT DATA IN XLSX FILE 
+        $( ".exportInExcelBtn a" ).click(function (e) { 
+            e.preventDefault();
+
+            let url_last_segment    = location.href.substring(location.href.lastIndexOf('/') + 1);
+            let decoded             = decodeURI(url_last_segment)
+            let filters;
+
+            if (decoded.indexOf("Dashboard") >= 0){
+
+                filters     = decoded.split("&action=list&entity=Dashboard");
+                if( filters.length > 1 ){
+                    decoded = "&entity=Dashboard" + filters[filters.length-1];
+                }else{
+
+                    filters     = decoded.split("?action=search");
+                    if( filters.length > 1 ){
+                        decoded = "&entity=Dashboard" + filters[filters.length-1];
+                    }else{
+                        decoded = "&entity=Dashboard";
+                    }
+                }
+
+            }
+            let exportURL = window.location.origin + '/admin/?action=export' + decoded;
+            // console.log( exportURL );
+            window.location.replace( exportURL );
+        });
+
+
+        // ADJUST TITLE POSITION
+        $(document).ready(function () {
+            $( ".main-header .navbar" ).after( "<h2 class='dashboard-title'></h2>" );
+        
+        
+            let content_header = $("section.content-header").detach();            
+            $( "header.main-header" ).after( "<div id='dl_beforeContentHeader'></div>" );
+            $( "#dl_beforeContentHeader" ).after( content_header );
+        
+
+            let content_footer = $("section.content-footer").detach();            
+            $( ".content-wrapper" ).after( "<div id='dl_beforeContentFooter'></div>" );
+            $( "#dl_beforeContentFooter" ).after( content_footer );
+
+            
+            // $("table.datagrid tbody").height($("section.sidebar").height() - 220);
+        
+        });
+
+        function checkForChanges() {
+            
+            if ($('div#modal-filters').hasClass('show')){
+                $(".modal-backdrop.fade.show").hide();
+                $("aside.main-sidebar").hide();
+            } else{
+                $(".modal-backdrop.fade.show").show();
+                $("aside.main-sidebar").show();
+            }
+
+            setTimeout(checkForChanges, 50);
+        }
+
+        $(document).ready(function () {
+            $(checkForChanges);
+            let notes_modals = $('.addNoteModal.modal').detach();
+            $('body').append(notes_modals);
+        });
+
+        $(document).ready(function() {
+            var stickyNav = function(){
+                var stickyNavTop = 100;
+                var scrollTop = $(window).scrollTop();
+                if (scrollTop > stickyNavTop) { 
+                    $('table.table.datagrid thead').addClass('sticky');
+                    $('table.table.datagrid thead.sticky').css("top", scrollTop-51);
+                } else {
+                    $('table.table.datagrid thead ').removeClass('sticky'); 
+                }
+            };
+            
+            stickyNav();
+            
+            $(window).scroll(function() {
+                stickyNav();
+            });
+        });
+
+
+        function comboBookingFunction() {
+            let that = $(this);
+            let orderID;
+            if ( that.parents("tr").data('orderid') ) {
+                orderID = that.parents("tr").data('orderid');
+            }else{
+                orderID = that.parents("tr").children('td.text[data-name="booking"]').text().trim().replace("#RJ", "");
+                that.parents("tr").attr("data-orderid", orderID);
+            }
+            
+            $('tr.needsToHide[data-orderid="'+orderID+'"], tr.needsToHide[data-dlorderid="'+orderID+'"]').toggle();
+            // $('tr.combiBookingRow[data-orderid="'+orderID+'"]').toggle();
+            $('tr[data-orderid="'+orderID+'"], tr[data-dlorderid="'+orderID+'"]').toggleClass("shown");
+        }
+        
+        
+        function editnotebtnclick(orderid, itemid, loopindex ) {
+            // EDIT NOTE BUTTON ON CLICK
+            tinymce.init({
+                selector: 'textarea#editNoteTextArea_' + orderid + '_' + itemid + '_' + loopindex,
+                menubar: false,
+                plugins: 'lists',
+                toolbar: 'bullist',
+                tinycomments_mode: 'embedded',
+            });
+            $("#edit_note_"+orderid+"_"+itemid+"_"+loopindex).css("display", "flex");
+            $("#addNoteModal_"+itemid+" .modal-footer, #addNoteModal_"+itemid+" .modal-header, #addNoteModal_"+itemid+" .modal-subheader").hide();
+        }
+
+        function deleteNotebtnclick(that, orderid, itemid, loopindex ) {
+            // Delete NOTE BUTTON ON CLICK
+            if (window.confirm("Note will be deleted, are you sure? ")) {
+
+                that = $(that);
+                if (that.hasClass("loading-button")) { return; }
+                that.addClass("loading-button");
+                that.attr("disabled", "disabled");
+
+                let notenum = loopindex;
+              
+              
+
+                $.ajax({
+                    url:'/admin/delete/note',
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        "orderid": orderid,
+                        "itemid": itemid,
+                        "notenum": notenum,
+                    },
+                    async: true,
+                    success: function (response) {
+                        response = JSON.parse(response);
+                        if(response.status == 'success'){
+
+
+                            that.removeClass("loading-button");
+                            that.removeAttr("disabled");
+                            $("#previous_notes_"+itemid).hide();
+                            $("#previous_notes_"+itemid).load(location.href + " #previous_notes_"+itemid);
+                            $("#previous_notes_"+itemid).eq(0).addClass("toDel").removeClass("previous_notes_container");
+                            $("#previous_notes_"+itemid).show();
+                            $("#previous_notes_"+itemid).parents("form").find(".modal-body").append("<p class='noteAdded'>Note has been deleted.</p>");
+                            setTimeout(function() {
+                                $("p.noteAdded").remove();
+                            }, 3000);
+
+                        }else{
+                            alert(response.error);
+                            return false;
+                        }
+                    }
+                });
+            }
+        }
+             
+
+
+        function showCustomerNotesFunc(orderid, itemid ) {
+            // EDIT NOTE BUTTON ON CLICK
+            $("form#addNewNoteForm"+itemid+" .driverNotesSection").hide();
+            $("form#addNewNoteForm"+itemid+" .modal-footer").hide();
+            $("form#addNewNoteForm"+itemid+" .customerNotesSection").show();
+            $("button.btn-driverNotes").removeClass("selected");
+            $("button.btn-customerNotes").addClass("selected");
+        }
+
+
+        function showDriverNotesFunc(orderid, itemid ) {
+            // EDIT NOTE BUTTON ON CLICK
+            $("form#addNewNoteForm"+itemid+" .driverNotesSection").show();
+            $("form#addNewNoteForm"+itemid+" .modal-footer").show();
+            $("form#addNewNoteForm"+itemid+" .customerNotesSection").hide();
+            $("button.btn-driverNotes").addClass("selected");
+            $("button.btn-customerNotes").removeClass("selected");
+
+        }
+
+
+
+        function updateNoteClickFunc (that, orderid, itemid, loopindex){
+            that = $(that);
+            if (that.hasClass("loading-button")) { return; }
+            that.addClass("loading-button");
+            that.attr("disabled", "disabled");
+
+            let notenum     = loopindex;
+            let itemID      = itemid;
+            let rows        = $(`tr[data-id='${itemID}']`);
+            let data        = {};
+            rows.each(function( index, row ) {
+                $(row).find("input, select, button").each(function () {
+                    $(this).attr("disabled", "disabled");
+                    if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                        return;
+                    }
+                    data[$(this).attr("name")] = $(this).val();
+                });
+            });
+
+            delete data["undefined"];
+            let newNote = tinyMCE.activeEditor.getContent();
+            $.ajax({
+                url:'/admin/edit/note',
+                type: "POST",
+                dataType: "json",
+                data: {
+                    "orderid": orderid,
+                    "itemid": itemid,
+                    "notenum": notenum,
+                    "newNote": newNote
+                },
+                async: true,
+                success: function (response) {
+                    response = JSON.parse(response);
+                    if(response.status == 'success'){
+
+
+                        that.removeClass("loading-button");
+                        that.removeAttr("disabled");
+
+
+                        $("#previous_notes_"+itemid).load(location.href + " #previous_notes_"+itemid);
+                        $("#previous_notes_"+itemid).hide();
+                        $("#previous_notes_"+itemid).eq(0).addClass("toDel").removeClass("previous_notes_container");
+                        $("#previous_notes_"+itemid).show();
+                        $("#edit_note_"+orderid+"_"+itemid+"_"+notenum).hide();
+                        $("#addNewNoteForm"+itemid+" .modal-header").show().css("display", "felx");
+                        $("#addNewNoteForm"+itemid+" .modal-footer").show().css("display", "felx");
+                        $("#addNewNoteForm"+itemid+" .modal-subheader").show().css("display", "felx");
+                        $("#previous_notes_"+itemid).parents("form").find(".modal-body").append("<p class='noteAdded'>Note has been updated.</p>");
+                        tinymce.remove('textarea.editNoteTextArea');
+                        setTimeout(function() {
+                            $("p.noteAdded").remove();
+                        }, 3000);
+
+
+                    }else{
+                    alert(response.error);
+                    return false;
+                    }
+                }
+            });
+        }
+
+        function closeEditorFunc (orderid, itemid, loopindex){
+            $("#edit_note_"+orderid+"_"+itemid+"_"+loopindex).hide();
+            $("#addNewNoteForm"+itemid+" .modal-header").show().css("display", "felx");
+            $("#addNewNoteForm"+itemid+" .modal-footer").show().css("display", "felx");   
+            $("#addNewNoteForm"+itemid+" .modal-subheader").show().css("display", "felx");   
+        }
+
+
+    $(document).ready(function () {
+        $("table.table.datagrid tr:not(.first-driver-row.additional-driver-row, .combiBookingRow, .itemExtrasAddonsRow)").each(function (index, element) {
+            let orderID = $(this).children('td.text[data-name="booking"]').text().trim().replace("#RJ", "");
+            let itemID  = $(this).find('input.bulk_actions_checkbox').val();
+            $(this).attr("data-orderid", orderID);
+            $(this).attr("data-id", itemID);
+
+        });
+
+
+
+        // button.action-inline-save
+        $("table.table.datagrid tr input:not(.bulk_actions_checkbox, .passenger_name, .addressInput, .pickAirlineCompany, .pickFlightNumber, .pickTime, .adultCount, .childCount, .departureTime, .arrivalTime, .vehicleType), table.table.datagrid tr select:not(.vehicleType)").on("change paste keyup", function() {
+            $(this).parents("tr").addClass("edited");
+            $(this).parents("tr").find('.bulk_actions_checkbox').prop('checked', true).change();
+            $(this).closest("tr").find("td:not(:has(td.table_checkbox)):not(:has(select.billingStatus))").css('background-color', '#cbc9c9');
+		    $(this).closest("tr").find("input:not(:has(.bulk_actions_checkbox)").css('background-color', '#cbc9c9');
+    	    $(this).closest("tr").find("td, select, input").css('color', '#292D42');
+            // $('.option').show();
+            // $('.first_options').show();
+            // $('.multi_selection').hide();
+        });
+
+        // button.action-inline-save
+        $("input.departureTime, input.arrivalTime, .form_datepicker.readonly.hasDatepicker").on("change", function() {
+            // $(this).parents("tr").find("button.action-inline-save").click();     
+            // $(this).parents("tr").find("div.dropdown-content").css('display', 'none');
+            $(this).parents("tr").addClass("edited");
+            $(this).parents("tr").find('.bulk_actions_checkbox').prop('checked', true).change();
+            $(this).closest("tr").find("td:not(:has(td.table_checkbox)):not(:has(select.billingStatus))").css('background-color', '#cbc9c9');
+		    $(this).closest("tr").find("input:not(:has(.bulk_actions_checkbox)").css('background-color', '#cbc9c9');
+    	    $(this).closest("tr").find("td, select, input").css('color', '#292D42');
+            // $('.option').show();
+            // $('.first_options').show();
+            // $('.multi_selection').hide();
+        });
+
+        $(document).on("focusout","input.passenger_name, input.addressInput, input.pickAirlineCompany, input.pickFlightNumber, input.adultCount, input.childCount",function(){
+            // $(this).parents("tr").find("button.action-inline-save").click(); 
+            // $(this).parents("tr").find("div.dropdown-content").css('display', 'none');
+            $(this).parents("tr").addClass("edited");
+            $(this).parents("tr").find('.bulk_actions_checkbox').prop('checked', true).change();
+            $(this).closest("tr").find("td:not(:has(td.table_checkbox)):not(:has(select.billingStatus))").css('background-color', '#cbc9c9');
+            $(this).closest("tr").find("input:not(:has(.bulk_actions_checkbox)").css('background-color', '#cbc9c9');
+    	    $(this).closest("tr").find("td, select, input").css('color', '#292D42');
+            // $('.option').show();
+            // $('.first_options').show();
+            // $('.multi_selection').hide();
+        });
+
+
+        $('.form_datepicker.readonly.hasDatepicker').on('focus', function() {
+            if ($(this).is(':visible')) {
+                $(this).parents("tr").addClass("edited");
+                $(this).parents("tr").find('.bulk_actions_checkbox').prop('checked', true).change();
+                $(this).closest("tr").find("td:not(:has(td.table_checkbox)):not(:has(select.billingStatus))").css('background-color', '#cbc9c9');
+                $(this).closest("tr").find("input:not(:has(.bulk_actions_checkbox)").css('background-color', '#cbc9c9');
+                $(this).closest("tr").find("td, select, input").css('color', '#292D42');
+                $('table.table.datagrid tr.data_row.edited').css('background','#cbc9c9');
+                // $('.option').show();
+                // $('.first_options').show();
+                // $('.multi_selection').hide();
+            }
+        });
+        // ACTION FOR CHANGING VEHICLE TYPE 
+        $("table.table.datagrid tr select.vehicleType").on("change", function() {
+        
+            alert("To change vehicle type, please also select new vehicle from that type!");
+            $(this).parents("tr").find("select.vehicle_id").focus();
+        });
+
+
+        $("tr.additional-driver-row td.decimal div.net input").inputFilter(function(value) {
+            return /^-?\d*[.,]?\d*$/.test(value);    // Allow digits only, using a RegExp
+        },"Only digits allowed");
+
+        // ACTION FOR CHANGING ADDIOTIONAL DRIVER NET PRICE 
+        $("tr.additional-driver-row td.decimal div.net input").on("change", function() {
+            let net_price   = $(this).val();
+            let taxRate     = $(this).parents("tr").find("input.additionalDriverTaxRate").val();
+            if($.isNumeric(net_price)){
+                let netTaxPrice = ( parseFloat( parseFloat(net_price) * parseFloat(taxRate) ) + parseFloat(net_price));
+                $(this).parents("tr").find(".additionalDriverNetTaxValue").html("$"+  Number(netTaxPrice).toFixed(2) );
+            
+            }else{
+                console.log("Please Enter Numaric Value Only!")
+            }
+        });
+
+
+        // Per Page Order Items
+        $("select#max_result").on("change", function() {
+            let itemsPerPage = $(this).val();
+
+            let urlToGo = window.location.href;
+            if (urlToGo.indexOf('max_results=') > -1) {
+                let oldItemsPerPage = getUrlParameter('max_results');
+                urlToGo = urlToGo.replace("max_results="+oldItemsPerPage, "max_results="+itemsPerPage);
+                window.location.replace( urlToGo );
+
+            } else {
+                window.location.replace( urlToGo + "&max_results=" + itemsPerPage );
+            }
+
+        });
+
+        let current_url =  window.location.href;
+        if (current_url.indexOf('max_results=') > -1) {
+            let itemsPerPage = getUrlParameter('max_results');
+            $("select#max_result").val(itemsPerPage);
+        }
+        // Per Page Order Items
+
+
+    });
+
+    (function($) {
+        $.fn.inputFilter = function(callback, errMsg) {
+            return this.on("input keydown keyup mousedown mouseup select contextmenu drop focusout", function(e) {
+            if (callback(this.value)) {
+                // Accepted value
+                if (["keydown","mousedown","focusout"].indexOf(e.type) >= 0){
+                $(this).removeClass("input-error");
+                this.setCustomValidity("");
+                }
+                this.oldValue = this.value;
+                this.oldSelectionStart = this.selectionStart;
+                this.oldSelectionEnd = this.selectionEnd;
+            } else if (this.hasOwnProperty("oldValue")) {
+                // Rejected value - restore the previous one
+                $(this).addClass("input-error");
+                this.setCustomValidity(errMsg);
+                this.reportValidity();
+                this.value = this.oldValue;
+                this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+            } else {
+                // Rejected value - nothing to restore
+                this.value = "";
+            }
+            });
+        };
+    }(jQuery));
+    var getUrlParameter = function getUrlParameter(sParam) {
+        var sPageURL = window.location.search.substring(1),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+            }
+        }
+        return false;
+    };
+
+
+    // RESIZE AND ADD SCROLL TO 3 DOTS MENU IF TABLE HEIGHT IS LESS.
+    let resizeObserver = new ResizeObserver(() => {
+        let tableHeight = $('table.table.datagrid').height();        
+        if( tableHeight < 430 ){
+            $("body").append("<style data-id='toMake3BtnsScroll'>.dropdown div.dropdown-content { height: 200px; max-height: 122px; overflow-y: scroll; bottom: -23px !important; right: 65px !important;}</style>");
+        }else{
+            $('style[data-id="toMake3BtnsScroll"]').remove();
+        } 
+    });
+
+    table_elem = $("table.table.datagrid")[0];
+    resizeObserver.observe(table_elem);
+    // RESIZE AND ADD SCROLL TO 3 DOTS MENU IF TABLE HEIGHT IS LESS.
+
+    
+    $("table tbody tr").hover(function(){
+        let itemid = $(this).data("id");
+        $('table tbody').find('tr[data-id="'+itemid+'"]').addClass('shownd');
+    }, function(){
+        let itemid = $(this).data("id");
+        $('table tbody').find('tr[data-id="'+itemid+'"]').removeClass('shownd');
+    });
+
+    /**
+    *
+    * @param {jQuery} selector
+    */
+    function initDatePicker_dashboard(selector) {
+        let classToLookFor = "form_datepicker";
+
+        let target = selector;
+        if (!target.hasClass(classToLookFor)) {
+            target = selector.find("." + classToLookFor);
+        }
+
+        if (target.length > 0) {
+            if (!target.hasClass("readonly")) {
+                target.addClass("readonly");
+            }
+
+            target.datepicker({
+                dateFormat: 'MM dd, yy',
+                minDate: new Date("01/01/1996"),
+                onSelect: function () {
+                    $(this).trigger("input");
+                }
+            });
+        }
+    }
+
+	$( document ).ready(function() {
+		$.ajax({
+			url: '/admin/select_boxes/',
+			type: 'GET',
+			dataType: 'json',
+			success: function( response ) {
+				let display_column_val = "";
+				console.log( response );
+				$.each( response, function( column_name, column_values ) {
+					$('.filter_checkbox.' + column_name).html('');
+					$('.filter_checkbox.' + column_name).append('<div class="select"><input type="checkbox" name="all_' + column_name + '" value="all" class="select_all_boxes"><label for="all_' + column_name + '">Select All</label></div>');
+
+					$.each( column_values, function( index, column_value ) {
+						if (column_value != null){
+
+							display_column_val = column_value;
+							
+							if( column_name == "orderId" ){
+								display_column_val = "#RJ"+column_value;	
+							}
+							if( column_name == "status" ){
+								if( column_value == 0 ) {
+									display_column_val = "UNPAID";
+								}else if ( column_value == 1 ){
+									display_column_val = "PAID";
+								}
+							}
+							
+							if( column_name == "pickDate" ){
+								display_column_val = moment(column_value.date).format('YYYY-MM-DD');
+							}else if( column_name == "pickTime" ){
+								display_column_val = moment(column_value.date).format('HH:mm');
+							}else if( column_name == "pickTimeTransport" ){
+								display_column_val = moment(column_value.date).format('HH:mm');
+							}
+							
+							if( column_name == "pickTime" ){
+								$('.filter_checkbox.arrival').append('<div class="select_option"><input type="checkbox" name="'+display_column_val+'" value="'+display_column_val+'"><label for="'+display_column_val+'"> '+display_column_val+'</label></div>');
+								$('.filter_checkbox.departure').append('<div class="select_option"><input type="checkbox" name="'+display_column_val+'" value="'+display_column_val+'"><label for="'+display_column_val+'"> '+display_column_val+'</label></div>');
+							}else if( column_name == "pickTimeTransport" ){
+								$('.filter_checkbox.pickTimeTransport').append('<div class="select_option"><input type="checkbox" name="'+display_column_val+'" value="'+display_column_val+'"><label for="'+display_column_val+'"> '+display_column_val+'</label></div>');
+							}else if( column_name == "status" ){
+								$('.filter_checkbox.status').append('<div class="select_option"><input type="checkbox" name="'+display_column_val+'" value="'+column_value+'"><label for="'+display_column_val+'"> '+display_column_val+'</label></div>');
+							}else{
+								$('.filter_checkbox.' + column_name).append('<div class="select_option"><input type="checkbox" name="'+display_column_val+'" value="'+display_column_val+'"><label for="'+display_column_val+'"> '+display_column_val+'</label></div>');
+							}
+						}
+						
+					});
+			
+				});
+				
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('AJAX error:', textStatus, errorThrown);
+			}
+		});
+	});	
+
+
+
+    $(document).mouseup(function(e) {
+        var container = $(".filter");
+        var isDaterangepicker = $(e.target).closest(".daterangepicker").length > 0;
+        var isDaterangepickerButton = $(e.target).hasClass("daterangepicker-input");
+        var isDateInput = $(e.target).hasClass("date");
+
+        if (!isDaterangepicker && !isDaterangepickerButton && !isDateInput && !container.is(e.target) && container.has(e.target).length === 0 ) {
+            container.hide();
+            $(".datagrid thead i").removeClass('active');
+        }
+    });
+    
+
+							
+	$(document).ready(function() {
+		$(".filter input.text_filter").on('input', function() {
+			let inputval = $(this).val();
+			let len = inputval.length;
+			if (len >= 1) {
+				$('.select').css('display','none');
+			} else {
+				$('.select').css('display','inline-block');
+			}
+    });
+		
+	function debounce(func, delay) {
+		let timeout;
+		return function() {
+			clearTimeout(timeout);
+			timeout = setTimeout(() => {
+				func.apply(this, arguments);
+			}, delay);
+		}
+	}
+
+	const filterOptions = function() {
+		var searchTerm = $(this).val().toLowerCase();
+
+		$('.select_option').each(function() {
+			$(this).children().filter(function() {
+				return $(this).text().toLowerCase().indexOf(searchTerm) === -1;
+			}).hide();
+
+			$(this).children().filter(function() {
+				return $(this).text().toLowerCase().indexOf(searchTerm) !== -1;
+			}).show();
+
+			$(this).find('input[type="checkbox"]').each(function() {
+				if ($(this).siblings().is(':visible')) {
+					$(this).show();
+				} else {
+					$(this).hide();
+				}
+			});
+		});
+	};
+
+		$('input.text_filter').on('input', debounce(filterOptions, 250));
+	});
+
+
+
+	$(document).on('click', '.filter .load-more', function () {
+		var $this 		= $(this),
+			offset 		= $this.data('offset'),
+			to_load_col = $this.data('columnname'),
+			url 		= "{{ path('select_boxes_load_more') }}?offset=" + offset + "&to_load_col=" + to_load_col;
+		
+		if ($this.hasClass("loading-button")) { return; }
+		$this.addClass("loading-button");
+		$.ajax({
+			url: url,
+			type: 'GET',
+			dataType: 'json',
+			success: function( response ) {
+				let display_column_val = "";
+				console.log( response );
+				$.each( response, function( column_name, column_values ) {
+					$.each( column_values, function( index, column_value ) {
+						if (column_value != null){
+
+							display_column_val = column_value;
+							
+							if( column_name == "orderId" ){
+								display_column_val = "#RJ"+column_value;	
+							}
+							if( column_name == "status" ){
+								if( column_value == 0 ) {
+									display_column_val = "UNPAID";
+								}else if ( column_value == 1 ){
+									display_column_val = "PAID";
+								}
+							}
+							
+							if( column_name == "pickDate" ){
+								display_column_val = moment(column_value.date).format('YYYY-MM-DD');
+							}else if( column_name == "pickTime" ){
+								display_column_val = moment(column_value.date).format('HH:mm');
+							}else if( column_name == "pickTimeTransport" ){
+								display_column_val = moment(column_value.date).format('HH:mm');
+							}
+							
+							if( column_name == "pickTime" ){
+								$('.filter_checkbox.arrival').append('<div class="select_option"><input type="checkbox" name="'+display_column_val+'" value="'+display_column_val+'"><label for="'+display_column_val+'"> '+display_column_val+'</label></div>');
+								$('.filter_checkbox.departure').append('<div class="select_option"><input type="checkbox" name="'+display_column_val+'" value="'+display_column_val+'"><label for="'+display_column_val+'"> '+display_column_val+'</label></div>');
+							}else if( column_name == "pickTimeTransport" ){
+								$('.filter_checkbox.pickTimeTransport').append('<div class="select_option"><input type="checkbox" name="'+display_column_val+'" value="'+display_column_val+'"><label for="'+display_column_val+'"> '+display_column_val+'</label></div>');
+							}else{
+								$('.filter_checkbox.' + column_name).append('<div class="select_option"><input type="checkbox" name="'+display_column_val+'" value="'+display_column_val+'"><label for="'+display_column_val+'"> '+display_column_val+'</label></div>');
+							}
+						}
+						
+					});
+					$this.data('offset', offset + 10); // HERE MAX IS RESULT
+                    $this.removeClass("loading-button");
+
+			
+				});
+				
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('AJAX error:', textStatus, errorThrown);
+			}
+		});
+	});
+
+	$(".ddd").on("click", function() {
+		var $button = $(this);
+		var $input = $button.closest('.sp-quantity').find("input.quntity-input");
+		$input.val((i, v) => Math.max(0, +v + 1 * $button.data('multi'))).change();
+
+	});
+
+
+    $(document).mouseup(function(e) {
+        var passengerQtyContainer 		= $(".passengerQty-dropdown"); 
+        if ( !passengerQtyContainer.is(e.target) && passengerQtyContainer.has(e.target).length === 0 ) {
+            passengerQtyContainer.hide();
+            passengerQtyContainer.parents("td").removeClass("dl-relative");
+        }
+    });
+
+
+
+	$("input.quntity-input.adultCount, input.quntity-input.childCount").on('change', function() {
+		let _adultCount 		= parseInt( $(this).parents("td").find("input.quntity-input.adultCount").val() );
+		let _childCount 		= parseInt( $(this).parents("td").find("input.quntity-input.childCount").val() );
+		let totalPassengersQty 	= _adultCount + _childCount;
+		$(this).parents("td").find(".totalPassengersQty").val(totalPassengersQty);
+
+	});
+
+    $("button#bulkSendFromFrontBtn").on("click", function () {
+        if ($(this).hasClass("loading-button")) { return; }
+        $(this).addClass("loading-button");
+
+        let selectedCheckboxValues  = $('input.bulk_actions_checkbox:checked').map(function() {
+            return $(this).val();
+        }).get();
+        let final_data = [];
+
+        if (selectedCheckboxValues.length === 0) {
+            alert("Please select atleast 1 booking!");
+            $(this).removeClass("loading-button");
+            $(this).removeAttr("disabled");
+            return false;
+
+        }else{
+            
+            $.each( selectedCheckboxValues, function( index, selectedCheckboxValue ) {
+                let parentRow   = $('#bulkActionsCheckbox_'+selectedCheckboxValue).parents("tr");
+                let itemID      = selectedCheckboxValue;
+                let rows        = $(`tr[data-id='${itemID}']`);
+                parentRow.find("input, select, button").each(function () {
+                    $(this).attr("disabled", "disabled");
+                    if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                        return;
+                    }
+                });
+                rows.find("input, select, button").each(function () {
+                    $(this).attr("disabled", "disabled");
+                    if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                        return;
+                    }
+                });
+
+                final_data.push(itemID);
+            });
+        }
+        final_data = JSON.stringify(final_data);
+        let final_to_send = {
+            data:  final_data,
+            bulk: 1
+        };
+
+        let that = $(this);
+
+
+        $.ajax({
+            url: '{{ url("bulk_send_email_from_front") }}',
+            type: "POST",
+            data: final_to_send,
+            success: function (response) {                                
+                if (response.status === 'success') {  
+
+                    that.removeClass("loading-button");
+                    that.removeAttr("disabled");
+                    
+                    $.each( selectedCheckboxValues, function( index, selectedCheckboxValue ) {
+                        let parentRow   = $('#bulkActionsCheckbox_'+selectedCheckboxValue).parents("tr");
+                        let itemID      = selectedCheckboxValue;
+                        let rows        = $(`tr[data-id='${itemID}']`);
+                        parentRow.find("input, select, button").each(function () {
+                            $(this).removeAttr("disabled");
+                            
+                        });
+                        rows.find("input, select, button").each(function () {
+                            $(this).removeAttr("disabled");
+                            
+                        });
+                    });
+
+                    // location.reload();
+                    $("#notification_bar .notification_container p").html("Email has been created!");
+                    $("#notification_bar").show().css('display', 'flex');
+                    // $("section.sidebar").css("margin-top", "-150px");
+                    setTimeout(function() {
+                        $("section.sidebar").css("margin-top", "-70px");
+                        $("#notification_bar").fadeOut();
+                    }, 3000);
+
+
+                }else{
+                    alert("Error: " + response.message); 
+                }
+
+                $.each( selectedCheckboxValues, function( index, selectedCheckboxValue ) {
+                    let parentRow   = $( 'input.bulk_actions_checkbox[value="'+selectedCheckboxValue+'"]' ).parents("tr");
+                    let itemID      = selectedCheckboxValue;
+                    let rows        = parentRow;
+
+                    rows.find("input, select, button").each(function () {
+                        $(this).prop("disabled", false);
+                    });
+                });
+                that.removeClass("loading-button");
+                that.removeAttr("disabled");
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) { 
+                alert("Status: " + textStatus); alert("Error: " + errorThrown); 
+            }   
+        });
+    });
+
+    document.title = 'Dashboard';
+    </script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.3/moment.min.js"></script>
+
+    {% if 'search' == app.request.get('action') %}
+        <script type="text/javascript">
+            const _search_query = "{{ app.request.get('query')|default('')|e('js') }}";
+            // the original query is prepended to allow matching exact phrases in addition to single words
+            $('#main').find('table tbody td:not(.actions)').highlight($.merge([_search_query], _search_query.split(' ')));
+
+        </script>
+    {% endif %}
+    
+    {% if app.request.get('filters') is not null and app.request.get('filters').order_supplier_id is defined %}
+
+        <script type="text/javascript">
+            $(document).ready(function() {
+                let supplier_id_to_filter           = {{ app.request.get('filters').order_supplier_id }};
+                let allAdditionalDriverRows         = $("tr.additional-driver-row");
+                allAdditionalDriverRows.each(function( index ) {
+                    let additionalDriverRow         = $( this );
+                    let additionalDriverRowSupplier = additionalDriverRow.find('.driver_id select').val();
+                    if( supplier_id_to_filter != additionalDriverRowSupplier ){
+                        additionalDriverRow.remove();
+                    }
+                });
+
+                let allExtraAddonsRows         = $("tr.itemExtrasAddonsRow");
+                allExtraAddonsRows.each(function( index ) {
+                    let extraAddonsRow         = $( this );
+                    let extraAddonsRowSupplier = extraAddonsRow.find('select.selectSupplier').val();
+                    if( supplier_id_to_filter != extraAddonsRowSupplier ){
+                        extraAddonsRow.remove();
+                    }
+                });
+            });
+
+             
+        </script>    
+
+    {% endif %}
+
+    {# TINYMYC INITIALIZING  #}
+    <script src="https://cdn.tiny.cloud/1/1eh4qj1va5w92wymk125udubazllso8vllb0oi76aaq4h1th/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
+    <style>
+    div#notification_bar {
+        position: fixed;
+        width: 320px;
+        top: 0;
+        right: 0px;
+        margin: 0;
+        height: 65px;
+        border-top-right-radius: 0px;
+        border-bottom-right-radius: 0px;
+        align-items: center;
+        filter: drop-shadow(5px 0px 5px #000);
+    }
+    form.addNewNoteForm .modal-footer {
+        background: transparent;
+    }
+    .dropdown-content button.btn.btn-editNote {
+        margin-top: 10px !important;
+    }
+    table.datagrid thead.sticky{
+        position: sticky;
+        background: #fff;
+        box-shadow: none;
+        z-index: 9;
+        box-shadow: 0px -5px 10px 5px #c3c3c3;
+    }
+    td.type i.fa-square,
+    td.type i.fa-flag{
+        cursor: pointer;
+    }
+    table.table.datagrid td:last-child 
+    {
+		position: sticky !important;
+        background: #fff;
+        right: 0px;
+        padding-right: 10px;
+        width: 100%;
+    }
+    td.editLink > button, td.editLink > div {
+        display: inline-block;
+        width: 50%;
+    }
+    tr.additional-driver-row input,
+    tr.additional-driver-row select {
+        height: 24px;
+    }
+    
+    table.table.datagrid thead th.pickup_date i:hover{
+        cursor: pointer;
+    }
+
+    .NotesContainerHeading {
+        font-weight: bold;
+        padding: 5px 0px;
+    }
+    .previous_notes_container.customerNotes {
+        height: auto;
+        overflow-y: auto;
+        padding: 10px 5px;
+    }
+    .modal-subheader {
+        padding: 1rem;
+        padding-bottom: 0px;
+    }
+
+    button.selected,
+    button.selected:hover {
+        background-color: var(--color-primary);
+        color: var(--text-on-primary);
+    }
+    i.fa.fa-ellipsis-h {
+        cursor: pointer;
+    }
+    button.text-danger.action-remove-driver,button.text-danger.action-remove-driver:hover {
+        border: none;
+        background: transparent;
+        width: 100%;
+        box-shadow: none;
+    }
+    .dropdown {
+        position: relative;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        right: 74px;
+        top: 0;
+        min-width: 160px;
+        box-shadow: -9px 8px 9px -5px rgb(0 0 0 / 20%);
+        padding: 12px 16px;
+        z-index: 1;
+        flex-direction: column;
+
+    }
+    .dropdown-content button.btn {
+        background: transparent;
+        color: darkslategray;
+        border: none !important;
+        box-shadow: none;
+        text-align: left;
+        padding: 10px 15px;
+        margin: 0px !important;
+        border-radius: 0px;
+    }
+    div#flash-messages {
+        margin: 0px;
+    }
+
+    div#flash-messages .alert {
+        margin: 0px;
+    }
+
+    .dropdown-content button.btn:hover {
+        background: #0679b7;
+        box-shadow: none !important;
+        color: #fff;
+    }
+
+    div.dropdown-content {
+        padding: 0px;
+    }
+    .bulk_driver_assigner {
+        display: flex;
+    }
+
+    .bulk_action_row {
+        display: flex;
+        gap: 15px;
+        display: none;
+    }
+    table.datagrid thead {
+        background: transparent;
+    }
+    div.global-actions  input,
+    div.global-actions  select,
+    div.global-actions  a.btn {
+        border: 1px solid #E2E8F0 !important;
+        border-radius: 8px !important;
+        height: 44px !important;
+        line-height: 22px !important;
+        display: block;
+        outline: none !important;
+        border: none !important;
+        font-style: normal !important;
+        font-weight: 400 !important;
+        font-size: 14px !important;
+        line-height: 150% !important;    
+        letter-spacing: 0.2px !important;
+        color: #64748B !important;
+
+    }
+    button.deletenoteBtn {
+        border: none;
+        font-size: 12px;
+        color: #b40000;
+    }
+
+    button.deletenoteBtn:hover {
+        color: red;
+    }
+
+    table.table.datagrid tr.combiBookingRow, 
+    .datagrid td, 
+    .datagrid th {
+        border: 0px;
+    }
+
+    table.table.datagrid tr {
+        border-top: var(--border-width) var(--border-style) var(--border-color);
+    }
+
+    tr.combiBookingRow {
+        display: none;
+    }
+    .exportInExcelBtn.TransportationManagement a.btn,
+    .exportInExcelBtn.TransportationManagement a.btn i{
+        background: #FC7C5C;
+        font-style: normal !important;
+        font-weight: 600 !important;
+        font-size: 14px !important;
+        line-height: 21px !important;
+        letter-spacing: 0.5px !important;
+        color: #FFFFFF !important;
+    }
+    .exportInExcelBtn.TransportationManagement a.btn {
+        padding: 11px;
+        height: 37px !important;
+    }
+    .extraAddonHeading{
+        font-weight: bold;
+        font-size: 14px;
+        line-height: 150%;
+        letter-spacing: 0.5px;
+        color: #0F172A;
+    }
+    .singleExtra.Label,
+    .singleAddon.Label {
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 150%;
+        letter-spacing: 0.5px;
+        color: #0F172A;
+    }
+    div.global-actions  a.btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    div.global-actions  select {
+        border: 1px solid #ccc !important;
+    }
+
+  div.form-action-search input[type=search].form-control {
+        background-color: var(--white) !important;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg viewBox='0 0 1792 1792' xmlns='http://www.w3.org/2000/svg'%3e%3cpath fill='%23000000' d='M1216 832q0-185-131.5-316.5t-316.5-131.5-316.5 131.5-131.5 316.5 131.5 316.5 316.5 131.5 316.5-131.5 131.5-316.5zm512 832q0 52-38 90t-90 38q-54 0-90-38l-343-342q-179 124-399 124-143 0-273.5-55.5t-225-150-150-225-55.5-273.5 55.5-273.5 150-225 225-150 273.5-55.5 273.5 55.5 225 150 150 225 55.5 273.5q0 220-124 399l343 343q37 37 37 90z'/%3e%3c/svg%3e");				background-repeat: no-repeat;
+        background-size: 17px 17px;
+        padding-left: 13px !important;
+        background-position: 97% 50%;
+        width: 355px !important;
+        height: 33px !important;
+    }
+    section.content-header {border-bottom: none;}
+    button#bulkAssignBtn {
+        margin-right: 15px;
+    }
+
+    select.billingStatus,
+    select.confirmationStatus,
+    select.selectSupplier,
+    tr.additional-driver-row select,
+    select[name="vehicle.id"] {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        color: #64748B;
+        align-items: center;
+        gap: 8px;
+        flex: none;
+        order: 0;
+        flex-grow: 0;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 150%;
+        border: none;
+        padding: 4px 12px;
+        height: 32px;
+        letter-spacing: 0.5px;
+        background: transparent;
+        max-width: 167px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;   
+        padding-left: 0px;         
+    }    
+ 
+    tr.additional-driver-row input {
+        border: none;
+        width: 100%;
+    }    
+    
+    select.selectSupplier {
+        padding-left: 0px;
+    }
+    .billingStatus.Paid {
+        color: #22C55E !important;
+        background: #F0FDF4;
+    }
+
+
+    .billingStatus.Unpaid {
+        color: #EF4444 !important;
+        background: #FEF2F2;
+    }
+
+    .billingStatus.Cancelled {
+        color: #F97316 !important;
+        background: #FFF7ED;
+    }
+    .confirmationStatus.Assigned {
+        background: #FEFCE8 !important;
+        color: #EAB308;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        flex: none;
+        order: 0;
+        flex-grow: 0;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 150%;
+        border: none;
+        padding: 4px 12px;
+        height: 32px;
+        letter-spacing: 0.5px;
+        max-width: 137px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .confirmationStatus.Approved {
+        color: #3B82F6 !important;
+        background: #EFF6FF;
+    }
+
+    .confirmationStatus.Unassigned {
+        color: #F97316 !important;
+        background: #FFF7ED;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        flex: none;
+        order: 0;
+        flex-grow: 0;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 150%;
+        border: none;
+        padding: 4px 12px;
+        height: 32px;
+        letter-spacing: 0.5px;
+        max-width: 137px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .confirmationStatus.Confirmed {
+        color: #22C55E !important;
+        background: #F0FDF4;
+    }
+
+    table.table.datagrid tbody td {
+        font-style: normal;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 150%;
+    /* identical to box height, or 24px */
+        letter-spacing: 0.5px;
+        color: #64748B;
+    }
+
+    table.table.datagrid thead th {
+        font-style: normal;
+        font-weight: 600;
+        font-size: 16px;
+        line-height: 150%;
+		position:relative;
+    /* identical to box height, or 24px */
+        letter-spacing: 0.5px;
+        color: #0F172A;
+    }
+
+
+    select.form-select.bulk-actions, select#bulkAssignSelect {
+        border-radius: var(--border-radius);
+        background: transparent;
+    }
+    section.content-header {
+        position: sticky;
+        background: #fff;
+        top: 0;
+    }
+    button.btn.btn-comboBooking, 
+    button.btn.btn-comboBooking:hover {
+        font-style: normal;
+        font-weight: 600;
+        font-size: 12px;
+        line-height: 150%;
+        letter-spacing: 0.5px;
+        color: #3B82F6;
+        border: none !important;
+        outline: none !important;
+        padding: 0px;
+        display: block;
+        margin: 0px;
+        width: 10px;
+        height: 10px;
+        text-align: left;
+        margin-top: 4px;
+        box-shadow: none !important;
+    }
+    table.table.datagrid tbody td[data-name="type"] {
+        text-align: center;
+        font-weight: bold;
+        font-family: serif;
+        color: #ef4444bf !important;
+    }
+
+    table.table.datagrid tbody td.type.string i.absolutePosition {
+        position: absolute;
+        right: 20px;
+        top: 38px;
+    }
+
+    table.table.datagrid tbody td.type.string {
+        position: relative;
+    }
+    table.table.datagrid tr.needsToHide {
+        border-top: 0px;
+    }
+    .list .content-header .d-flex.flex-row .content-header-title {
+        display: none;
+    }
+    div#modal-filters {
+        background: #000000b0;
+    }
+    div.content-wrapper {
+        max-width: 100%;
+        overflow:hidden;
+        overflow-x: scroll;
+        margin-left: 30px;
+        grid-template-columns: auto;
+    }
+    .wrapper {
+        grid-row-gap: 0px;
+        grid-template-areas:
+            "header header"
+            "dl_beforeContentHeader content-header"
+            "sidebar content-wrapper";
+        margin-top: 0px;
+
+        margin-right: 0px;
+        margin-bottom: 0px;
+}
+    section.content-header{
+        margin-left: 10px;
+        margin-right: 20px;
+        width: calc(100% - 10px);
+    }
+    section.content-footer{
+        margin-left: 35px;
+        margin-right: 20px;
+        width: calc(100% - 10px);
+    }
+
+    h2.dashboard-title {
+        margin: 0px;
+        margin-left: 10px;
+        align-self: center;
+        display: flex;
+        flex: auto;
+        background: #292D42;
+        padding: 15px 31px;
+    }
+
+
+    .main-header nav.navbar {
+        align-self: center;
+        width: var(--sidebar-width);
+        width: 36px;
+    }
+  
+    i.fa.fa-fw.fa-money-bill-alt,
+    i.fa.fa-fw.fa-shuttle-van,
+    i.fa.fa-fw.fa-handshake,
+    i.fa.fa-fw.fa-funnel-dollar {
+        margin-left: 0px;
+    }
+    .easyadmin-sidebar-width-compact i.fa.fa-fw.fa-money-bill-alt,
+    .easyadmin-sidebar-width-compact i.fa.fa-fw.fa-shuttle-van,
+    .easyadmin-sidebar-width-compact i.fa.fa-fw.fa-handshake,
+    .easyadmin-sidebar-width-compact i.fa.fa-fw.fa-funnel-dollar{
+        margin-left: 2px;
+    }
+    body.easyadmin-sidebar-width-compact .sidebar-menu .treeview-menu li:hover {
+        width: 160px;
+    }
+    .treeview-menu a .fa{
+        filter: opacity(1);
+    }
+    body.easyadmin-sidebar-width-compact .sidebar-menu li:hover .treeview-menu span{
+        position: absolute;
+    }
+   
+    .navbar-custom-menu .user{
+        flex-direction: row-reverse;
+        color: #fff;
+        text-transform: capitalize;
+    }
+    .navbar-custom-menu .user-avatar{
+        margin-left: 10px;
+    }
+    .main-header .content-top.navbar-custom-menu {
+        align-self: center;
+        display: flex;
+        flex: auto;
+        justify-self: flex-end;
+        flex-direction: row-reverse;
+        background: #292D42;
+        height: 100%;
+        padding-right: 26px;
+    }
+
+    section.sidebar {
+        margin-top: -70px;
+        z-index: 999;
+        position: absolute;
+        /* height: 90%; */
+        /* overflow-y: scroll; */
+    }
+    header.main-header {
+        padding: 0 10px;
+        justify-content: flex-start;
+    }
+
+    
+    .list section.content-header {
+        padding-top: 20px;
+        padding-bottom: 20px;
+        z-index: 99;
+
+    }
+
+    table.datagrid thead.dl-fixed {
+        position: fixed;
+        background: #fff;
+        border-bottom: 1px solid #ececec;
+        top: 84px;
+        z-index: 999;
+    }
+    p.noteAdded {
+        position: relative;
+        padding: 0.75rem 1.25rem;
+        border: 1px solid transparent;
+        border-radius: 0.25rem;
+        color: #155724;
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        margin-bottom: 0px;
+        margin-top: 20px;
+        display: block;
+    }
+    td.date input,
+    td.time input,
+    td.float input {
+        border: none !important;
+        width: 119px;
+        color: #64748B;
+        background: transparent;
+    }
+
+
+    table.table.datagrid tr.edited,
+    table.datagrid tbody tr:hover,
+    table.datagrid tbody tr:hover td,
+    table.datagrid tbody tr:hover td input,
+    table.datagrid tbody tr:hover .form_timepicker.arrivalTime.timepicker,
+    table.datagrid tbody tr:hover select {
+        color: #000 !important;
+        background: #cbc9c9 !important
+    }
+
+    .shown i.fa.fa-angle-down:before {    
+        content: "\f106";
+    }
+    span.itemHasExtras {
+        position: absolute;
+        right: 0px;
+    }
+    table.datagrid tr.additional-driver-row th:last-child, 
+    table.table.datagrid tr.additional-driver-row td:last-child,
+    table.table.datagrid tr.first-driver-row.additional-driver-row{
+        position: static;
+        background: #fff !important;
+    }
+    tr.itemExtrasAddonsRow.needsToHide.addon.data_row,
+    tr.first-driver-row.additional-driver-row.empty.data_row {
+        background: #fff !important;
+    }
+
+    #notification_bar {
+        color: #155724;
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        font-weight: bold;
+        color: #155724;
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        font-weight: bold;
+        display: flex;
+        padding: 15px;
+        margin-top: 15px;
+        border-radius: 8px;
+    }
+
+    select.vehicleType {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        color: #64748B;
+        gap: 8px;
+        flex: none;
+        order: 0;
+        flex-grow: 0;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 150%;
+        border: none;
+        border-radius: 8px;
+        padding: 4px 12px;
+        height: 32px;
+        letter-spacing: 0.5px;
+        background: transparent;
+        max-width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .notification_container {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        flex: auto;
+    }
+
+    .notification_container p {
+        display: block;
+        margin: 0;
+    }
+
+    div#notification_bar .icon_container {
+        justify-self: end;
+    }
+
+    #notification_bar i {
+        color: #155724;
+    }
+    
+    #notification_bar{
+        display:none;
+    }
+    .max_result_selector {
+        display: flex;
+        align-items: center;
+        color: #000;
+        background: #fff;
+        justify-content: center;
+        width: 130px;
+        gap: 5px;
+        border-radius: 8px;
+        margin-left: 15px;
+    }
+
+    select#max_result {
+        background: #fff;
+    }
+
+
+    button.action-inline-save {
+        border: none;
+        background: transparent;
+        font-weight: normal;
+        color: #64748B;
+        padding-right: 10px;
+    }
+    table.table.datagrid tr.edited,
+    table.table.datagrid tr.edited td.editLink {
+        background: #fff;
+    }
+    
+    td.pick_date.date, th.pickup_date, td.pick_date.date input {
+        min-width: 160px;
+        color: #64748B;
+    }
+
+    table.datagrid tbody td.additionalDriverHeadingTD {
+        position: relative;
+        height: 110px;
+    }
+
+    .additionalDriverHeading {
+        position: absolute;
+        top: 0px;
+        left: 122px;
+        font-weight: bold;
+        color: #0F172A;
+        font-size: 14px;
+        text-decoration: underline;
+    }
+    button.action-remove-driver.dl_btn:hover, 
+    button.action-remove-driver.dl_btn {
+        border: none;
+        box-shadow: none !important;
+        width: auto;
+        font-size: 16px;
+        padding: 0px;
+        padding-right: 10px;
+    }
+    div.singleAddon {
+        height: 44px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    tr.itemExtrasAddonsRow.addon, tr.itemExtrasAddonsRow.addon td {
+        padding-top: 0px;
+        padding-bottom: 0px;
+        background: #fff !important;
+    }
+    tr.itemExtrasAddonsRow.addon td {
+        padding-top: 5px;
+        padding-bottom: 5px;
+        background: #fff !important;
+    }
+
+    div.singleAddon.Label {
+        display: block;
+    }
+ 
+    div#ui-datepicker-div {
+        z-index: 999 !important;
+    }
+
+    input.form_datepicker {
+        width: 100% !important;
+    }
+    .additional-driver-row .combo_booking {
+        display: none;
+    }
+    select.dashboard_select {
+        display: flex;
+        flex-direction: row;
+        color: #64748B;
+        justify-content: center;
+        align-items: center;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 150%;
+        border: none;
+        border-radius: 8px;
+        padding: 4px 12px;
+        height: 32px;
+        letter-spacing: 0.5px;
+        background: transparent;
+        max-width: 174px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding-left: 0px;
+    }
+	.sort_asc:hover,
+	.sort_desc:hover,
+	.sort_asc:hover .sort_asc i,
+	.sort_desc:hover .sort_desc i{
+		color: #FC7C5C !important;
+	}
+	.datagrid thead i.active {color: #FC7C5C;}
+	button.load-more {
+		border: none;
+		background: #f4f4f4;
+		width: 100%;
+		text-align: center;
+		padding: 10px;
+		margin-bottom: 10px;
+		outline: none;
+	}
+
+	@keyframes spinner {
+		to {transform: rotate(360deg);}
+	}
+
+	button.load-more.loading-button::before {
+		content: '';
+		display: block;
+		width: 30px;
+		height: 30px;
+		border-radius: 50%;
+		border: 2px solid rgba(0, 0, 0, 0.1);
+		border-top-color: #3498db;
+		animation: spinner 0.6s linear infinite;
+		position: absolute;
+		top: 7px;
+		left: 72px;
+	}
+
+	button.load-more.loading-button {
+		position: relative;
+	}
+	.sp-quantity {
+		display: flex;
+		margin-bottom: 10px;
+	}
+	.sp-quantity-content {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		width: 50%;
+		justify-content: flex-end;
+	}
+
+	.sp-quantity-content input {
+		width: 32px;
+		text-align: center;
+		border-radius: 5px;
+	}
+
+	.passengerQty-dropdown {
+		background: white;
+		border-radius: 10px;
+		padding: 10px;
+		position: absolute;
+		z-index: 9999999999;
+		top: -5px;
+		left: 76px;
+		display: none;
+		width: 180px;
+		filter: drop-shadow(0px 0px 6px );
+	}
+
+    .dl-relative{
+        position: relative !important;
+    }
+
+	.sp-quantity-label {
+		width: 50%;
+	}
+	.sp-quantity-label {
+		font-weight: bold;
+	}
+    .perPageText {
+        color: #0F172A;
+        font-size: 16px;
+        line-height: 24px;
+        height: 33px;
+        font-weight: 600;
+        text-align: center;
+        margin: 0 8px;
+        display: flex;
+        align-items: center;
+    }
+    .divid {
+        border-right: 1px solid #E2E8F0;
+        height: 33px;
+    }
+    .option li {
+        display: flex;
+        align-items: center;
+    }
+    .divid.tool {
+        height: 43px;
+        border-right: 1px solid #55586B;
+    }
+    a.logo.logo-long img{
+        height: 40px; 
+    }
+    @media screen and (min-width: 992px){
+        div.wrapper{
+            width: calc(100% - 22px);
+        }
+        body.easyadmin-sidebar-width-compact div.wrapper {
+            grid-template-columns: 30px auto;
+        }
+    }
+    
+    body.easyadmin-sidebar-width-compact .sidebar-menu li:hover{
+        width: 200px;
+    }
+    .easyadmin-sidebar-width-compact .sidebar-menu>li:hover>a.sidebar--close>span {
+        left: 50px;
+        top: -4px;
+        padding: 10px 0;
+        padding-left: 20px;
+        border-radius: 4px;
+    }
+   .easyadmin-sidebar-width-compact .sidebar-menu>li:hover>a>span{
+       left: 33px !important;
+   }
+   .easyadmin-sidebar-width-compact .sidebar-menu>li:hover>.treeview-menu{
+        left: 40px !important;
+   }
+    a.menu--system {
+        margin-bottom: 100px;
+    }
+    section.content-footer {
+        width: auto;
+        margin-right: 0;
+    }
+    table.table.datagrid thead tr.edited {
+        background: #fff !important;
+    }
+    .easyadmin-sidebar-width-compact section.sidebar{
+        position: unset;
+    }
+    .cross_checkbox {
+        width: 20px;
+        height: 20px;
+        background: #FC7C5C;
+        display: flex;
+        align-items: center;
+        border-radius: 2px;
+        justify-content: center;
+    }
+    .main_div {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 230px;
+        font-size: 16px;
+        line-height: 24px;
+        width: 280px;
+        cursor: pointer;
+        padding: 0 0 0 8px;
+        font-weight: 500;
+    }
+    .all_check_select {
+        color: #FC7C5C;
+        padding: 0 0 0 18px;
+    }
+    .numOfcheck {
+        padding: 0 0 0 18px;
+    }
+    table.table.datagrid tbody td.status.integer{
+        width: 162px;
+    }
+</style>
+<script>    
+
+    $(document).ready(function () {
+        $('a.logo.logo-long').html('<img src="../images/logo.svg" alt="Logo">');
+
+        const tableHeight = $('table.table.datagrid tbody').height();
+        if(tableHeight <= 400){
+            $('table.table.datagrid tbody').append("<tr style='height: 50px; background: #f9f9f9 !important;'><td style='background: #f9f9f9 !important;' colspan='27'></td></tr>");
+        }
+    });
+
+
+
+    $(document).ready(function() {
+        var tbody       = $('tbody');
+        var trElement   = $("<tr class='select_count_tr'><td colspan='27'><div class='main_div'><div class='cross_checkbox'><svg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M10.5 1L1 10.5M10.5 1L1 10.5' stroke='white' stroke-width='2' stroke-linecap='round'/><path d='M10 10L1 1' stroke='white' stroke-width='2' stroke-linecap='round'/></svg></div><div class='numOfcheck'>0 order selected.</div> <div class='all_check_select'>Select all</div></div></td></tr>");
+        tbody.prepend(trElement);
+
+        $('.cross_checkbox').click(function() {
+            $('.bulk_actions_checkbox').prop('checked', false);
+            $('.numOfcheck').text("0 order selected.");
+            $('input.bulk_actions_checkbox').closest('.data_row').css('background-color', '#fff');
+            $('.passenger_name, .pickAirlineCompany, .pickFlightNumber, .adultCount, .childCount, .totalPassengersQty, .addressInput').css('background-color', '#fff');            
+            $("td:not(:has(td.table_checkbox)):not(:has(select.billingStatus))").css('background-color', '#fff');
+            $('input:not(:has(.bulk_actions_checkbox)').css('background-color', '#fff');
+            $('table.table.datagrid tr').css('background-color', '#fff');
+            $('.toolbar_container').hide();
+        });
+
+        $(".all_check_select").click(function() {
+            $(".table_checkbox input[type=checkbox]").prop("checked", true);
+            var checkedCount = $('input[class="bulk_actions_checkbox"]:checked').length;
+            $('.numOfcheck').text(checkedCount + " order selected.");
+            $('.select_count_tr').show();
+            $(".multi_selection").show();
+            $(".toolbar_container").show();
+            $('.other_options').hide();
+            $('.first_options').hide();
+        });
+
+        $('input[class="bulk_actions_checkbox"]').change(function() {
+            var checkedCount = $('input[class="bulk_actions_checkbox"]:checked').length;
+            if (checkedCount > 0) {
+                $('.numOfcheck').text(checkedCount + " order selected.");
+                $('.select_count_tr').show();
+            } else {
+                $('.numOfcheck').text("0 order selected.");
+            }
+        });
+
+        $('input[class="bulk_actions_checkbox"]').change(function() {
+            var checkedCount = $('input[class="bulk_actions_checkbox"]:checked').length;
+            if (checkedCount == 0) {
+                $(".toolbar_container").hide();
+                $('.first_options').show();
+                $(".multi_selection").hide();
+                $('.other_options').hide();
+                
+            }else if (checkedCount == 1) {
+                $(".toolbar_container").show();
+                $('.first_options').show();
+                $(".multi_selection").hide();
+                $('.other_options').hide();
+
+            } else if (checkedCount > 1) {
+                $(".toolbar_container").show();
+                $(".multi_selection").show();
+                $('.first_options').hide();
+                $('.other_options').hide();
+
+            } 
+        });
+    });
+
+
+    // SHOW PRE SELECTED FILTERS 
+    $( ".action-filters-button" ).on( "click", function() {
+
+    let preselectedFiltersInterval = setInterval(function () {
+  
+         let month_div        = $('input#filters_pickDate_value');
+         if( month_div.length > 0 ){
+             function getFiltersFromUrl(url) {
+            const paramsString = url.split('?')[1];
+            if (!paramsString) {
+            return {};
+            }
+            const params = {};
+            const paramPairs = paramsString.split('&');
+            for (const pair of paramPairs) {
+            const [key, value] = pair.split('=');
+            const decodedKey = decodeURIComponent(key);
+            const decodedValue = decodeURIComponent(value);
+            if (decodedKey.startsWith('filters[')) {
+              const regex = /filters\[([^\]]+)\](\[.*\])?/;
+              const match = decodedKey.match(regex);
+              if (match) {
+                const filterName = match[1];
+                const filterProp = match[2] ? match[2] : '[value]';
+                if (!params.filters) {
+                  params.filters = {};
+                }
+                if (!params.filters[filterName]) {
+                  params.filters[filterName] = {};
+                }
+                if (!params.filters[filterName][filterProp]) {
+                  params.filters[filterName][filterProp] = [];
+                }
+                params.filters[filterName][filterProp].push(decodedValue);
+              }
+            }
+            }
+            return { filters: params.filters };
+            }
+            const url = window.location.href;
+            const filtersArray = getFiltersFromUrl(url);
+            let filters_css_ids = $.extend({}, {
+            'type': 'filter-heading-1',
+            'status': 'filter-heading-2',
+            'confirmationStatus': 'filter-heading-3',
+            'passengerName': 'filter-heading-4',
+            'adultCount': 'filter-heading-5',
+            'childCount': 'filter-heading-6',
+            'pickDate': 'filter-heading-7',
+            'pickArea': 'filter-heading-8',
+            'pickAddress': 'filter-heading-9',
+            'dropArea': 'filter-heading-10',
+            'dropAddress': 'filter-heading-11',
+            'pickAirlineCompany': 'filter-heading-12',
+            'pickFlightNumber': 'filter-heading-13',
+            'pickTime': 'filter-heading-14',
+            'pickTimeTransport': 'filter-heading-15',
+            'order_supplier_id': 'filter-heading-16',
+            'order_vehicle_id': 'filter-heading-17',
+            'supplierCommission': 'filter-heading-18',
+            'titleRackPrice': 'filter-heading-19',
+            'titleNetPrice': 'filter-heading-20',
+            'totalTax': 'filter-heading-21'
+            });
+            $.each( filtersArray['filters'], function( filter_name, filter_value_array ){
+            if(filter_name == 'pickDate'){
+  
+            $.each( filter_value_array, function( filter_array_key, filter_array_value ){
+              let filter_comparison   = '';
+              let filter_value1       = '';
+              let filter_value2       = '';
+              if(filter_array_key == '[comparison]'){
+                filter_comparison   = filter_array_value[0];
+                $('#filters_'+ filter_name +'_comparison').val(filter_comparison)
+                // $("select#filters_confirmationStatus_comparison").val('=');
+                console.log(filter_comparison);
+              }
+              if(filter_array_key == '[value]'){
+                filter_value1   = filter_array_value[0];
+                $('#filters_'+ filter_name +'_value').val(filter_value1);
+              }
+              if(filter_array_key == '[value2]'){
+                filter_value2   = filter_array_value[0];
+                $('#filters_'+ filter_name +'_value2').val(filter_value2);
+                if( filter_value2 != '' ){
+                  $('div#wrapper_filters_'+ filter_name +'_value2').show();
+                }
+              }
+              let id_to_proceed = filters_css_ids[filter_name];
+              $('#' + id_to_proceed).find('input[type="checkbox"]').prop("checked", true);
+              $('#' + id_to_proceed).find('a').click();
+            });
+            }
+            });
+           clearInterval(preselectedFiltersInterval);
+         }
+  
+       }, 500);
+  });
+</script>
+{% endblock %}

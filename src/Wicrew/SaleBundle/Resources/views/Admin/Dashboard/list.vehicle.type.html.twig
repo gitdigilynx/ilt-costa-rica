@@ -1,0 +1,23 @@
+{% if item.product is defined and item.product is not null %}
+    {% set dataset = getVehicleTypes() %}
+    {% set emptyText = '' %}
+    {% if value is null %}
+        {% set value = item.product.vehicleType.id %}
+    {% endif %}
+    <select class="vehicleType" data-itemid="{{item.id}}" name="vehicleType">
+        {% if noNone is not defined %}
+            <option value="">Please Select</option>
+        {% endif %}
+        
+        {% for key, data in dataset %}
+            <option  value="{{ key }}"
+                    {% if value is same as(key) %}selected{% endif %}>
+                {{ data }}
+            </option>
+        {% endfor %}
+        
+    </select>
+
+{% else %}
+    --
+{% endif %}

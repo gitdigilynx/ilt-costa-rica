@@ -1,0 +1,31 @@
+<label>{{ 'core.passengers'|trans }}</label>
+<div class="input passenger-input input-passenger-icon">
+    {% block passengerDisplay %}
+        {% if trip is not defined %}
+            1 {{ 'core.adult'|trans }}
+        {% else %}
+            {{ trip['adultCount'] }} {{ (trip['adultCount'] == 1) ? 'core.adult'|trans : 'core.adults'|trans }}
+            {% if trip['childCount'] > 0 %}
+                , {{ trip['childCount'] }} {{ (trip['childCount'] == 1) ? 'core.child'|trans : 'core.children'|trans }}
+            {% endif %}
+        {% endif %}
+    {% endblock %}
+</div>
+<div class="passenger-dropdown" style="z-index: 999;" hidden>
+    <div class="pd-row">
+        {{ 'core.adults'|trans }}
+        <span>
+            <input type="hidden" name="{{ postDataSection }}[adultCount]"
+                   value="{{ (trip is defined) ? trip['adultCount'] : '1' }}" class="search-adult-count">
+            <span class="pd-minus">-</span><span class="pd-value">1</span><span class="pd-plus">+</span>
+        </span>
+    </div>
+    <div class="pd-row">
+        {{ 'core.children'|trans }}
+        <span>
+            <input type="hidden" name="{{ postDataSection }}[childCount]"
+                   value="{{ (trip is defined) ? trip['childCount'] : '0' }}" class="search-child-count">
+            <span class="pd-minus">-</span><span class="pd-value">0</span><span class="pd-plus">+</span>
+        </span>
+    </div>
+</div>

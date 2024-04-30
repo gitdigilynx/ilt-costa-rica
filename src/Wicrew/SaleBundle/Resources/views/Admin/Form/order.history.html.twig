@@ -1,0 +1,304 @@
+{% form_theme form _self %}
+
+{% block _order_custom_orderhistory_widget %}
+    {# @var order \App\Wicrew\SaleBundle\Entity\Order #}
+    {% set order = easyadmin.item %}
+    {% set orderHistory = order.getOrderHistoryTotal() %}
+    <div class="order-history">
+        {% include "@WicrewSale/Admin/Form/order.history.detail.html.twig" with { "order": order } %}
+    </div>
+    <br>
+    <div class="payment-section">
+        <div class="stripe charge">
+            <h3>{{ 'order.balance.makepayment'|trans() }}</h3>
+            {% set chargeAmount = orderHistory['totalDue'].greaterThanStr('0') ? orderHistory['totalDue'] : '0.00' %}
+            <div>
+                <span>{{ 'order.balance.makerefund.totalcharge'|trans() }}</span>
+                <span>{{ 'currency.symbol'|trans() }}{{ chargeAmount }}</span>
+            </div>
+            <div class="charge-form hidden">
+                <div class="stripe-section">
+                    <div id="card-element"></div>
+                    <div id="card-errors" role="alert"></div>
+                </div>
+            </div>
+            <div>
+                <label for="payment_charge_amount">{{ 'order.balance.makepayment.amount'|trans() }}</label>
+                <span><input type="text" class="form-control" id="payment_charge_amount" value="{{ chargeAmount }}"></span>
+            </div>
+            <div>
+                <label for="payment_charge_note">{{ 'order.balance.makepayment.note'|trans() }}</label>
+                <span><textarea class="form-control" id="payment_charge_note"></textarea></span>
+            </div>
+            <br>
+            <div>
+                <input type="hidden" id="payment_charge_marknewcard" name="payment[charge][marknewcard]" value=""/>
+                <span>
+                    <button id="payment_charge_as_cash" class="btn btn-secondary" data-type="charge_cash" type="button">
+                        Charge as cash/wire
+                    </button>
+                </span>
+                <span>
+                    <button class="payment_process_btn btn btn-secondary" data-type="charge" type="button">
+                        {{ 'order.balance.makepayment.charge'|trans() }}
+                    </button>
+                </span>
+                <span>
+                    <button id="payment_charge_as_new" class="btn btn-secondary" type="button">
+                        {{ 'order.balance.makepayment.chargeasnew'|trans() }}
+                    </button>
+                </span>
+                <span style="display: none;">
+                    <button id="send_mail_payment" class="btn btn-secondary" type="button">
+                        {{ 'order.balance.makepayment.sendmail'|trans() }}<img id="send_mail_payment_loading" src="{{ absolute_url(asset('bundles/wicrewcore/images/Spinner-1s-18px.gif')) }}"  style="position: relative;bottom: 1.5px;left: 5px;width: 16px;display:none;">
+                    </button>
+                </span>
+                <span>
+                    <button id="sharePaymentLink" class="btn btn-secondary" type="button">
+                        Share Via Link
+                        <img id="send_mail_payment_loading" src="{{ absolute_url(asset('bundles/wicrewcore/images/Spinner-1s-18px.gif')) }}"  style="position: relative;bottom: 1.5px;left: 5px;width: 16px;display:none;">
+                    </button>
+                </span>
+            </div>
+        </div>
+        <br>
+        <div class="stripe refund">
+            <h3>{{ 'order.balance.makerefund'|trans() }}</h3>
+            <div>
+                <span>{{ 'order.balance.makerefund.totalrefund'|trans() }}</span>
+                <span>{{ 'currency.symbol'|trans() }}{{ orderHistory['amountToRefund'] }}</span>
+            </div>
+            <div>
+                <label for="payment_refund_amount">{{ 'order.balance.makepayment.amount'|trans() }}</label>
+                <span><input class="form-control" type="text" id="payment_refund_amount" value="{{ orderHistory['amountToRefund']  }}"></span>
+            </div>
+            <div>
+                <label for="payment_refund_note">{{ 'order.balance.makepayment.note'|trans() }}</label>
+                <span><textarea class="form-control" id="payment_refund_note"></textarea></span>
+            </div> 
+            <div>
+                <label for="payment_refund_note">{{ 'order.balance.makepayment.item'|trans() }}</label>
+                <span>
+                    <select name="items" id="payment_order_itemid" class="form-control">
+                        <option>--</option> 
+                        {% for order_item in order.items %}
+                            <option value="{{order_item.id}}">#{{order_item.id}}</option> 
+                        {% endfor %}
+                    </select>
+                </span>
+            </div>
+            <br>
+            <div>
+                <span><button class="payment_process_btn btn btn-secondary" data-type="refund" type="button">{{ 'order.balance.makepayment.refund'|trans() }}</button></span>
+            </div>
+        </div>
+        <input type="hidden" id="payment_orderid" value="{{ order.id }}"/>
+
+        <div class="paymentLinkModal" style="display: none;">
+            <div  class="paymentLinkModal_subcontainer">
+                <div class="paymentLinkModal_header">
+                    <i class="fas fa-times"></i>
+                </div>
+
+                <div class="paymentLinkModal_content">
+                    <h2>Voilà - here's your link</h2>
+                    <h5>You can copy, paste and share this link with your client.</h5>
+
+                    <div class="paymentLink_container">
+                        <span class="tooltiptext">Copied!</span>
+                        <div class="paymentLink_icon" onclick="copyPaymentLink_url()"><i class="fas fa-link"></i></div> 
+                        <div id='paymentLink_urlToCopy' class="paymentLink_urlToCopy"  onclick="copyPaymentLink_url()"></div>
+                    </div>
+
+                    
+                    <div class="paymentLinkCopyLink"><a href="javascript:void(0);" onclick="copyPaymentLink_url()">Copy To Clipboard</a></div>
+                    
+                    <div class="paymentLinkDontBtnContainer"><button class="btn PaymentLinkDoneBtn">Done</button></a></div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <style>
+        .order-history table tr th {
+            padding: 8px;
+            white-space: nowrap;
+        }
+        .order-history table tr th:first-child {
+            padding-left: 20px;
+        }
+       .paymentLinkModal {
+            position: fixed;
+            top: 0;
+            border: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            align-items: center;
+            height: 100%;
+            z-index: 99999;
+            width: 100%;
+            justify-content: center;
+            background: #0000005e;
+        }
+
+        .paymentLinkModal_subcontainer {
+            background: #fff;
+            padding: 20px 40px;
+            filter: drop-shadow(0px 2px 5px #000);
+            border-radius: 10px;
+        }
+
+        .paymentLinkModal_header {
+            text-align: right;
+        }
+
+        .paymentLinkModal_content {
+            text-align: center;
+        }
+
+        .paymentLink_container .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 0;
+            position: absolute;
+            z-index: 99999;
+            right: 5px;
+            bottom: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .paymentLink_container .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #555 transparent transparent transparent;
+        }
+
+        .paymentLink_container {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-start;
+            cursor: pointer;
+            background: lightblue;
+            color: black;
+            padding: 24px;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 24px;
+            position: relative;
+
+        }
+        .paymentLinkModal_content h2 {
+            font-size: 34px;
+            font-weight: bold;
+            margin-bottom: 32px;
+        }
+
+        .paymentLinkModal_content h5 {
+            font-size: 24px;
+            margin-bottom: 32px;
+        }
+
+        .paymentLinkCopyLink a {
+            font-size: 22px;
+        }
+
+        .paymentLinkCopyLink {
+            margin-bottom: 32px;
+        }
+
+        .paymentLinkDontBtnContainer {
+            margin-bottom: 32px;
+        }
+
+        button.btn.PaymentLinkDoneBtn {
+            background: green;
+            color: white;
+            width: 132px;
+            height: 40px;
+            font-size: 18px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        button.btn.PaymentLinkDoneBtn:hover {
+            filter: drop-shadow(0px 4px 3px #b5b5b5);
+            letter-spacing: 3px;
+        }
+
+        .paymentLinkModal_header i {
+            cursor: pointer;
+        }
+        body#easyadmin-list-HistoryLog {
+            background: #292D42 !important;
+        }
+
+    </style>
+    <script>
+        function copyPaymentLink_url(){
+            var copyText = document.getElementById("paymentLink_urlToCopy");
+            copyTextToClipboard(copyText.textContent);
+            $('.paymentLinkModal_content .tooltiptext').css("visibility", "visible").css("opacity", "1");
+            setTimeout(function() {
+                $('.paymentLinkModal_content .tooltiptext').css("visibility", "hidden").css("opacity", "0");
+            }, 500);
+        }
+
+        function copyTextToClipboard(text) {
+            var sampleTextarea = document.createElement("textarea");
+            document.body.appendChild(sampleTextarea);
+            sampleTextarea.value = text; //save main text in it
+            sampleTextarea.select(); //select textarea contenrs
+            document.execCommand("copy");
+            document.body.removeChild(sampleTextarea);
+        }
+
+
+        $(document).on("click","button#sharePaymentLink",function() {
+            let that = $(this);
+            if (that.hasClass("loading-button")) { return; }
+            that.addClass("loading-button");
+            
+            var base_url = window.location.origin;
+            $.ajax({
+                url: '{{ url("create_payment_link") }}',
+                type: "POST",
+                data: {
+                    orderID: "{{ app.request.get('id') }}",
+                    siteURL: base_url,
+                },
+                success: function (response) { 
+                    if( response.status == 'success' ){
+                        $('div#paymentLink_urlToCopy').html(response.link);
+                        $('.paymentLinkModal').fadeIn();
+                    }else{
+                        alert(response.message);
+                    }
+                    that.prop('disabled', false);
+                    that.removeClass("loading-button");
+                }
+            });
+
+        });
+
+        $(document).on("click","button.btn.PaymentLinkDoneBtn, .paymentLinkModal_header i",function(e) {
+            e.preventDefault();
+            $('.paymentLinkModal').fadeOut();
+        });
+
+        
+
+    </script>
+{% endblock %}

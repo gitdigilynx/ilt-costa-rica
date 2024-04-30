@@ -1,0 +1,994 @@
+@import "variables";
+@import 'fa/solid';
+
+/*===============================
+=            Booking            =
+===============================*/
+
+.booking-section {
+    .right-panel {
+        margin-top: 70px;
+
+        @media #{$mobile} {
+            margin-top: 40px;
+        }
+    }
+}
+
+@mixin step-back {
+    position: relative;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #2e6eb2;
+    padding-left: 22px;
+    cursor: pointer;
+
+    &:before {
+        content: '';
+        position: absolute;
+        display: block;
+        width: 0;
+        height: 0;
+        border-top: 5px solid transparent;
+        border-bottom: 5px solid transparent;
+        border-right: 6px solid #2e6eb2;
+        top: 5px;
+        left: 0;
+    }
+
+    a, a:visited {
+        color: inherit;
+    }
+}
+
+.notices {
+    .notice {
+        margin-top: 1em;
+        border-radius: 4px;
+        padding: .75rem 1.25rem;
+        color: #713e0c;
+        background-color: #f7e4d1;
+    }
+}
+
+.booking-form {
+    font-family: 'Poppins', sans-serif;
+    padding-top: 60px;
+
+    @media #{$mobile} {
+        padding-top: 30px;
+    }
+
+    .step-back {
+        @include step-back;
+    }
+
+    h2 {
+        font-size: 30px;
+        font-weight: 300;
+        text-transform: capitalize;
+        margin-top: 60px;
+        margin-bottom: 30px;
+
+        @media #{$mobile} {
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+    }
+
+    .ride-header {
+        display: flex;
+
+        & > div {
+            width: 100%
+        }
+
+        .ride-header-label {
+            font-size: 10px;
+        }
+    }
+
+    .booking-product-info {
+        margin-bottom: 30px;
+
+        .ride-header {
+            .ride-index-circles,
+            .trip-points {
+                display: flex;
+                width: 100%;
+                max-width: 310px;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .ride-index-header {
+                display: flex;
+                flex-flow: row nowrap;
+
+                .ride-date-info,
+                .ride-passenger-info {
+                    display: none;
+                }
+            }
+
+            .ride-index-circles {
+                position: relative;
+                margin-bottom: 5px;
+
+                &:before {
+                    content: '';
+                    width: 96%;
+                    height: 3px;
+                    background-color: #2e6eb2;
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    margin-top: -2px;
+                    margin-left: -48%;
+                }
+
+                .connected-circle {
+                    margin-top: 0;
+                    background: #fff;
+
+                    &:before {
+                        display: none;
+                    }
+                }
+            }
+        }
+    }
+
+    .image-block,
+    .product-info-block,
+    .time-block,
+    .product-note {
+        float: left;
+        padding-right: 25px;
+
+        @media #{$mobile} {
+            float: none;
+            width: 100% !important;
+            margin-bottom: 20px;
+        }
+    }
+
+    .booking-product-info .image-block {
+        width: 40%;
+    }
+
+    .product-info-block {
+        width: 37%;
+    }
+
+    .time-block {
+        width: 18%;
+
+        strong {
+            display: block;
+        }
+    }
+
+    .vehicle-data {
+        &:before {
+            content: '•';
+            color: #2e6eb2;
+            margin-right: 5px;
+        }
+    }
+
+    .row-block {
+        margin-bottom: 10px;
+        @extend .clearfix;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        &.margin {
+            margin-top: 35px;
+        }
+    }
+
+    .col-block {
+        float: left;
+        width: 49%;
+        margin-right: 2%;
+
+        @media #{$mobile} {
+            float: none;
+            width: 100%;
+            margin-left: 0;
+            margin-bottom: 10px;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+
+        &:last-child {
+            margin-right: 0;
+        }
+
+        &.bg-field {
+            background: #f5f6f8;
+        }
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="email"],
+    input[type="tel"],
+    textarea,
+    select {
+        position: relative;
+        width: 100%;
+        font-family: 'Poppins', sans-serif;
+        font-size: 14px;
+        color: #070d1c;
+        border: 0;
+        background: 0;
+        padding-left: 15px;
+        z-index: 2;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="email"],
+    input[type="tel"],
+    select {
+        height: 50px;
+    }
+
+    select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right .75rem center;
+        background-size: 16px 12px;
+        appearance: none;
+    }
+
+    textarea {
+        height: 120px;
+    }
+}
+
+.booking-section-inner {
+    margin-top: 80px;
+
+    @media #{$mobile} {
+        margin-top: 40px;
+    }
+
+    &:first-child {
+        margin-top: 0;
+    }
+}
+
+.floating-label-w-icon {
+    background: #f5f6f8;
+    padding-left: 44px;
+
+    .floating-label-wrap {
+        background: 0;
+
+        > input {
+            padding-left: 0;
+        }
+    }
+
+    select {
+        padding-left: 0;
+    }
+
+    .floating-label {
+        left: 0;
+    }
+}
+
+@mixin floating-label-position {
+    font-size: 10px;
+    font-weight: bold;
+    top: 10px;
+}
+
+.floating-label-wrap {
+    position: relative;
+    background: #f5f6f8;
+
+    &.has-error {
+        .floating-label {
+            font-weight: bold;
+            color: #F00;
+        }
+
+        .d-block {
+            display: none !important;
+        }
+    }
+
+    > input {
+        padding-top: 16px;
+
+        &::placeholder {
+            color: transparent;
+        }
+
+        &.focus,
+        &.has-val {
+            ~ .floating-label {
+                @include floating-label-position;
+            }
+        }
+    }
+
+    > textarea {
+        padding-top: 25px;
+
+        &::placeholder {
+            color: transparent;
+        }
+
+        &.focus,
+        &.has-val {
+            ~ .floating-label {
+                @include floating-label-position;
+            }
+        }
+    }
+}
+
+.float-fixed {
+    .floating-label {
+        @include floating-label-position;
+    }
+}
+
+.floating-label {
+    position: absolute;
+    font-size: 14px;
+    color: #070d1c;
+    top: 16px;
+    left: 16px;
+    margin-bottom: 0;
+    transition: all 0.5s;
+}
+
+.booking-area-main-block {
+    margin-top: 30px;
+
+    .floating-label-wrap {
+        margin-bottom: 10px;
+
+        @media #{$mobile} {
+            margin-bottom: 0;
+        }
+    }
+}
+
+.booking-addon-section {
+    margin-top: 80px;
+
+    .addon-table {}
+
+    table td {
+        vertical-align: top;
+    }
+}
+
+.addon-section-title {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f5f6f8;
+    border: 1px $border-gray solid;
+    h4 {
+        font: {
+            size: 1.17em;
+            weight: 500;
+        }
+        color: $blue;
+    }
+    p {
+        margin: 0;
+    }
+}
+
+.addon-section-from-to {
+    margin-bottom: 20px;
+    span {
+        color: $blue;
+    }
+}
+
+.whats-included-text-hidden {
+    display: none;
+}
+
+.whats-included-toggle { 
+    .bar {
+        &::before {
+            @extend .fas;
+            content: fa-content($fa-var-angle-down);
+            font-size: 18px;
+
+            transition-timing-function: ease-in-out;
+            transition-duration: 0.4s;
+            transition-property: transform;
+        }
+    }
+
+    &.open {
+        .bar {
+            &::before {
+                transform: rotate(180deg);
+            }
+        }
+    }
+}
+
+
+ 
+.addon-description {
+    font-size: 0.8em;
+}
+
+.addon-group-item {
+    margin-bottom: 20px;
+    padding: 15px 0;
+    border: 1px $border-gray solid;
+
+    h3 {
+        font-weight: bold;
+        color: #070d1c;
+    }
+
+    .small {
+        font-size: 0.85em;
+    }
+
+    .addon-price-description {
+        font-size: 0.83em;
+        color: #2e6eb2;
+
+        .addon-discount {
+            color: #530000;
+            text-decoration: line-through;
+        }
+
+        .addon-type {
+            font-size: 0.85em;
+        }
+
+        .addon-price {
+            font-size:0.85em;
+            color: black;
+        }
+    }
+
+    .addon-item-listing {
+        /*opacity: 0.5;*/
+        opacity: 1;
+        transition: opacity 0.5s;
+    }
+
+    /*.addon-quantity, .addon-option-quantity {
+        display: none;
+    }*/
+
+    &.active {
+        .addon-item-listing {
+            opacity: 1;
+        }
+
+        .addon-quantity {
+            display: revert;
+        }
+    }
+}
+
+.addon-item-listing {
+    padding-left: 10px;
+
+    .addon-item {
+        display: flex;
+        padding: 10px 0;
+
+        .addon-option-info {
+            flex-grow: 1;
+        }
+
+        .addon-quantity {
+            flex-grow: 8;
+        }
+
+        .custom-checkbox-style label {
+            white-space: normal;
+        }
+
+        /*&.active .addon-option-quantity {
+            display: revert;
+        }*/
+    }
+}
+
+.custom-checkbox-style {
+    input[type="radio"],
+    input[type="checkbox"] {
+        display: none;
+
+        &:checked {
+            + label {
+                &:before {
+                    background: #000;
+                }
+
+                &:after {
+                    display: block;
+                }
+            }
+        }
+    }
+
+    input[type="radio"] {
+        + label {
+            &:before {
+                border-radius: 50%;
+            }
+
+            &:after {
+                width: 7px;
+                height: 7px;
+                background: #FFF;
+                border: 0;
+                border-radius: 50%;
+                top: 9px;
+                left: 9px;
+            }
+        }
+    }
+
+    label {
+        font-weight: 300;
+        font-size: 0.83em;
+        color: #2e6eb2;
+        position: relative;
+        white-space: nowrap;
+        padding-left: 38px;
+        margin-bottom: 0;
+
+        &:before {
+            /*content: '';*/
+            position: absolute;
+            display: block;
+            width: 25px;
+            height: 25px;
+            background: #6a6a6a;
+            border-radius: 3px;
+            top: 0;
+            left: 0;
+        }
+
+        &:after {
+            display: none;
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 8px;
+            border-left: 2px solid #FFF;
+            border-bottom: 2px solid #FFF;
+            top: 6px;
+            left: 5px;
+            transform: rotate(-45deg);
+        }
+    }
+}
+
+.add-to-cart-btn {
+    @include capsule-button(180px, black);
+    padding-left: 35px;
+    padding-right: 35px;
+}
+
+.detail-booking-section {
+    background: #f5f6f8;
+    padding-top: 80px;
+    padding-bottom: 80px;
+    margin-top: 80px;
+
+    @media #{$mobile} {
+        padding-top: 40px;
+        padding-bottom: 40px;
+        margin-top: 40px;
+    }
+
+    h2 {
+        margin-top: 0;
+    }
+}
+
+.detail-booking-listing {
+    ul {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
+
+    li {
+        margin-bottom: 3px;
+
+        &:before {
+            content: '•';
+            color: #070d1c;
+            margin-right: 10px;
+        }
+    }
+
+    .note {
+        display: block;
+        font-size: 10px;
+        padding-left: 15px;
+        margin-top: -3px;
+    }
+
+    .special {
+        h3 {
+            margin: 20px 0;
+            font-weight: 300;
+        }
+    }
+ 
+}
+
+.detail-booking-listing {
+    background-color: #f5f6f8;
+    border: 1px #aaadb4 solid; 
+}
+
+.detail-booking-contact {
+    margin-top: 40px;
+}
+
+@mixin add-to-cart-under-line-btn {
+    @include primary-color-button-no-border(initial);
+    position: relative;
+    margin-left: 30px;
+    height: unset;
+
+    &:after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 2px;
+        background-color: $blue;
+        left: 0;
+        bottom: 0;
+    }
+
+    &:hover {
+        color: lighten($blue, 20%);
+    }
+
+    &:hover:after {
+        background-color: lighten($blue, 20%);
+    }
+}
+
+.detail-booking-btn-block {
+    margin-top: 60px;
+
+    .add-to-cart-and-continue-btn {
+        @include add-to-cart-under-line-btn;
+    }
+}
+
+.departure-location-block {
+    background: #f5f6f8;
+    padding-left: 44px;
+
+    select {
+        padding-left: 0;
+    }
+}
+
+/*=====  End of Booking  ======*/
+
+/*===============================
+=            Summary            =
+===============================*/
+
+.summary-main-block {
+    font-size: 12px;
+    color: #FFF;
+    background: #2e6eb2;
+    padding: 40px 40px 60px;
+
+    @media #{$responsive} {
+        padding: 20px 20px 40px;
+    }
+
+    @media #{$mobile} {
+        margin-top: 30px;
+    }
+
+    h2 {
+        color: #FFF;
+        margin-top: 0;
+
+        @media #{$responsive} {
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+    }
+
+    .row-block-flex {
+        margin-bottom: 5px;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+    }
+
+    //.col-left {
+    //}
+
+    .col-right {
+        text-align: right;
+        flex-shrink: 0;
+    }
+}
+
+.summary-item {
+    border-top: 1px solid #FFF;
+    padding-top: 30px;
+
+    margin-bottom: 20px;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+
+    .row-block {
+        margin-bottom: 5px;
+    }
+}
+
+.summary-name {
+    font-weight: 600;
+}
+
+.summary-info {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.51);
+
+    &:last-of-type {
+        border-bottom: none;
+    }
+
+    ul {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
+
+    li {
+        margin-bottom: 3px;
+
+        &:before {
+            content: '•';
+            color: #FFF;
+            margin-right: 10px;
+        }
+    }
+}
+
+.summary-subtotal {
+    font-weight: 600;
+    margin-top: 25px;
+
+    @media #{$responsive} {
+        margin-top: 15px;
+    }
+}
+
+.summary-subtotal {
+    padding: 15px 0;
+    border-top: 1px solid #FFF;
+    border-bottom: 1px solid #FFF;
+
+    .row-block {
+        margin-bottom: 5px;
+    }
+}
+
+.summary-total {
+    padding-bottom: 35px;
+
+    @media #{$responsive} {
+        padding-top: 15px;
+        margin-top: 15px;
+    }
+
+    .title-block {
+        padding-top: 15px;
+        font-weight: 600;
+    }
+}
+
+.total-price-block {
+    margin-top: 10px;
+
+    .price-block {
+        font-size: 30px;
+        font-weight: 600;
+        line-height: 1;
+    }
+
+    .currency-block {
+        margin-top: -2px;
+    }
+}
+
+.booking-btn-block {
+    text-align: center;
+    margin: {
+        top: -24px;
+        bottom: 20px;
+    }
+
+    &.checkout {
+        margin: 20px 0;
+        text-align: right;
+    }
+
+    .add-to-cart-and-continue-btn {
+        @include add-to-cart-under-line-btn;
+        display: inline-block;
+        margin-top: 10px;
+        margin-left: 0;
+    }
+}
+
+.activity-tour-time-note.col-block {
+    font-size: 12px;
+    float: right;
+}
+
+/*=====  End of Summary  ======*/
+
+/*===============================
+=          Breadcrumbs          =
+===============================*/
+
+.booking-breadcrumbs {
+    list-style: none;
+    overflow: hidden;
+    margin: -33px 0 0 0;
+    padding: 0;
+    width: 100%;
+    height: 35px;
+
+    border-bottom: 1px solid $gray;
+
+    display: flex;
+    flex-wrap: nowrap;
+
+    .bread-text {
+        &::before {
+            @extend .fas;
+            content: fa-content($fa-var-check);
+        }
+    }
+
+    .current, .current ~ li {
+        .bread-text {
+            &::before {
+                content: '';
+            }
+        }
+    }
+
+    li {
+        display: inline-block;
+        position: relative;
+        padding: 0.7em 1em 0.7em 2em;
+        float: left;
+        width: 25%;
+
+        background-color: #fff;
+        text-align: center;
+        text-transform: uppercase;
+
+        font-weight: bold;
+        font-size: 12px;
+
+        &::after,
+        &::before {
+            content: "";
+            position: absolute;
+            margin-top: -1.5em;
+            border-top: 1.5em solid transparent;
+            border-bottom: 1.5em solid transparent;
+            border-left: 1em solid;
+            top: 50%;
+            right: -1em;
+        }
+
+        &::after {
+            z-index: 2;
+            border-left-color: #fff;
+        }
+
+        &::before {
+            border-left-color: #ccc;
+            right: -1.1em;
+            z-index: 1;
+        }
+
+        &:last-of-type::before,
+        &:last-of-type::after {
+            margin: 0;
+            border: none;
+        }
+
+        @media (max-width: 767px) {
+            font-size: 10px;
+            line-height: 23px;
+            letter-spacing: 0;
+
+            &::after,
+            &::before {
+                margin-top: -1.7em;
+                border-top: 1.7em solid transparent;
+                border-bottom: 1.7em solid transparent;
+            }
+        }
+    }
+
+    .current {
+        background-color: $blue;
+        color: #fff;
+
+        &::after {
+            border-left-color: $blue;
+        }
+    }
+
+    @media (max-width: 767px) {
+        display: flex;
+        flex-flow: row nowrap;
+
+        li {
+            white-space: nowrap;
+            display: block;
+
+            &:first-child {
+                padding-left: 1em;
+            }
+
+            &:last-child {
+                width: 33.33%;
+            }
+        }
+    }
+}
+
+@media (max-width: 767px) {
+    .booking-breadcrumbs-wrapper {
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
+
+
+/*=====  End of Breadcrumbs  ======*/
+
+/*=====  beginning of discount  ======*/
+
+.discount-code-question {
+    cursor: pointer;
+
+    &:hover {
+        color: #b6ccff;
+    }
+}
+
+/*=====  end of discount  ======*/

@@ -1,0 +1,20 @@
+{% extends '@EasyAdmin/default/layout.html.twig' %}
+
+{% block head_javascript %}
+    {{ parent() }}
+    <script type="text/javascript">
+        var validateErrorMsg = {
+            error: '{{ 'core.error'|trans() }}',
+            required: '{{ 'core.add.dest.empty_error'|trans() }}',
+            filetype: '{{ 'core.form.validate.filetype'|trans() }}',
+            filesize: '{{ 'core.form.validate.filesize'|trans() }}',
+            filewidth: '{{ 'core.form.validate.filewidth'|trans() }}',
+            fileheight: '{{ 'core.form.validate.fileheight'|trans() }}',
+            minlength: '{{ 'core.form.validate.minlength'|trans() }}',
+            maxlength: '{{ 'core.form.validate.maxlength'|trans() }}',
+            isnumber: '{{ 'core.form.validate.isnumber'|trans() }}',
+            isfloat: '{{ 'core.form.validate.isfloat'|trans() }}',
+            morethanzero: '{{ 'core.form.validate.morethanzero'|trans() }}'
+        };
+    </script>
+{% endblock head_javascript %}

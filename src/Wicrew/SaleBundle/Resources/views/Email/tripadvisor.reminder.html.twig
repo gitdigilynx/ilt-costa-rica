@@ -1,0 +1,26 @@
+{% extends "@WicrewCore/Email/main.email.html.twig" %}
+
+{% block titlemail %}{{ 'sale.tripadvisor.reminder.mail.title'|trans() }}{% endblock %}
+
+{% block mailcontent %}
+    <div class="contact-content">
+        <div class="header-information">
+            {% if orderitem.supplier %}
+                {% set fromname = orderitem.supplier.bizName %}
+            {% else %}
+                {% set fromname = 'email.assigndriver.ilt'|trans() %}
+            {% endif %}
+            <div>{{ 'email.hi'|trans() }} {{ orderitem.order.firstname ~ ' ' ~ orderitem.order.lastname }}</div>
+            <div>{{ ('sale.tripadvisor.reminder.mail.content')|raw() }}</div>
+            <div>
+                <a href="https://www.tripadvisor.ca/Attraction_Review-g309293-d9875168-Reviews-ILT_Costa_Rica-San_Jose_San_Jose_Metro_Province_of_San_Jose.html">Trip
+                    Advisor</a></div>
+        </div>
+        {% set orderSet = [ orderitem ] %}
+        {% include "@WicrewSale/Admin/Form/order.item.detail.html.twig" with { "orderItems": orderSet } only %}
+        <div class="footer-information">
+            <div>{{ 'email.thankyou'|trans() }}</div>
+            <div><img src="{{ absolute_url(asset('bundles/wicrewcore/images/logo.png')) }}" alt=""></div>
+        </div>
+    </div>
+{% endblock %}

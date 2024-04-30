@@ -1,0 +1,199 @@
+<script src="https://js.stripe.com/v3/"></script>
+<script src="{{ absolute_url(asset('bundles/wicrewcore/javascript/stripe.js')) }}"></script>
+<script type="text/javascript">
+    function addClassFloatLabel(obj) {
+        let val = obj.val();
+        if (val) {
+            obj.parents('.floating-label-wrap').addClass('float-fixed');
+        }
+    }
+
+    function checkFloatLabel() {
+        $('.floating-label-wrap > input:not([type=hidden])').each(function () {
+            let obj = $(this);
+
+            addClassFloatLabel(obj);
+        });
+
+        $('.floating-label-wrap > textarea').each(function () {
+            let obj = $(this);
+
+            addClassFloatLabel(obj);
+        });
+    }
+
+    checkFloatLabel();
+
+    $(document).on('submit', 'form#form_checkout', function (event) {
+        $('#checkout_submit_button').prop('disabled', true).css('backgroundColor', '#333');
+        $('#loading_container').show();
+        let formElm = $(this);
+        let postElm = new FormData(document.getElementById(formElm.attr('id')));
+
+        event.preventDefault();
+        let error = validateForm();
+        if (error) {
+            $('#checkout_submit_button').prop('disabled', false).css('backgroundColor', '#000');
+            $('#loading_container').hide();
+            return false;
+        }
+
+        let checkoutAsQuote = $("#checkout_as_quote");
+        let checkoutAsQuoteWithoutPaymentLink = $("#checkout_as_quote_withoutPaymentLink");
+        let paymentType = $("#payment-type");
+        if (
+            (checkoutAsQuote.length && checkoutAsQuote.is(":checked"))
+            || (paymentType.length && paymentType.val() === "{{ constant('\\App\\Wicrew\\SaleBundle\\Entity\\Order::PAYMENT_TYPE_CASH') }}")
+            || (checkoutAsQuoteWithoutPaymentLink.length && checkoutAsQuoteWithoutPaymentLink.is(":checked"))
+
+        ) {
+            submitCheckoutForm(formElm, postElm);
+        } else {
+            let card_name = $( '#card_name' ).val();
+            stripe.createToken(card, {name: card_name}).then(function (result) {
+                if (result.error) {
+                    // Inform the user if there was an error.
+                    let errorElement = document.getElementById("card-errors");
+                    errorElement.textContent = result.error.message;
+                    $('#checkout_submit_button').prop('disabled', false).css('backgroundColor', '#000');
+                    $('#loading_container').hide();
+                } else {
+                    // Send the token to your server.
+                    let tknResult = stripeTokenHandler(result.token, "form_checkout");
+                    postElm.append("stripeToken", tknResult);
+                    if (tknResult) {
+                        submitCheckoutForm(formElm, postElm);
+                    }
+                }
+            });
+        }
+    });
+
+    $('#payment-type, #checkout_as_quote').on("change", function () {
+        let stripeSection = $(".stripe-section");
+        let paymentType = $("#payment-type");
+        let paymentTypeLabel = $("label[for='payment-type']");
+        let checkoutAsQuote = $("#checkout_as_quote");
+
+        stripeSection.show();
+        paymentTypeLabel.show();
+        checkoutAsQuote.show();
+        paymentType.show();
+        paymentType.removeAttr('readonly');
+
+        if (checkoutAsQuote.is(':checked')) {
+            $('#checkout_as_quote_withoutPaymentLink').prop('checked', false); // Unchecks it
+            stripeSection.hide();
+            paymentTypeLabel.hide();
+            paymentType.hide();
+            paymentType.attr('readonly', 'readonly');
+        } else if (!checkoutAsQuote.is(':checked') && paymentType.val() !== "{{ constant('\\App\\Wicrew\\SaleBundle\\Entity\\Order::PAYMENT_TYPE_CREDIT_CARD') }}") {
+            stripeSection.hide();
+        }
+    });
+
+    $('input#checkout_as_quote_withoutPaymentLink').on("change", function () {
+        let stripeSection       = $(".stripe-section");
+        let paymentType         = $("#payment-type");
+        let paymentTypeLabel    = $("label[for='payment-type']");
+        let checkoutAsQuote     = $("#checkout_as_quote");
+        
+
+        stripeSection.show();
+        paymentTypeLabel.show();
+        checkoutAsQuote.show();
+        paymentType.show();
+        paymentType.removeAttr('readonly');
+
+        if ( $(this).is(':checked') ) {
+            checkoutAsQuote.prop('checked', false); // Unchecks it
+            stripeSection.hide();
+            paymentTypeLabel.hide();
+            paymentType.hide();
+            paymentType.attr('readonly', 'readonly');
+
+        } else{ 
+            stripeSection.show();
+            paymentTypeLabel.show();
+            paymentType.show();
+            paymentType.removeAttr('readonly');
+        }
+    
+    });
+
+    function submitCheckoutForm(formElm, postElm) {
+        $.ajax({
+            url: formElm.attr('action'),
+            type: "POST",
+            data: postElm,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.status === "success") {
+                    if ( ( $('input#checkout_as_quote_withoutPaymentLink').length && $('input#checkout_as_quote_withoutPaymentLink').is(":checked") ) ) {
+                        window.location.replace(window.location.origin + "/admin");
+                    } else {
+                        window.location.replace("{{ url('sale_checkout_success') }}");
+                    }
+                } else {
+                    alert(response.message);
+                    $('#checkout_submit_button').prop('disabled', false).css('backgroundColor', '#000');
+                    $('#loading_container').hide();
+                    return false;
+                }
+            }
+        });
+    }
+
+    $( window ).on("load", function() {
+        $('html, body').animate({
+            scrollTop: $(".checkout-form-section").offset().top - 130
+        }, 2000);
+    });
+</script>
+
+<style>
+    div#loading_container {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #fff;
+        z-index: 999999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    #loading {
+        display: inline-block;
+        width: 60px;
+        height: 60px;
+        border: 4px solid rgb(46 103 178 / 22%);
+        border-radius: 50%;
+        border-top-color: #2e6eb2;
+        animation: spin 1s ease-in-out infinite;
+        -webkit-animation: spin 1s ease-in-out infinite;
+    }
+
+    div#loading_container p {
+        font-size: 18px;
+    }
+
+    div#card-errors {
+        color: red;
+        margin-top: 10px;
+        font-weight: 400;
+    }
+
+    @keyframes spin {
+        to { -webkit-transform: rotate(360deg); }
+    }
+    
+    @-webkit-keyframes spin {
+        to { -webkit-transform: rotate(360deg); }
+    }
+</style>

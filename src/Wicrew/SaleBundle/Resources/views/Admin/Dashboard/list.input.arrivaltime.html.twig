@@ -1,0 +1,22 @@
+{% if (item.pickArea.type == 1 and item.dropArea.type != 1) or ( ( item.pickArea.id == 1 or item.pickArea.id == 2 ) and ( item.dropArea.id != 1 or item.dropArea.id != 2 ) ) %}
+    {% set value =  item.pickTime %}
+{% else %}
+    {% set value =  NULL %}
+{% endif %}
+
+{% if (item.pickArea.type == 1 and item.dropArea.type == 1) %}
+    {% set value =  NULL %}
+{% endif %}
+
+{% if value is not null %}
+    <input type="text"
+        name="arrivalTime" 
+        style="border: none; width: 100%" 
+        class="form_timepicker arrivalTime" 
+        {% if value is not null %}
+            value="{{ value|formatNoNull("H:i") }}" 
+        {% endif %}
+    />
+{% else %}
+    
+{% endif %}

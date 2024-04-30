@@ -1,0 +1,75 @@
+# Core Bundle
+core:
+    yes: Yes
+    no: No
+
+    assigned: Assigned
+    unassigned: Unassigned
+
+    error: Error
+
+    created_date: Created date
+    create.success: Successfully created a new item.
+    update.success: Successfully edited the item.
+    delete.success: Successfully deleted the item.
+
+    add.dest.empty_error: Please do not leave this field empty.
+    form.validate.filetype: File upload is wrong type
+    form.validate.filesize: File upload is size than
+    form.validate.filewidth: File upload have width less than
+    form.validate.fileheight: File upload have height less than
+    form.validate.minlength: Please put value length than
+    form.validate.maxlength: Please put value length less than
+    form.validate.isnumber: Please put value in number only
+    form.validate.isfloat: Please put value in decimal only
+    form.validate.morethanzero: Please put value in number more than zero
+
+    option.please_select: Please select
+    no_result: Your search returns no results.
+
+    image404: Image not found.
+
+    adult: Adult
+    adults: Adults
+    child: Child
+    childs: Childs
+    children: Children
+    passengers: Passengers
+
+    price_type: Price type
+    fixed: Fixed price
+    quantity: Quantity
+
+    rack:
+        fixed: Total RACK price
+        adult: RACK price per adult
+        child: RACK price per child
+
+    net:
+        fixed: Net fixed rate
+        adult: Net rate per adult
+        child: Net rate per child
+
+per:
+    fixed: Fixed
+    person: Per Person
+    adult: Per Adult
+    child: Per Child
+
+currency.symbol: $
+currency.text: USD
+currency.text.tax: USD +tx.
+
+delete.confirm: Are you sure you want to delete this?
+
+Users: Users
+Tax: Tax
+Activity: Activity
+Product: Product
+Area: Area
+ID: ID
+Duplicate: Duplicate
+
+archives: Archives
+
+page.not.found: Page not found

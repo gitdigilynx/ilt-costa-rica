@@ -1,0 +1,55 @@
+{% extends "easy_admin/admin.base_layout.html.twig" %}
+
+{% block page_title %}
+    {{ 'activity.duplicate.title'|trans({ 'id': activity.id }) }}
+{% endblock %}
+
+{% block main %}
+    <div class="view_orders">
+        <h4>{{ 'activity.duplicate.new_slug'|trans }}</h4>
+
+        <form method="post" action="{{ path('easyadmin',
+            {
+                entity: 'Activity',
+                action: 'duplicate',
+                id: activity.id,
+            }) }}">
+            <div class="form-group field-text">
+                <div class="form-widget">
+                    <label for="activity_slug" class="form-control-label required">Slug</label>
+                    <input class="form-control" id="activity_slug" required type="text" name="slug" value="{{ inputtedSlug is defined ? inputtedSlug : activity.slug }}">
+                </div>
+                <div class="form-widget">
+                    <label for="activity_name" class="form-control-label required">Name</label>
+                    <input class="form-control" id="activity_name" required type="text" name="name" value="{{ inputtedName is defined ? inputtedName : activity.name }}">
+                </div>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary action-save">
+                    <span class="btn-label">Submit</span>
+                </button>
+            </div>
+        </form>
+
+        <div class="button-action">
+            <a class="btn btn-link action-list" title="Back to listing" href="{{ path('easyadmin',
+                {
+                    entity: 'Activity',
+                    action: 'list'
+                }) }}" target="_self">Back to listing</a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block head_stylesheets %}
+    {{ parent() }}
+    <style>
+        .view_orders {
+            padding: 40px;
+        }
+
+        .button-action {
+            padding-top: 20px;
+        }
+    </style>
+{% endblock %}

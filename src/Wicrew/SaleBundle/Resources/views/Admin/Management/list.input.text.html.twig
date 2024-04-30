@@ -1,0 +1,37 @@
+<input type="text"
+       name="{{
+       entity_config['nameInputArrayWrapper'] is defined ?
+       entity_config['nameInputArrayWrapper'] ~ '[' ~ field_options['arrayWrapperIndex'] ~ ']' ~ '[' ~ field_options['property'] ~ ']'
+       : field_options['property'] }}"
+
+        {% if field_options['type'] == 'date' %}
+            class="form_datepicker"
+            readonly
+        {% elseif field_options['type'] == 'time' %}
+            class="form_timepicker"
+            style="width: 100%"
+        {% endif %}
+
+        {% if field_options['width'] is defined %}
+            style="width: {{ field_options['width'] }}"
+        {% endif %}
+
+        {% if field_options['placeholder'] is defined %}
+            placeholder="{{ field_options['placeholder'] }}"
+        {% endif %}
+
+        {% if field_options['maxLength'] is defined %}
+            maxlength="{{ field_options['maxLength'] }}"
+        {% endif %}
+
+        {% if value is not null %}
+            {% if field_options['type'] == 'date' %}
+                value="{{ value|formatNoNull("F d, Y") }}"
+            {% elseif field_options['type'] == 'time' %}
+                value="{{ value|formatNoNull("H:i") }}"
+            {% else %}
+                value="{{ value }}"
+            {% endif %}
+        {% endif %}
+       {% if required is defined and required %}required{% endif %}
+>

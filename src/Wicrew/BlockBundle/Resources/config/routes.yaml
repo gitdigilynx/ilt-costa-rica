@@ -1,0 +1,5 @@
+wicrew_block:
+    resource: '@WicrewBlockBundle/Controller/ApiController.php'
+    type: annotation
+    prefix: /api
+

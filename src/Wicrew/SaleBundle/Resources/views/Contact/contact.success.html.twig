@@ -1,0 +1,21 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ 'sale.checkout.success'|trans() }}{% endblock %}
+
+{% block body %}
+
+    <section class="page-header" style="height: 674px;">
+        <div class="container">
+            <div class="d-flex content">
+                <div class="align-self-center">
+                    <h1>Private Flights</h1>
+                    <h2>We are checking availability. We'll be contacting you to confirm your reservation. Thank you!</h2>
+                </div>
+            </div>
+        </div>
+        {% set backgroundImageURL = absolute_url(asset('bundles/wicrewcore/images/header/private-flights-cover.jpg')) %}
+        <div class="bg"
+             style="background-image: url('{{ backgroundImageURL }}');"></div>
+    </section>
+
+{% endblock %}

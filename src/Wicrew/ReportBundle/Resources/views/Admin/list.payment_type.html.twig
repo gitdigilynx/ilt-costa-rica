@@ -1,0 +1,7 @@
+{% if value == constant('App\\Wicrew\\SaleBundle\\Entity\\Order::PAYMENT_TYPE_CREDIT_CARD') %}
+    {{ "report.payment_type.option.credit_card"|trans }}
+{% elseif value == constant('App\\Wicrew\\SaleBundle\\Entity\\Order::PAYMENT_TYPE_CASH') %}
+    {{ "report.payment_type.option.cash"|trans }}
+{% elseif value == constant('App\\Wicrew\\SaleBundle\\Entity\\Order::PAYMENT_TYPE_CHEQUE') %}
+    {{ "report.payment_type.option.cheque"|trans }}
+{% endif %}

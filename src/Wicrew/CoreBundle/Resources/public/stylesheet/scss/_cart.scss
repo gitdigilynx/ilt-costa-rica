@@ -1,0 +1,312 @@
+@import "variables";
+
+/*=================================
+=            Cart Page            =
+=================================*/
+
+.cart-page {
+    font-family: 'Poppins', sans-serif;
+    padding: 80px 0;
+
+    @media #{$mobile} {
+        padding: 40px 0;
+    }
+}
+
+.cart-item-listing {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+
+    li {
+        border: 1px solid #CCC;
+        padding: 15px 20px 25px;
+        // margin-bottom: 30px;
+
+        &:last-child {
+            margin-bottom: 36px;
+        }
+    }
+
+    .product-name-row {
+        font-size: 20px;
+        color: #070d1c;
+        border-bottom: 1px solid #2e6eb2;
+        padding-bottom: 10px;
+        @extend .clearfix;
+
+        @media #{$mobile} {
+            font-size: 16px;
+        }
+
+        .product-name {
+            float: left;
+            width: calc(100% - 180px);
+
+            @media #{$mobile} {
+                float: none;
+                width: 100%;
+            }
+        }
+
+        .product-price {
+            float: right;
+            width: 180px;
+            text-align: right;
+
+            @media #{$mobile} {
+                float: none;
+                width: 100%;
+                text-align: left;
+                margin-top: 10px;
+            }
+
+            .modify {
+                background-color: transparent;
+                border: 1px solid #070d1c;
+                font: {
+                    size: 18px;
+                    weight: inherit;
+                }
+            }
+        }
+    }
+    .modify {
+        background-color: #2e6eb2; 
+        color: white;
+        border: none;
+        border-radius: 44px;
+        font: {
+            size: 16px;
+            weight: inherit;
+        }
+        margin-bottom: 10px;
+        width: 150px;
+    }
+
+    .remove-item {
+        background-color: #2e6eb2;
+        color: white;
+        border: none;
+        border-radius: 44px;
+        width: 150px;
+        font: {
+            size: 16px;
+            weight: inherit;
+        }
+
+        /*position: relative;
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        text-indent: -9999em;
+        border: 1px solid #070d1c;
+        border-radius: 50%;
+        vertical-align: top;
+        margin-top: 6px;
+        margin-left: 5px;
+        cursor: pointer;
+
+        @media #{$mobile} {
+            margin-top: 3px;
+        }
+
+        &:before,
+        &:after {
+            content: '';
+            position: absolute;
+            width: 75%;
+            height: 1px;
+            background: #070d1c;
+            top: 8px;
+            left: 2px;
+        }
+
+        &:before {
+            transform: translate(0) rotate(135deg);
+        }
+
+        &:after {
+            transform: translate(0) rotate(225deg);
+        }*/
+    }
+
+    .product-info-block .vehicle-data {
+        position: relative;
+        padding-left: 9px;
+        font-size: 12px; 
+      }
+
+    .product-info-block .vehicle-data::before {
+        content: '';
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 7px;
+        background-color: #2e6eb2;
+        width: 4px;
+        height: 4px;
+        border-radius: 100%;
+      }
+
+    .product-info-wrapper {
+        margin-top: 20px;
+        @extend .clearfix;
+
+        display: flex;
+
+        .img-block {
+            float: left;
+            width: 170px;
+
+            @media #{$mobile} {
+                float: none;
+                width: 100%;
+                max-width: 170px;
+                margin: 0 auto;
+            }
+
+            img {
+                width: 100%;
+                height: auto;
+            }
+        }
+
+        .spacer {
+            width: 30px;
+        }
+
+        .product-info-block {
+            @media #{$ipad} {
+                margin-top: 20px;
+                margin-left: 0;
+            }
+        }
+    }
+
+    h3 {
+        font-size: 14px;
+        font-weight: 600;
+        color: #070d1c;
+        margin-top: 10px;
+        margin-bottom: 0;
+
+        &:first-child {
+            margin-top: 0;
+        }
+    }
+}
+
+/*=====  End of Cart Page  ======*/
+
+/*=====================================
+=            Checkout Page            =
+=====================================*/
+
+.checkout-page {
+}
+
+.checkout-form-section {
+    margin-top: 60px;
+
+    h2 {
+        margin-top: 0;
+    }
+}
+
+.payment-information-section {
+    margin-top: 70px;
+
+    .stripe-section {
+        label {
+            margin-right: 5px;
+            padding: 15px 0;
+            font-weight: 500;
+            text-align: right;
+            display: block;
+        }
+
+        .field_name {
+            margin-bottom: 10px;
+
+            #card_name {
+                width: 100%;
+                padding: 15px;
+                background: #f5f6f8;
+                border: 0;
+                color: #32325d;
+            }
+        }
+
+        .field_card {
+            #card-element {
+                background: #f5f6f8;
+                padding: 15px;
+            }
+        }
+    }
+}
+
+/*=====  End of Checkout Page  ======*/
+
+.order-success-page {
+    padding: 80px 0;
+}
+
+.page-sale_cart,
+.page-sale_checkout {
+    .page-header {
+        .content {
+            h2 {
+                font-family: $font-covered;
+                font-size: 3rem;
+                font-weight: 400;
+                line-height: 0.95em;
+                margin-bottom: 10px;
+            }
+        }
+    }
+}
+
+.product-info-block .addon-data{
+    position: relative;
+    padding-left: 10px;
+}
+
+.product-info-block .addon-data::before {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 7px;
+    background-color: black;
+    width: 4px;
+    height: 4px;
+    border-radius: 100%;
+}
+
+@media #{$ipad} {
+    .vehicle-info-desktop {
+        display:none;
+    }
+    .cart-addon-services {
+        width: 100%!important;
+    } 
+    .cart-addon-services-container {
+        display: block!important;
+    }
+    .cart-info-item-container {
+        display: block!important;
+    }
+}
+
+@media #{$desktop} {
+    .vehicle-info-mobile {
+        display:none;
+    }
+}
+@media #{$desktop} {
+    .cart-info-item-container .product-info-block-jeep-boat-jeep{
+        width: 50%;
+    }
+}

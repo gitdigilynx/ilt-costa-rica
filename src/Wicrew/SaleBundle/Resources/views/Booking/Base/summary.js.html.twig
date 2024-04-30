@@ -1,0 +1,140 @@
+<script type="text/javascript">
+    function centsToString(intVal) {
+        let cents = intVal % 100;
+        if (cents < 10) {
+            cents = "0" + cents.toString();
+        } else {
+            cents = cents.toString();
+        }
+
+        intVal = intVal.toString();
+        let dollar = intVal.substr(0, intVal.length - 2);
+        if (dollar.length < 1) {
+            dollar = "0";
+        }
+        return dollar + "." + cents;
+    }
+
+    function updateGrandTotal() {
+        let subtotal = 0;
+        let tax = 0;
+        let grand = 0;
+
+        $("[id^=subtotal-for-]").each(function () {
+            subtotal += parseInt($(this).val());
+        });
+
+
+        $("[id^=taxes-for-]").each(function () {
+            tax += parseInt($(this).val());
+        });
+
+        grand = subtotal + tax;
+
+        $("#booking-subtotal").text("{{ 'currency.symbol'|trans }}" + centsToString(subtotal) + " {{ 'currency.text'|trans }}");
+        $("#booking-taxes").text("{{ 'currency.symbol'|trans }}" + centsToString(tax) + " {{ 'currency.text'|trans }}");
+        $("#booking-grand").text("{{ 'currency.symbol'|trans }}" + centsToString(grand));
+    }
+
+    function updateGrandTotalByDiscount() {
+        let grand = 0;
+        let discount = 0;
+
+        grand = $('#booking-grand').data('value');
+        $(".discount-value").each(function () {
+            discount += parseInt($(this).data('value'));
+        });
+        grand -= discount;
+
+        $("#booking-grand").text("{{ 'currency.symbol'|trans }}" + centsToString(grand));
+    }
+
+    // handle click discount question
+    let discountFormHidden = false;
+    handleClickDiscountQuestion();
+
+    function handleClickDiscountQuestion() {
+        updateDiscountFormVisibility()
+
+        $('#discount-code-question').click(function() {
+            updateDiscountFormVisibility();
+        });
+
+    }
+
+    function updateDiscountFormVisibility() {
+        if (discountFormHidden) {
+            $('#discount-code-form').show();
+            discountFormHidden = false;
+        } else {
+            $('#discount-code-form').hide();
+            discountFormHidden = true;
+        }
+    }
+
+    // handle click discount code button
+    handleClickDiscountCodeButton();
+    function handleClickDiscountCodeButton() {
+        $('#discount-code-button').click(function() {
+            let data = {};
+            data['discount_code'] = $('#discount-code').val();
+            $('#discount-code-button').prop('disabled', true).css('opacity', '0.6');
+            $.ajax({
+                url: '{{ url("validate_discount_code") }}',
+                type: "POST",
+                data: data,
+                success: function (response) {
+                    if (response.status !== 'success') {
+                        alert(response.message);
+                        return false;
+                    }
+                    if (!response.discount_code_valid)  {
+                        $('#discount-code-error-message').show();
+                    } else {
+                        $('#discount-code-error-message').hide();
+                        $('#discount-code-question').click();
+                    }
+
+                    if (response.discount_code_valid) {
+                        $('.discount-code-list').html(response.html);
+                        handleClickDiscountCodeRemoveButton();
+                    }
+                    $('#discount-code-button').prop('disabled', false).css('opacity', '1');
+                    updateGrandTotalByDiscount();
+                }
+            });
+        });
+    }
+
+    // handle click remove discount code
+    handleClickDiscountCodeRemoveButton();
+
+    function handleClickDiscountCodeRemoveButton() {
+        $('.discount-code-remove').each(function() {
+            $(this).click(function() {
+                let discount_id = $(this).data('discountId');
+                let data = {};
+                data['discount_id'] = discount_id;
+                $(this).parent().parent().css('opacity', '0.6');
+                $.ajax({
+                    url: '{{ url("remove_discount_code") }}',
+                    type: "POST",
+                    data: data,
+                    success: function (response) {
+                        $('span [data-discount-id="'+response['discount_id']+'"]').parent().parent().remove();
+                        if (response.status !== 'success') {
+                            alert(response.message);
+                            return false;
+                        }
+
+                        $('.discount-code-list').html(response.html);
+                        $(this).parent().parent().css('opacity', '1');
+                        updateGrandTotalByDiscount();
+                        handleClickDiscountCodeRemoveButton();
+                    }
+                });
+            })
+        });
+    }
+
+</script>

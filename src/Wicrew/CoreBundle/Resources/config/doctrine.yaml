@@ -1,0 +1,15 @@
+doctrine:
+    orm:
+        dql:
+            numeric_functions:
+                Rand: App\Wicrew\CoreBundle\Doctrine2\Functions\Rand
+            datetime_functions:
+                date_format: App\Wicrew\CoreBundle\Doctrine2\Functions\DateFormat
+                date_add: App\Wicrew\CoreBundle\Doctrine2\Functions\DateAdd
+                date_sub: App\Wicrew\CoreBundle\Doctrine2\Functions\DateSub
+                find_in_set: DoctrineExtensions\Query\Mysql\FindInSet
+                replace: DoctrineExtensions\Query\Mysql\Replace
+
+    dbal:
+        mapping_types:
+            bit: boolean

@@ -1,0 +1,61 @@
+{% extends "@WicrewSale/Admin/Management/list.input.select.html.twig" %}
+{% set dataset = {
+    (constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::CONFIRMATION_STATUS_UNASSIGNED')): "management.order.confirmation.unassigned"|trans(),
+    (constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::CONFIRMATION_STATUS_ASSIGNED')): "management.order.confirmation.assigned"|trans(),
+    (constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::CONFIRMATION_STATUS_APPROVED')): "management.order.confirmation.approved"|trans(),
+    (constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::CONFIRMATION_STATUS_CONFIRMED')): "management.order.confirmation.confirmed"|trans()
+} %}
+{% set noNone = true %}
+
+{% block input_select %}
+    {% set select_color = '--orange' %}
+    {% set display_status_val = 'Unassigned' %}
+
+    {% for key, data in dataset %}
+        {% if value is same as(key) %}
+            {% if key is same as constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::CONFIRMATION_STATUS_UNASSIGNED') %}
+                {% set select_color = '--orange' %}
+                {% set display_status_val = 'Unassigned' %}
+                
+            {% elseif key is same as constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::CONFIRMATION_STATUS_ASSIGNED') %}
+                {% set select_color = '--yellow' %}
+                {% set display_status_val = 'Assigned' %}
+            {% elseif key is same as constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::CONFIRMATION_STATUS_APPROVED') %}
+                {% set select_color = '--blue' %}
+                {% set display_status_val = 'Approved' %}
+            {% elseif key is same as constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::CONFIRMATION_STATUS_CONFIRMED') %}
+                {% set select_color = '--green' %}
+                {% set display_status_val = 'Confirmed' %}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+   
+    
+    {% set request_url =  app.request.requesturi  %}
+
+    {% if 'export' in request_url %}
+        {{ display_status_val }}
+    {% else %}
+        <select  name="confirmation_status"  style="color: var({{ select_color }});" >
+            {% if noNone is not defined %}<option value="">{{ (emptyText is defined ? emptyText : 'booking.please.select')|trans() }}</option>{% endif %}
+                {% for key, data in dataset %}
+                    {% if key is same as constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::CONFIRMATION_STATUS_UNASSIGNED') %}
+                        {% set color = '--orange' %}
+                    {% elseif key is same as constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::CONFIRMATION_STATUS_ASSIGNED') %}
+                        {% set color = '--yellow' %}
+                    {% elseif key is same as constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::CONFIRMATION_STATUS_APPROVED') %}
+                        {% set color = '--blue' %}
+                    {% elseif key is same as constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::CONFIRMATION_STATUS_CONFIRMED') %}
+                        {% set color = '--green' %}
+                    {% endif %}
+                    <option
+                            value="{{ key }}"
+                            {% if value is same as(key) %}selected{% endif %} style="color: var({{ color }});">
+                        {{ data }}
+                    </option>
+                {% endfor %}
+            {# {% endif %} #}
+        </select>
+    {% endif %}
+    
+{% endblock %}

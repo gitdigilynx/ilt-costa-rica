@@ -1,0 +1,12 @@
+<script type="text/javascript">
+    $(document).ready(function () {
+        // Booking a Jeep Boat Jeep
+        $(document).on('click', '[id^=book_jbj_]', function () {
+            let transportationType = $(this).data('transportationtype');
+
+            redirectToBookingPage({
+                jbjType: transportationType
+            });
+        });
+    })
+</script>

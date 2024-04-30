@@ -1,0 +1,3 @@
+imports:
+    - { resource: "@WicrewReportBundle/Resources/config/easy_admin.yaml" }
+#    - { resource: "@WicrewReportBundle/Resources/config/services.yaml" }

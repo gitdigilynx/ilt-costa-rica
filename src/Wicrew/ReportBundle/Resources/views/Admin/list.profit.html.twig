@@ -1,0 +1,11 @@
+{% set currencySymbol = 'currency.symbol'|trans() %}
+{% set rackPrice = item.getSubtotalRack %}
+{% set netPrice = item.getSubtotalNet %}
+
+{% if item.order.supplier is not null %}
+    {% set commission = (rackPrice * (item.order.supplier.commission / 100)) %}
+{% else %}
+    {% set commission = 0 %}
+{% endif %}
+
+{{currencySymbol}}{{ (rackPrice - netPrice - commission) }}

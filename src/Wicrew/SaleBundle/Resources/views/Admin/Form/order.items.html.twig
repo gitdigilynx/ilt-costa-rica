@@ -1,0 +1,910 @@
+{% form_theme form _self %}
+
+
+{% block _order_custom_statusitems_label %} 
+{% endblock %}
+
+{% block _order_custom_statusitems_widget %} 
+{% endblock %}
+
+{% block _order_custom_orderitems_widget %}
+    <h5><strong>Order details</strong></h5>
+    <div class="order-detail">
+        <div><strong>{{ 'order.detail.id'|trans() }}:</strong> #RJ{{ easyadmin.item.id }}</div>
+        <div><strong>{{ 'order.detail.date'|trans() }}:</strong> {{ easyadmin.item.createdAt|date("d M Y") }}</div>
+        <div><strong>{{ 'order.detail.purchase.point'|trans() }}:</strong> {% if easyadmin.item.supplier %}{{ 'ilt.partners.booking'|trans() }}{% else %}{{ 'customer.booking'|trans() }}{% endif %}</div>
+        <input type="hidden" name="order[prestatus]" value="{{ easyadmin.item.status }}"/>
+        <br>
+        <label class="form-control-label required" for="order_status"><strong>Billing Status:</strong></label>
+        <select id="order_status" name="order[status]" class="form-control" style="display: inline-block;text-align: center;width: auto;margin-left: 10px;">
+            <option value="0" {% if easyadmin.item.status == '0' %}selected="selected"{% endif %}>UNPAID</option>
+            <option value="1" {% if easyadmin.item.status == '1' %}selected="selected"{% endif %}>PAID</option>
+            <option value="2" {% if easyadmin.item.status == '2' %}selected="selected"{% endif %}>CANCELLED</option>
+        </select>
+    </div>   
+    <br>
+    <style>
+        #edit-order-form .field-group:nth-child(1) fieldset:nth-child(1) {
+            {# color: #6174d1; #}
+        } 
+    </style>
+    {% set _request_parameters = app.request.query %}
+    {# @var order \App\Wicrew\SaleBundle\Entity\Order #}
+    {% set order = easyadmin.item %}
+    {% set totalDiscounts = 0 %}
+    {% if order.getDiscountValues %}
+    <div class="order-notes">
+        <h3>{{ 'discount.title'|trans() }}</h3>
+        <fieldset>
+            {% for discountValue in order.getDiscountValues %}
+                {% set totalDiscounts = totalDiscounts + discountValue.discountRack.__toString() %}
+                <div>
+                    <label>{{ discountValue.discount.name|trans() }}</label>: -{{ 'currency.symbol'|trans() ~ discountValue.discountRack }}</label>
+                </div>
+            {% endfor %}
+        </fieldset>
+    </div>
+    {% endif %}
+    
+    <div class="order-items">
+        <h5><strong>Service details</strong></h5>
+        {% set _order_total = 0 %}
+        {% for item in order.items %}
+            {% include "@WicrewSale/Admin/order.item.info.html.twig" with { "item": item } %}
+            {% if item.status != 2 %}
+                {% set _order_total = _order_total + item.grandTotal %}
+            {% endif %}
+        {% endfor %}
+        <div  class="orderSummaryContainer" style="display: flex; justify-content: right;">
+            <div class="orderSummary" style="font-size: 18px; width: 100%; max-width: 300px; padding-top: 20px;">
+                <ul style="list-style: none; padding: 0;">
+                    <li style="margin-bottom: 10px;">Total: <span style="float: right;">{{ 'currency.symbol'|trans() ~ _order_total|number_format(2, '.', ',') }}</span></li>
+                    <li style="margin-bottom: 10px;">Discounts: <span style="float: right;">-{{ 'currency.symbol'|trans() ~ totalDiscounts|number_format(2, '.', ',') }}</span></li>
+                    <li>Total with Discounts: <span style="float: right;">{{ 'currency.symbol'|trans() ~ (_order_total - totalDiscounts)|number_format(2, '.', ',') }}</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <br>
+            <div class="payment-section">
+                <div class="stripe charge">
+                    <h3>{{ 'order.balance.makepayment'|trans() }}</h3>
+                    <div>
+                        {# <span>{{ 'order.balance.makerefund.totalcharge'|trans() }}</span>
+                        <span>{{ 'currency.symbol'|trans() }}{{ chargeAmount }}</span> #}
+                    </div>
+                    <div class="charge-form hidden">
+                        <div class="stripe-section">
+                            <div id="card-element"></div>
+                            <div id="card-errors" role="alert"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="payment_charge_amount">{{ 'order.balance.makepayment.amount'|trans() }}</label>
+                        <span><input type="text" class="form-control" id="payment_charge_amount" ></span>
+                    </div>
+                    <div>
+                        <label for="payment_charge_note">{{ 'order.balance.makepayment.note'|trans() }}</label>
+                        <span><textarea class="form-control" id="payment_charge_note"></textarea></span>
+                    </div>
+                    <br>
+                    <div>
+                        <input type="hidden" id="payment_charge_marknewcard" name="payment[charge][marknewcard]" value=""/>
+                        <span>
+                            <button id="payment_charge_as_cash" class="btn btn-secondary" data-type="charge_cash" type="button">
+                                Charge as cash/wire
+                            </button>
+                        </span>
+                        <span>
+                            <button class="payment_process_btn btn btn-secondary" data-type="charge" type="button">
+                                {{ 'order.balance.makepayment.charge'|trans() }}
+                            </button>
+                        </span>
+                        <span>
+                            <button id="payment_charge_as_new" class="btn btn-secondary" type="button">
+                                {{ 'order.balance.makepayment.chargeasnew'|trans() }}
+                            </button>
+                        </span>
+                        <span style="display: none;">
+                            <button id="send_mail_payment" class="btn btn-secondary" type="button">
+                                {{ 'order.balance.makepayment.sendmail'|trans() }}<img id="send_mail_payment_loading" src="{{ absolute_url(asset('bundles/wicrewcore/images/Spinner-1s-18px.gif')) }}"  style="position: relative;bottom: 1.5px;left: 5px;width: 16px;display:none;">
+                            </button>
+                        </span>
+                        <span>
+                            <button id="sharePaymentLink" class="btn btn-secondary" type="button">
+                                Share Via Link
+                                <img id="send_mail_payment_loading" src="{{ absolute_url(asset('bundles/wicrewcore/images/Spinner-1s-18px.gif')) }}"  style="position: relative;bottom: 1.5px;left: 5px;width: 16px;display:none;">
+                            </button>
+                        </span>
+                    </div>
+                </div>
+                <br>
+                <div class="stripe refund">
+                    <h3>{{ 'order.balance.makerefund'|trans() }}</h3>
+                    <div>
+                        {# <span>{{ 'order.balance.makerefund.totalrefund'|trans() }}</span>
+                        <span>{{ 'currency.symbol'|trans() }}{{ orderHistory['amountToRefund'] }}</span>
+                    </div> #}
+                    <div>
+                        <label for="payment_refund_amount">{{ 'order.balance.makepayment.amount'|trans() }}</label>
+                        <span><input class="form-control" type="text" id="payment_refund_amount" ></span>
+                    </div>
+                    <div>
+                        <label for="payment_refund_note">{{ 'order.balance.makepayment.note'|trans() }}</label>
+                        <span><textarea class="form-control" id="payment_refund_note"></textarea></span>
+                    </div> 
+                    <div>
+                        <label for="payment_refund_note">{{ 'order.balance.makepayment.item'|trans() }}</label>
+                        <span>
+                            <select name="items" id="payment_order_itemid" class="form-control">
+                                <option>--</option> 
+                                {% for order_item in order.items %}
+                                    <option value="{{order_item.id}}">#{{order_item.id}}</option> 
+                                {% endfor %}
+                            </select>
+                        </span>
+                    </div>
+                    <br>
+                    <div>
+                        <span><button class="payment_process_btn btn btn-secondary" data-type="refund" type="button">{{ 'order.balance.makepayment.refund'|trans() }}</button></span>
+                    </div>
+                </div>
+                <input type="hidden" id="payment_orderid" value="{{ order.id }}"/>
+        
+                <div class="paymentLinkModal" style="display: none;">
+                    <div  class="paymentLinkModal_subcontainer">
+                        <div class="paymentLinkModal_header">
+                            <i class="fas fa-times"></i>
+                        </div>
+        
+                        <div class="paymentLinkModal_content">
+                            <h2>Voilà - here's your link</h2>
+                            <h5>You can copy, paste and share this link with your client.</h5>
+        
+                            <div class="paymentLink_container">
+                                <span class="tooltiptext">Copied!</span>
+                                <div class="paymentLink_icon" onclick="copyPaymentLink_url()"><i class="fas fa-link"></i></div> 
+                                <div id='paymentLink_urlToCopy' class="paymentLink_urlToCopy"  onclick="copyPaymentLink_url()"></div>
+                            </div>
+        
+                            
+                            <div class="paymentLinkCopyLink"><a href="javascript:void(0);" onclick="copyPaymentLink_url()">Copy To Clipboard</a></div>
+                            
+                            <div class="paymentLinkDontBtnContainer"><button class="btn PaymentLinkDoneBtn">Done</button></a></div>
+        
+                        </div>
+        
+                    </div>
+                </div>
+        
+            </div>
+            <style>
+                .order-history table tr th {
+                    padding: 8px;
+                    white-space: nowrap;
+                }
+                .order-history table tr th:first-child {
+                    padding-left: 20px;
+                }
+               .paymentLinkModal {
+                    position: fixed;
+                    top: 0;
+                    border: 0;
+                    left: 0;
+                    right: 0;
+                    display: flex;
+                    align-items: center;
+                    height: 100%;
+                    z-index: 99999;
+                    width: 100%;
+                    justify-content: center;
+                    background: #0000005e;
+                }
+        
+                .paymentLinkModal_subcontainer {
+                    background: #fff;
+                    padding: 20px 40px;
+                    filter: drop-shadow(0px 2px 5px #000);
+                    border-radius: 10px;
+                }
+        
+                .paymentLinkModal_header {
+                    text-align: right;
+                }
+        
+                .paymentLinkModal_content {
+                    text-align: center;
+                }
+        
+                .paymentLink_container .tooltiptext {
+                    visibility: hidden;
+                    width: 120px;
+                    background-color: #555;
+                    color: #fff;
+                    text-align: center;
+                    border-radius: 6px;
+                    padding: 5px 0;
+                    position: absolute;
+                    z-index: 99999;
+                    right: 5px;
+                    bottom: 5px;
+                    opacity: 0;
+                    transition: opacity 0.3s;
+                }
+        
+                .paymentLink_container .tooltiptext::after {
+                    content: "";
+                    position: absolute;
+                    top: 100%;
+                    left: 50%;
+                    margin-left: -5px;
+                    border-width: 5px;
+                    border-style: solid;
+                    border-color: #555 transparent transparent transparent;
+                }
+        
+                .paymentLink_container {
+                    display: flex;
+                    gap: 10px;
+                    justify-content: flex-start;
+                    cursor: pointer;
+                    background: lightblue;
+                    color: black;
+                    padding: 24px;
+                    border-radius: 10px;
+                    font-size: 16px;
+                    margin-bottom: 24px;
+                    position: relative;
+        
+                }
+                .paymentLinkModal_content h2 {
+                    font-size: 34px;
+                    font-weight: bold;
+                    margin-bottom: 32px;
+                }
+        
+                .paymentLinkModal_content h5 {
+                    font-size: 24px;
+                    margin-bottom: 32px;
+                }
+        
+                .paymentLinkCopyLink a {
+                    font-size: 22px;
+                }
+        
+                .paymentLinkCopyLink {
+                    margin-bottom: 32px;
+                }
+        
+                .paymentLinkDontBtnContainer {
+                    margin-bottom: 32px;
+                }
+        
+                button.btn.PaymentLinkDoneBtn {
+                    background: green;
+                    color: white;
+                    width: 132px;
+                    height: 40px;
+                    font-size: 18px;
+                    text-transform: uppercase;
+                    font-weight: bold;
+                }
+        
+                button.btn.PaymentLinkDoneBtn:hover {
+                    filter: drop-shadow(0px 4px 3px #b5b5b5);
+                    letter-spacing: 3px;
+                }
+        
+                .paymentLinkModal_header i {
+                    cursor: pointer;
+                }
+                body#easyadmin-list-HistoryLog {
+                    background: #292D42 !important;
+                }
+        
+            </style>
+            <script>
+                function copyPaymentLink_url(){
+                    var copyText = document.getElementById("paymentLink_urlToCopy");
+                    copyTextToClipboard(copyText.textContent);
+                    $('.paymentLinkModal_content .tooltiptext').css("visibility", "visible").css("opacity", "1");
+                    setTimeout(function() {
+                        $('.paymentLinkModal_content .tooltiptext').css("visibility", "hidden").css("opacity", "0");
+                    }, 500);
+                }
+        
+                function copyTextToClipboard(text) {
+                    var sampleTextarea = document.createElement("textarea");
+                    document.body.appendChild(sampleTextarea);
+                    sampleTextarea.value = text; //save main text in it
+                    sampleTextarea.select(); //select textarea contenrs
+                    document.execCommand("copy");
+                    document.body.removeChild(sampleTextarea);
+                }
+        
+        
+                $(document).on("click","button#sharePaymentLink",function() {
+                    let that = $(this);
+                    if (that.hasClass("loading-button")) { return; }
+                    that.addClass("loading-button");
+                    
+                    var base_url = window.location.origin;
+                    $.ajax({
+                        url: '{{ url("create_payment_link") }}',
+                        type: "POST",
+                        data: {
+                            orderID: "{{ app.request.get('id') }}",
+                            siteURL: base_url,
+                        },
+                        success: function (response) { 
+                            if( response.status == 'success' ){
+                                $('div#paymentLink_urlToCopy').html(response.link);
+                                $('.paymentLinkModal').fadeIn();
+                            }else{
+                                alert(response.message);
+                            }
+                            that.prop('disabled', false);
+                            that.removeClass("loading-button");
+                        }
+                    });
+        
+                });
+        
+                $(document).on("click","button.btn.PaymentLinkDoneBtn, .paymentLinkModal_header i",function(e) {
+                    e.preventDefault();
+                    $('.paymentLinkModal').fadeOut();
+                });
+        
+                
+        
+            </script>
+    </div> 
+{% endblock %}
+{% block _order_custom_orderitems_additems_widget %}
+    {% set _request_parameters = app.request.query %}
+    {# @var order \App\Wicrew\SaleBundle\Entity\Order #}
+    {% set order = easyadmin.item %}
+    <div class="add-order-item">
+        <h3>{{ 'order.add.items'|trans() }}</h3>
+        <fieldset>
+            <div>{{ 'order.items.select.type.add'|trans() }}</div>
+            <div>
+                <select id="service_type_order">
+                    <option value="">{{ 'core.option.please_select'|trans() }}</option>
+                    <option value="{{ path('product_transportation', { 'orderID': order.id, 'type': 'private-shuttles' }) }}">{{ 'order.service.pvt.shuttles'|trans() }}</option>
+                    {# <option value="{{ path('product_transportation', { 'orderID': order.id, 'type': 'shared-shuttles' }) }}">{{ 'order.service.shr.shuttles'|trans() }}</option> #}
+                    <option value="{{ path('product_transportation', { 'orderID': order.id, 'type': 'private-flight' }) }}">{{ 'order.service.pvt.flight'|trans() }}</option>
+                    <option value="{{ path('product_transportation', { 'orderID': order.id, 'type': 'jeep-boat-jeep' }) }}">{{ 'order.service.jbj'|trans() }}</option>
+                    <option value="{{ path('product_transportation', { 'orderID': order.id, 'type': 'water-taxi' }) }}">{{ 'order.service.watertaxi'|trans() }}</option>
+                    <option value="{{ path('wicrew_locations',       { 'orderID': order.id }) }}">{{ 'activity.title'|trans() }}</option>
+                </select>
+            </div>
+            <div>
+                <a id="add_item_button" href="">
+                    <button type="button" class="btn btn-primary hidden">
+                        {{ 'order.add.item'|trans() }}
+                    </button>
+                </a>
+            </div>
+        </fieldset>
+    </div>
+    <div class="order-notes">
+        <h3>{{ 'order.add.notes'|trans() }}</h3>
+        <fieldset>
+            <div>
+                <input type="text" id="add_order_notes"/>
+                <button type="button" class="btn btn-primary" id="save_order_notes">{{ 'order.add.notes'|trans() }}</button>
+            </div>
+            <div>
+                <div>{{ 'order.notes.list'|trans() }}</div>
+                <div>{{ order.notes|raw() }}</div>
+            </div>
+        </fieldset>
+    </div>
+    
+
+    <div class="AddCustomServiceContainer">
+        <div class="AddCustomServiceSubContainer">
+            <div class="orderItems">
+                <h3>Add new custom service to order items</h3>
+                <fieldset>
+                    <table id="add-addons-extras">
+                        <thead>
+                            <th></th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Tour Name</th>
+                            <th>Pick-up Area</th>
+                            <th>Pick-up Location</th>
+                            <th>Drop-off Area</th>
+                            <th>Drop-off Location</th>
+                            <th>Label</th>
+                            <th>Price</th>
+                            <th>Action(s)</th>
+                        </thead>
+                        <tbody>
+                            {% for orderItem in order.sortedItems %}   
+                                {# @var orderItem \App\Wicrew\SaleBundle\Entity\OrderItem #} 
+                                <tr>
+                                    <td>{{loop.index}}</td>
+                                    <td>{{ orderItem.pickDate|formatNoNull('F jS, Y') }}</td>
+                                    <td>
+                                        {% if orderItem.activity is not null %}
+                                            {{ orderItem.tourTime|formatNoNull('H:i') }}
+                                        {% else %}
+                                            {{ orderItem.pickDate|formatNoNull('H:i') }}
+                                        {% endif %} 
+                                    </td>
+                                    <td>
+                                        {% if orderItem.activity is not null %}
+                                            {{ orderItem.activity.name }}
+                                        {% else %}
+                                            --
+                                        {% endif %} 
+                                    </td>
+                                    <td> {{ orderItem.pickArea.name }} </td>
+                                    <td>
+                                        {% if orderItem.pickAddress != "" %} 
+                                            {{ orderItem.pickAddress }}
+                                        {% else %}
+                                            --
+                                        {% endif %} 
+                                    </td>
+                                    <td>
+                                        {{ orderItem.dropArea.name }}
+                                    </td>
+                                    <td>
+                                        {% if orderItem.dropAddress != "" %} 
+                                            {{ orderItem.dropAddress }}
+                                        {% else %}
+                                            --
+                                        {% endif %} 
+                                    </td>
+                                    <td>
+                                        <input type="text" data-itemid="{{orderItem.id}}" class="customServiceLabel" /> 
+                                    </td>
+                                    <td>
+                                        <input type="number" step=".01" min="0.01" data-itemid="{{orderItem.id}}" class="customServicePrice" /> 
+                                    </td>
+                                    <td>
+                                        <input type="button" data-itemid="{{orderItem.id}}" value="Add Service" class="addCustomService_btn" /> 
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+
+                    </table>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    
+    
+    <div class="addons-container">
+        <div class="addons-subcontainer">
+            <div class="orderItem">
+                <h3>Add Addons/Extras to order items</h3>
+                <fieldset>
+                    <table id="add-addons-extras">
+                        <thead>
+                            <th></th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Tour Name</th>
+                            <th>Pick-up Area</th>
+                            <th>Pick-up Location</th>
+                            <th>Drop-off Area</th>
+                            <th>Drop-off Location</th>
+                            <th>Adults</th>
+                            <th>Children</th>
+                            <th>Add Add-on(s)</th>
+                            <th>Qty.</th>
+                            <th>Add Extra(s)</th>
+                        </thead>
+                        <tbody>
+                            {% for orderItem in order.sortedItems %}   
+                                {# @var orderItem \App\Wicrew\SaleBundle\Entity\OrderItem #} 
+                                <tr>
+                                    <td>{{loop.index}}</td>
+                                    <td>{{ orderItem.pickDate|formatNoNull('F jS, Y') }}</td>
+                                    <td>
+                                        {% if orderItem.activity is not null %}
+                                            {{ orderItem.tourTime|formatNoNull('H:i') }}
+                                        {% else %}
+                                            {{ orderItem.pickDate|formatNoNull('H:i') }}
+                                        {% endif %} 
+                                    </td>
+                                    <td>
+                                        {% if orderItem.activity is not null %}
+                                            {{ orderItem.activity.name }}
+                                        {% else %}
+                                            --
+                                        {% endif %} 
+                                    </td>
+                                    <td> {{ orderItem.pickArea.name }} </td>
+                                    <td>
+                                        {% if orderItem.pickAddress != "" %} 
+                                            {{ orderItem.pickAddress }}
+                                        {% else %}
+                                            --
+                                        {% endif %} 
+                                    </td>
+                                    <td>
+                                        {{ orderItem.dropArea.name }}
+                                    </td>
+                                    <td>
+                                        {% if orderItem.dropAddress != "" %} 
+                                            {{ orderItem.dropAddress }}
+                                        {% else %}
+                                            --
+                                        {% endif %} 
+                                    </td>
+                                    <td>
+                                        <div class="quantity buttons_added">
+                                            <input type="button" value="-" class="minus"><input type="number" step="1" min="0" max="" value="0" title="Adult Quantity" class="adultCount input-text qty text" size="4" pattern="" inputmode=""><input type="button" value="+" class="plus">
+                                        </div>
+                                    </td>
+                                    <td> 
+                                        <div class="quantity buttons_added">
+                                            <input type="button" value="-" class="minus"><input type="number" step="1" min="0" max="" value="0" title="Child Quantity" class="childCount input-text qty text" size="4" pattern="" inputmode=""><input type="button" value="+" class="plus">
+                                        </div>
+                                    </td>
+                                    <td class="select-addons"> <select data-itemid="{{orderItem.id}}" class="addons_selection"><option>Please Select</option></select> </td>
+                                    <td> 
+                                        <div class="quantity buttons_added">
+                                            <input type="button" value="-" class="minus"><input type="number" step="1" min="0" max="" value="0" title="Passenger Quantity" class="passengerCount input-text qty text" size="4" pattern="" inputmode=""><input type="button" value="+" class="plus">
+                                        </div>
+                                    </td>
+                                    <td class="select-extras"> <select data-itemid="{{orderItem.id}}" class="extras_selection"><option>Please Select</option></select> </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+
+                    </table>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    
+    <div id="notification_bar">
+        <div class="notification_container">
+            <p></p>
+        </div>
+        <div class="icon_container">
+            <i style="cursor:" class="fa fa-times close_notification" aria-hidden="true"></i>
+        </div>
+    </div>
+
+
+
+    <style>
+        .add-order-item, 
+        .order-notes,
+        .AddCustomServiceContainer,
+        .addons-container {
+            margin-bottom: 62px;
+        }
+        
+        .add-order-item h3, 
+        .order-notes h3,
+        .AddCustomServiceContainer h3,
+        .addons-container h3 {
+            margin-bottom: 22px;
+        }
+
+        div#notification_bar {
+            position: fixed;
+            width: 320px;
+            top: 0;
+            right: 0px;
+            margin: 0;
+            height: 65px;
+            border-top-right-radius: 0px;
+            border-bottom-right-radius: 0px;
+            align-items: center;
+            filter: drop-shadow(5px 0px 5px #000);
+        }
+        #notification_bar {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            font-weight: bold;
+            display: flex;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 8px;
+        }
+        #notification_bar p {  
+            margin: 0px;
+        }
+
+        div#notification_bar .icon_container {
+            justify-self: end;
+            margin-left: auto;
+        }
+
+        #notification_bar i {
+            color: #155724;
+        }
+        
+        #notification_bar{
+            display:none;
+        }
+        table#add-addons-extras {
+            white-space: nowrap;
+        }
+
+        table#add-addons-extras th, table#add-addons-extras td {
+            padding: 0px 10px;
+            height: 42px;
+        }
+        .addons-subcontainer.form-widget {
+            overflow-x: scroll;
+        }
+        table#add-addons-extras td select {
+            height: 32px;
+            width: 185px;
+        }
+
+        /* -- quantity box -- */
+
+        .quantity {
+            display: inline-block; 
+        }
+
+        .quantity .input-text.qty {
+            width: 35px;
+            height: 39px;
+            padding: 0 5px;
+            text-align: center;
+            background-color: transparent;
+            border: 1px solid #efefef;
+        }
+
+        .quantity.buttons_added {
+            text-align: left;
+            position: relative;
+            white-space: nowrap;
+            vertical-align: top; 
+        }
+
+        .quantity.buttons_added input {
+            display: inline-block;
+            margin: 0;
+            vertical-align: top;
+            box-shadow: none;
+        }
+
+        .quantity.buttons_added .minus,
+        .quantity.buttons_added .plus {
+            padding: 7px 10px 8px;
+            height: 41px;
+            background-color: #ffffff;
+            border: 1px solid #efefef;
+            cursor:pointer;
+        }
+
+        .quantity.buttons_added .minus {
+            border-right: 0; 
+        }
+
+        .quantity.buttons_added .plus {
+            border-left: 0; 
+        }
+
+        .quantity.buttons_added .minus:hover,
+        .quantity.buttons_added .plus:hover {
+            background: #eeeeee; 
+        }
+
+        .quantity input::-webkit-outer-spin-button,
+        .quantity input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            margin: 0; 
+        }
+        
+        .quantity.buttons_added .minus:focus,
+        .quantity.buttons_added .plus:focus {
+            outline: none; 
+        }
+
+
+    </style>
+
+
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url:'/admin/get/entities',
+                type: "GET",
+                async: true,
+                success: function (response) {
+                    response    = $.parseJSON( response );
+                    let addons  = response.addons;
+                    let extras  = response.extras;
+                    
+                    $.each( addons, function( index, value ) {
+                        $( "select.addons_selection" ).append("<option value='"+index+"'>"+value+"</option>");
+                    });
+
+                    $.each( extras, function( index, value ) {
+                        $( "select.extras_selection" ).append("<option value='"+index+"'>"+value+"</option>");
+                    });
+
+
+                }
+            });
+
+            $("i.close_notification").on("click", function () {
+                $("#notification_bar").fadeOut();
+            });
+        });
+
+
+
+        $("input.addCustomService_btn").on("click", function (e) { 
+            e.preventDefault();
+            window.onbeforeunload = null;
+
+            if( !confirm('Are you sure you want to continue?')) {
+                return false;
+            }
+            let item_id             = $(this).data("itemid");
+            let customServiceLabel  = $(this).parents("tr").find("input.customServiceLabel").val();
+            let customServicePrice  = $(this).parents("tr").find("input.customServicePrice").val();
+
+            $.ajax({
+                url:'/admin/add/custom_service',
+                type: "POST",
+                async: true,
+                data: {
+                    "item_id": item_id,
+                    "customServiceLabel": customServiceLabel,
+                    "customServicePrice": customServicePrice,
+
+                }, success: function (response) {
+                    response    = $.parseJSON( response );
+                    if(response.status == "success"){
+                        $("input.customServiceLabel").val("");
+                        $("input.customServicePrice").val("");
+
+                        $("#notification_bar .notification_container p").html("Custom service has been added!");
+                        $("#notification_bar").show().css('display', 'flex');
+                        setTimeout(function() {
+                            $("section.sidebar").css("margin-top", "-70px");
+                            $( "div#_easyadmin_form_design_element_18" ).load( location.href + " div#_easyadmin_form_design_element_18" );
+                            $("#notification_bar").fadeOut();
+                            $('input[name="order[prestatus]"]').val(0);
+                        }, 3000);
+                    }else{
+                        alert(response.message);
+                    }
+                    
+                }
+            });
+
+        });
+
+
+        $("select.addons_selection").change(function (e) { 
+            e.preventDefault();
+            window.onbeforeunload = null;
+
+            if( !confirm('Are you sure you want to continue?')) {
+                return false;
+            }
+            let item_id     = $(this).data("itemid");
+            let addon_id    = $(this).val();
+            let adultCount  = $(this).parents("tr").find("input.adultCount.qty").val();
+            let childCount  = $(this).parents("tr").find("input.childCount.qty").val();
+
+            $.ajax({
+                url:'/admin/add/addon',
+                type: "POST",
+                async: true,
+                data: {
+                    "addon_id": addon_id,
+                    "item_id": item_id,
+                    "adultCount": adultCount,
+                    "childCount": childCount,
+
+                },
+                success: function (response) {
+                    response    = $.parseJSON( response );
+                    // console.log(response);
+                    if(response.status == "success"){
+                        $("select.addons_selection option:selected").prop("selected", false)
+                        $("input.adultCount").val(0);
+                        $("input.childCount").val(0);
+
+                          
+                        $("#notification_bar .notification_container p").html("Addon has been added!");
+                        $("#notification_bar").show().css('display', 'flex');
+                        setTimeout(function() {
+                            $("section.sidebar").css("margin-top", "-70px");
+                            $( "div#_easyadmin_form_design_element_18" ).load( location.href + " div#_easyadmin_form_design_element_18" );
+                            $("#notification_bar").fadeOut();
+                            $('input[name="order[prestatus]"]').val(0);
+                        }, 3000);
+                    }else{
+                        alert(response.message);
+                    }
+                    
+                }
+            });
+
+        });
+
+        $("select.extras_selection").change(function (e) { 
+            e.preventDefault();
+            window.onbeforeunload = null;
+
+            if( !confirm('Are you sure you want to continue?')) {
+                return false;
+            }
+            let item_id  = $(this).data("itemid");
+            let extra_id = $(this).val();
+            let passengerCount  = $(this).parents("tr").find("input.passengerCount.qty").val();
+            
+
+            $.ajax({
+                url:'/admin/add/extra',
+                type: "POST",
+                async: true,
+                data: {
+                    "extra_id": extra_id,
+                    "item_id": item_id,
+                    "passengerCount": passengerCount
+
+                },
+                success: function (response) {
+                    response    = $.parseJSON( response );
+                    // console.log(response);
+                    if(response.status == "success"){
+                        $("select.extras_selection option:selected").prop("selected", false)
+                        $("input.passengerCount").val(0);
+                        $("#notification_bar .notification_container p").html("Extra has been added!");
+                        $("#notification_bar").show().css('display', 'flex');
+                        setTimeout(function() {
+                            $("section.sidebar").css("margin-top", "-70px");
+                            $( "div#_easyadmin_form_design_element_18" ).load( location.href + " div#_easyadmin_form_design_element_18" );
+                            $("#notification_bar").fadeOut();
+                            $('input[name="order[prestatus]"]').val(0);
+                        }, 3000);
+                    }else{
+                        alert(response.message);
+                    }
+                }
+            });
+
+        });
+
+
+
+    // JS FOR QTY BOX
+    function wcqib_refresh_quantity_increments() {
+        jQuery("div.quantity:not(.buttons_added), td.quantity:not(.buttons_added)").each(function(a, b) {
+            var c = jQuery(b);
+            c.addClass("buttons_added"), c.children().first().before('<input type="button" value="-" class="minus" />'), c.children().last().after('<input type="button" value="+" class="plus" />')
+        })
+    }
+    String.prototype.getDecimals || (String.prototype.getDecimals = function() {
+        var a = this,
+            b = ("" + a).match(/(?:\.(\d+))?(?:[eE]([+-]?\d+))?$/);
+        return b ? Math.max(0, (b[1] ? b[1].length : 0) - (b[2] ? +b[2] : 0)) : 0
+    }), jQuery(document).ready(function() {
+        wcqib_refresh_quantity_increments()
+    }), jQuery(document).on("updated_wc_div", function() {
+        wcqib_refresh_quantity_increments()
+    }), jQuery(document).on("click", ".plus, .minus", function() {
+        var a = jQuery(this).closest(".quantity").find(".qty"),
+            b = parseFloat(a.val()),
+            c = parseFloat(a.attr("max")),
+            d = parseFloat(a.attr("min")),
+            e = a.attr("step");
+        b && "" !== b && "NaN" !== b || (b = 0), "" !== c && "NaN" !== c || (c = ""), "" !== d && "NaN" !== d || (d = 0), "any" !== e && "" !== e && void 0 !== e && "NaN" !== parseFloat(e) || (e = 1), jQuery(this).is(".plus") ? c && b >= c ? a.val(c) : a.val((b + parseFloat(e)).toFixed(e.getDecimals())) : d && b <= d ? a.val(d) : b > 0 && a.val((b - parseFloat(e)).toFixed(e.getDecimals())), a.trigger("change")
+    });
+    </script>
+{% endblock %}
+

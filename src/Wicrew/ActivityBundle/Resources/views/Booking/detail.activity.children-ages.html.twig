@@ -1,0 +1,74 @@
+<style>
+#dynamic-select-inputs-children .floating-label-wrap>select ~ .floating-label {
+    font-size: 10px;
+    font-weight: bold;
+    top: 8px;
+}
+
+#dynamic-select-inputs-children .floating-label-wrap>select:focus-visible {
+    outline: none;
+}
+
+#dynamic-select-inputs-children .floating-label-wrap:has(>select:focus-visible) {
+    outline: -webkit-focus-ring-color auto 1px;
+    outline: -moz-focus-ring-color auto 1px;
+    outline: focus-ring-color auto 1px;
+}
+
+#dynamic-select-inputs-children .floating-label-wrap {
+    margin-top: 10px;
+    padding-top: 10px;
+}
+</style>
+<script type="text/javascript">
+    const inputChildrenId = '{{ childCountID }}'
+    const postDataSection = '{{ postDataSection }}'
+    const childrenAges = '{{ childrenAges }}'//Value obtained from the Cart page when going back to edit a booking activity form
+    const inputChildrenSelector = document.getElementById(inputChildrenId);
+
+    const childrenAgesList = childrenAges.split(',')
+
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("dom loaded")
+        if (inputChildrenSelector.value > 0) {
+            setTimeout(function() {
+                inputChildrenSelector.dispatchEvent(new Event('change'));
+            }, 1000);
+        }
+    });
+
+    inputChildrenSelector.addEventListener('change', function() {
+        const nearestColBlock = inputChildrenSelector.closest('.col-block');
+        const childrenNumber = inputChildrenSelector.value;
+
+        if (document.getElementById('dynamic-select-inputs-children')) {
+            document.getElementById('dynamic-select-inputs-children').remove();
+        }
+
+        const dynamicSelectInputs = document.createElement('div');
+        dynamicSelectInputs.id = 'dynamic-select-inputs-children';
+
+        for (let divIdentifier = 0; divIdentifier < childrenNumber; divIdentifier++) {
+            let childAge = '';
+            if (typeof childrenAgesList[divIdentifier] !== 'undefined') {
+                childAge = childrenAgesList[divIdentifier]
+            }
+
+            let ageOptions = '';
+            for (let age = 0; age <= 11; age++) {
+                ageOptions += `<option value="${age}" ${age == childAge ? 'selected' : ''}>${age} year old</option>`;
+            }
+
+            dynamicSelectInputs.innerHTML += `
+            <div class="floating-label-wrap">
+                <select required="required" id="children-${divIdentifier}-age" name=${postDataSection}[children_ages][${divIdentifier}]">
+                    <option value="">Select age</option>
+                    ${ageOptions}
+                </select>
+                <label class="floating-label" for="children-${divIdentifier}">Child ${divIdentifier + 1}</label>
+            </div>    
+            `;
+        }
+        nearestColBlock.appendChild(dynamicSelectInputs);
+    })
+</script>

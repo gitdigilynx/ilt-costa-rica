@@ -1,0 +1,13 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+    <div class="main-content" id="main_content">
+        {% block mainContent %}{% endblock %}
+
+        {% block testimonials %}{% include "@WicrewPage/testimonials.html.twig" %}{% endblock %}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {% include "@WicrewProduct/Product/transportationtype.js.html.twig" %}
+{% endblock %}

@@ -1,0 +1,115 @@
+<div class="summary summary-main-block">
+    <h2>{{ 'sale.summary'|trans() }}</h2>
+    {% set bookingNumber = 1 %}
+    {# @var subtotal \App\Wicrew\CoreBundle\Service\Money #}
+    {% set subtotal = newMoney() %}
+    {# @var taxes \App\Wicrew\CoreBundle\Service\Money #}
+    {% set taxes = newMoney() %}
+    {# @var grandTotal \App\Wicrew\CoreBundle\Service\Money #}
+    {% set grandTotal = newMoney() %}
+    {% for summary in summaries %}
+        {% if isPaymentMail is defined and isPaymentMail %}
+            {% include "@WicrewSale/Booking/Base/summary.section.html.twig" with { "summary": summary, "bookingNumber": bookingNumber, "order": order, "isPaymentMail": isPaymentMail, "itemNumber": loop.index, "itemsCustomServices": itemsCustomServices } only %}
+        {% else %}
+            {% include "@WicrewSale/Booking/Base/summary.section.html.twig" with { "summary": summary, "bookingNumber": bookingNumber } only %}
+        {% endif %}
+        {% set bookingNumber = bookingNumber + 1 %}
+        {% set subtotal = subtotal.add(summary.subtotalPrice.rackPrice) %}
+        {% set taxes = taxes.add(summary.totalTaxes.rackPrice) %}
+        {% set grandTotal = grandTotal.add(summary.grandTotal.rackPrice) %}
+    {% endfor %}
+
+    {% if isPaymentMail is defined and isPaymentMail %}
+        {% set subtotal = order.getOrderHistoryTotal()['totalDue'] %}
+        {% set grandTotal = order.getOrderHistoryTotal()['totalDue']  %}
+    {% endif %}
+
+    {% set grandTotalWithoutPromo = grandTotal %}
+
+    <div class="summary-subtotal">
+        <div class="row-block-flex">
+            <div class="col-left">
+                {{ 'subtotal.title'|trans }}
+            </div>
+
+            <div id="booking-subtotal" class="col-right">
+                {{ 'currency.symbol'|trans }}{{ subtotal }} {{ 'currency.text'|trans }}
+            </div>
+        </div>
+
+        {% if pricesIncludeTax() %}
+            {% if (isPaymentMail is not defined or not isPaymentMail) %}
+                <div class="row-block-flex">
+                    <div class="col-left">
+                        {{ 'tax.title'|trans }}
+                    </div>
+
+                    <div id="booking-taxes" class="col-right">
+                        {{ 'currency.symbol'|trans }}{{ taxes }} {{ 'currency.text'|trans }}
+                    </div>
+                </div>
+            {% else %}
+            {# THIS IS MAIL PAYMENT  #}
+           
+            {% endif %}
+        {% endif %}
+       
+
+        {% if discountValues is defined %}
+            <br>
+            <div class="discount-code-list">
+                {% for discountValue in discountValues %}
+                    <div class="row-block-flex" style="color: #ff9a52">
+                        <div class="col-left">
+                            {{ discountValue.discount.name }} <span class="fa fa-trash discount-code-remove" data-discount-id="{{ discountValue.discount.id }}" style="cursor: pointer"></span>
+                        </div>
+
+                        <div class="col-right discount-value" data-value="{{discountValue.discountRack.toCents()}}">
+                            -{{ 'currency.symbol'|trans }}{{ discountValue.discountRack }} {{ 'currency.text'|trans }}
+                        </div>
+                    </div>
+                    {% set grandTotal = grandTotal.subtract(discountValue.discountRack) %}
+                {% endfor %}
+            </div>
+            <br>
+            {# {% if isPaymentMail is not defined or not isPaymentMail %} #}
+                <div class="row-block-flex" style="color: white;">
+                    <div class="col-left discount-code-question" id="discount-code-question" data-discount-form-hidden="false">
+                        {{'do.you.have.a.discount.code'|trans()}}
+                    </div>
+
+                    <div id="booking-subtotal" class="col-right">
+                    </div>
+                </div>
+
+                <div id="discount-code-form" style="">
+                    <div class="row-block-flex discount-code-form" style="color: white;">
+                        <div class="col-left" style="margin-right: 9px;">
+                            <input type="text" style="color: #070d1c; background-color: white;height: 30px;margin-right: 44px;border-radius: 2px;border: none;width: 114px; width: 100%; font-size: 14px;color: #070d1c; padding-left: 15px;" class="" id="discount-code" placeholder="Enter code here">
+                        </div>
+
+                        <div id="booking-subtotal" class="col-right">
+                            <button type="button" style="text-align: center;height: 30px;line-height: 16px;font-size: 12px;border-radius: 2px;" class="btn-black lg-btn" placeholder="Enter code here" id="discount-code-button">
+                                Apply
+                            </button>
+                        </div>
+                    </div>
+                    <p style="color: #ff9595;display:none;" id="discount-code-error-message">Discount code not available</p>
+                </div>
+            {# {% endif %} #}
+        {% endif %}
+    </div>
+
+    <div class="total summary-total">
+        <div class="title-block">{{ 'sale.summary.total'|trans }}</div>
+        <div class="total-price-block">
+            <div id="booking-grand" class="price-block" data-value="{{ grandTotalWithoutPromo.toCents() }}">
+                {{ 'currency.symbol'|trans }}{{ grandTotal }}
+            </div>
+
+            <div class="currency-block">USD</div>
+        </div>
+    </div>
+</div>
+
+{% include "@WicrewSale/Booking/Base/summary.js.html.twig" %}

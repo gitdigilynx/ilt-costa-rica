@@ -1,0 +1,33 @@
+{% set readonly = false %}
+<select style="padding-top: 12px;" id="activityType" class="updates-summary-of-{{ bookingNumber }}" data-bookingnumber="{{ bookingNumber }}" name="{{ postDataSection }}[activityType]" required="required">
+    <option value="" selected="selected">Please select</option>
+    {% for _activityType in activity.types %}
+        <option value="{{ _activityType }}"  
+        {% if ( (dl_activityType is defined) and (dl_activityType == _activityType) ) or ( ( dl_activity[bookingNumber]["activityType"] is defined) and (dl_activity[bookingNumber]["activityType"] == _activityType) ) %} 
+            selected="selected" 
+        {% endif %}
+        >
+            {% if _activityType == 1 %}
+                Group
+            {% else %}
+                Private
+            {% endif %}
+        </option>
+    {% endfor %}
+</select>
+<label style="top: 6px;" class="floating-label" for="activityType">Type</label>
+<style>
+select#activityType + span.select2 span.select2-selection{
+    padding-top: 8px;
+    padding-left: 15px;
+}
+</style>
+<script>
+$('select#activityType').on('change', function() {
+    let bookingNumber = $(this).data("bookingnumber");
+    eval("updateSummaryOfBookingNumber_" + bookingNumber + "()");
+});
+$( document ).ready(function() {
+    $('select#activityType').change();
+});
+</script>

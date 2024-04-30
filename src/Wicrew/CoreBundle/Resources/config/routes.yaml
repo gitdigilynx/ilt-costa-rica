@@ -1,0 +1,4 @@
+#wicrew_member:
+#    resource: '@WicrewCoreBundle/Controller/IndexController.php'
+#    type: annotation
+##    prefix: /core

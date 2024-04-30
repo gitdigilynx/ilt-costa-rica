@@ -1,0 +1,219 @@
+{% set currencySymbol = 'currency.symbol'|trans() %}
+{% set currencyText = 'currency.text'|trans() %}
+{% set orderHasCustomServices = false %}
+{% if (isPaymentMail is defined and isPaymentMail) and ((customServices is defined and customServices) or (summary.customServices is defined and summary.customServices|length > 0) or (itemsCustomServices[itemNumber - 1] is defined and itemsCustomServices[itemNumber - 1]|length > 0 )) %}
+    {% set orderHasCustomServices = true %}
+{% endif %}
+
+{% if orderHasCustomServices %}
+<div class="summary-item" id="summary-{{ bookingNumber }}">
+    {% set showFromCustomServicesVar = true %}
+    {% if summary.customServices %}
+        {% set showFromCustomServicesVar = false %}
+        {% for custom_service in summary.customServices %}
+            <div class="summary-name row-block-flex">
+                <div class="col-left">Custom Services</div>
+                <div class="col-right">${{ custom_service['value']|number_format(2, '.', ',') }} USD</div>
+            </div>
+            <div class="row-block summary-info">
+                <ul>
+                    <li>Service Date: {{ summary.pickupDate|formatNoNull('F jS, Y') }}</li>
+                    <li class="row-block-flex justify-content-start"><div>{{ summary.adultCount }} x {{ 'core.adults'|trans }}</div></li>
+                    {% if summary.childCount > 0 %}<li class="row-block-flex justify-content-start"><div>{{ summary.childCount }} x {{ 'core.children'|trans }}</div></li>{% endif %}
+                    <li> {{custom_service['name']}} </li>
+                </ul>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if (customServices is defined and customServices) and showFromCustomServicesVar %}
+        {% for custom_service in customServices %}
+            <div class="summary-name row-block-flex">
+                <div class="col-left">Custom Services</div>
+                <div class="col-right">${{ custom_service['value']|number_format(2, '.', ',') }} USD</div>
+            </div>
+            <div class="row-block summary-info">
+                <ul>
+                    <li>Service Date: {{ summary.pickupDate|formatNoNull('F jS, Y') }}</li>
+                    <li class="row-block-flex justify-content-start"><div>{{ summary.adultCount }} x {{ 'core.adults'|trans }}</div></li>
+                    {% if summary.childCount > 0 %}<li class="row-block-flex justify-content-start"><div>{{ summary.childCount }} x {{ 'core.children'|trans }}</div></li>{% endif %}
+                    <li> {{custom_service['name']}} </li>
+                </ul>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if (itemsCustomServices is defined and itemsCustomServices) and showFromCustomServicesVar %}
+        {% for custom_service in itemsCustomServices[itemNumber - 1] %}
+            <div class="summary-name row-block-flex">
+                <div class="col-left">Custom Services</div>
+                <div class="col-right">${{ custom_service['value'].__toString|number_format(2, '.', ',') }} USD</div>
+            </div>
+            <div class="row-block summary-info">
+                <ul>
+                    <li>Service Date: {{ summary.pickupDate|formatNoNull('F jS, Y') }}</li>
+                    <li class="row-block-flex justify-content-start"><div>{{ summary.adultCount }} x {{ 'core.adults'|trans }}</div></li>
+                    {% if summary.childCount > 0 %}<li class="row-block-flex justify-content-start"><div>{{ summary.childCount }} x {{ 'core.children'|trans }}</div></li>{% endif %}
+                    <li> {{custom_service['name']}} </li>
+                </ul>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+{% else %}
+<div class="summary-item" id="summary-{{ bookingNumber }}">
+    <div class="summary-name row-block-flex">
+        <div class="col-left">
+            {{ summary.titlePrice.rowTitle }}
+        </div>
+
+        <div class="col-right">
+            {{ currencySymbol }}{{ summary.titlePrice.displayText }} {{ currencyText }}
+        </div>
+    </div>
+
+    <div class="row-block summary-info">
+        <ul>
+            {% if isPaymentMail is defined and isPaymentMail %}
+                <li>Service Date: {{ summary.pickupDate|formatNoNull('F jS, Y') }}</li>
+            {% endif %}
+            
+            {% for bulletPoint in summary.bulletList %}
+                <li>{{ bulletPoint }}</li>
+            {% endfor %}
+            <li>{{ 'booking.from'|trans() }} {{ summary.areaFrom.name }}</li>
+            <li class="area_address">{{ summary.areaFrom.address }}</li>
+            <li>{{ 'booking.to'|trans() }} {{ summary.areaTo.name }}</li>
+            <li class="area_address">{{ summary.areaTo.address }}</li>
+            <li class="row-block-flex justify-content-start">
+                <div>
+                    {{ summary.adultCount }} x {{ 'core.adults'|trans }}
+                </div>
+                <div class="ml-auto">
+                    {# {{ currencySymbol }}{{ summary.adultCount * summary.adultRackPrice }} {{ currencyText }} #}
+                </div>
+            </li>
+            {% if summary.childCount > 0 %}
+            <li class="row-block-flex justify-content-start">
+                <div>
+                    {{ summary.childCount }} x {{ 'core.children'|trans }}
+                </div>
+                <div class="ml-auto">
+                    {# {{ currencySymbol }}{{ summary.childCount * summary.childRackPrice }} {{ currencyText }} #}
+                </div>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+
+    {% for rowBlock in summary.otherRowBlocks %}
+        <div class="row-block-flex">
+            <div class="col-left">
+                {{ rowBlock.rowTitle }}
+            </div>
+
+            <div class="col-right">
+                {{ rowBlock.displayText }}
+            </div>
+        </div>
+    {% endfor %}
+
+    {% if summary.areaFrom.addFee or summary.areaTo.addFee or summary.addons|length > 0 or summary.extras|length > 0 %}
+        <div class="row-block summary-info">
+            {# {{dump(summary.addons)}} #}
+            <div class="summary-name">
+                <div class="col-left">
+                    {{ 'booking.extras'|trans }}
+                </div>
+            </div>
+            {% if summary.areaFrom.addFee %}
+                <div class="row-block-flex">
+                    <div class="col-left">
+                        {{ summary.areaFrom.additionalFee.rowTitle }}
+                    </div>
+
+                    <div class="col-right">
+                        {{ summary.areaFrom.additionalFee.displayText }}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if summary.areaTo.addFee %}
+                <div class="row-block-flex">
+                    <div class="col-left">
+                        {{ summary.areaTo.additionalFee.rowTitle }}
+                    </div>
+
+                    <div class="col-right">
+                        {{ summary.areaTo.additionalFee.displayText }}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% set order_item_ids = [] %}
+            {% if isPaymentMail is defined and isPaymentMail %}
+                {% for order_item in order.items %}
+                    {% if order_item.id not in order_item_ids %}
+                       
+                        {% if summary.addons|length > 0 and loop.index == itemNumber %}
+                            {% for addon in order_item.addons %}
+                                <div class="row-block-flex">
+                                    <div class="col-left">
+                                        {{ addon.label|raw }} <br>
+                                        <small>Tax: ${{ addon.tax|number_format(2, '.', ',') }} USD</small>
+                                    </div>
+
+                                    <div class="col-right">
+                                        ${{ (addon.adultRackPrice + addon.childRackPrice + addon.extraTransportation + addon.tax)|number_format(2, '.', ',') }} USD
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        {% if summary.extras|length > 0 and loop.index == itemNumber  %}
+                            {% for extra in order_item.extras %}
+                                <div class="row-block-flex">
+                                    <div class="col-left">
+                                        {{ extra.label|raw }}  <br>
+                                        <small>Tax: ${{ extra.tax|number_format(2, '.', ',') }} USD</small>
+                                    </div>
+
+                                    <div class="col-right">
+                                        ${{ (extra.rackPrice + extra.tax)|number_format(2, '.', ',') }} USD
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        {% set order_item_ids = order_item_ids|merge([order_item.id]) %}
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                {% for addon in summary.addons %}
+                    <div class="row-block-flex">
+                        <div class="col-left">
+                            {{ addon.rowTitle|raw }}
+                        </div>
+
+                        <div class="col-right">
+                            {{ addon.displayText }}
+                        </div>
+                    </div>
+                {% endfor %}
+
+                {% for extra in summary.extras %}
+                    <div class="row-block-flex">
+                        <div class="col-left">
+                            {{ extra.rowTitle|raw }}
+                        </div>
+
+                        <div class="col-right">
+                            {{ extra.displayText }}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endif %}

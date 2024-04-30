@@ -1,0 +1,81 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-timepicker/1.10.0/jquery.timepicker.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-timepicker/1.10.0/jquery.timepicker.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function () {
+    const DEPARTURE_TIME_SINGLE_CLASS = ".departure-time-single";
+    const DEPARTURE_TIME_COLLECTION_CLASS = ".departure-times-collection";
+
+    $('.validate-form').submit(function () {
+        let error = validateForm();
+        if (error) {
+            setTimeout(function() {
+                $('button.action-save').removeAttr('disabled');
+            }, 100);
+
+            return false;
+        }
+    });
+
+    let transportTypeSelect = $("select[name='product[transportationType]']");
+
+    initTimePicker($(".validate-form"));
+    updateTransportTypeFields(parseInt(transportTypeSelect.val().toString()))
+
+    // Throw event whenever the product transportation type is changed.
+    transportTypeSelect.on("change", function () {
+        $(document).trigger("transportTypeChange", [ { transportType: $(this).val() } ]);
+    })
+
+    $(document).on("transportTypeChange", function (e, data) {
+        let transportType = data.transportType;
+        updateTransportTypeFields(parseInt(transportType));
+    });
+
+    /**
+     *
+     * @param {int} transportType
+     */
+    function updateTransportTypeFields(transportType) {
+        if (transportType === {{ constant('App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_SHARED_SHUTTLE') }}) {
+            let isNullCheckbox = $(DEPARTURE_TIME_SINGLE_CLASS).find(".nullable-control input");
+            if (!isNullCheckbox.is(":checked")) {
+                isNullCheckbox.trigger("click");
+            }
+
+            $(DEPARTURE_TIME_SINGLE_CLASS).addClass("hidden");
+            $(DEPARTURE_TIME_COLLECTION_CLASS).removeClass("hidden");
+        } else {
+            $(DEPARTURE_TIME_SINGLE_CLASS).removeClass("hidden");
+            $(DEPARTURE_TIME_COLLECTION_CLASS).addClass("hidden");
+        }
+    }
+
+    // Disable time-based price range fields that aren't enabled.
+    $('.group-enabler input').each(function () {
+        $(this).on("click", function () {
+            updateGroupOfSyncedFields($(this));
+        });
+
+        updateGroupOfSyncedFields($(this));
+    });
+
+    function updateGroupOfSyncedFields(enabledCheckbox) {
+        let enabled = enabledCheckbox.is(":checked");
+        let allInputsInGroup = enabledCheckbox.parents(".time-based-group-of-fields").find('input:not([id$="Enabled"]), select');
+
+        allInputsInGroup.each(function () {
+            if (enabled) {
+                $(this).parents(".form-group").show();
+            }  else {
+                $(this).parents(".form-group").hide();
+
+                // If a field requires a number and they were left blank, default the now-disabled field to 0.
+                if ($(this).data("validate") === "isnumber:1" && $(this).val() === "") {
+                    $(this).val("0");
+                }
+            }
+        });
+    }
+});
+</script>

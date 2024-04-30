@@ -1,0 +1,154 @@
+{% if selectedChidlrenAreas is not defined %}
+    {% set selectedChidlrenAreas = [] %}
+{% endif %}
+
+
+
+
+{% if tripType is defined %}
+    {% set tripSearchType = tripType %}
+{% else %}
+    {% set tripSearchType = constant('App\\Wicrew\\ProductBundle\\Entity\\Product::TRIP_TYPE_ONE_WAY') %}
+{% endif %}
+ 
+{% set departure_index = 1 %}
+{% set returning_index = 2 %}
+
+<div class="ride-index-header">
+	<h5 class="ride-index-title">Ride {{ index }}</h5>
+	<div class="ride-date-info">
+		{% if index == returning_index %}
+			<span class="fa fa-calendar-day"></span> 
+			{% if dateTo|length != 0 %}
+				{{ dateTo }}
+			{% else %}
+				{{ dateFrom }}
+			{% endif %}
+		{% else %}
+			<span class="fa fa-calendar-day"></span> {{ dateFrom }}
+		{% endif %}
+	</div>
+</div>
+<div class="ride-index-circles">
+    <div class="connected-circle"></div>
+    <div class="connected-circle"></div>
+</div>
+<div class="trip-points" style="flex-direction: column; justify-content: flex-start; align-items: flex-start; max-width: max-content;">
+    <div><span style='font-weight: 400;'>Pick-up Area: </span>
+		{% if selectedChidlrenAreas.child_area_from is defined %}
+			{{ selectedChidlrenAreas.child_area_from|first }}
+		{% else %}	
+			{{ getAreaTextById(pickAreaID) }}
+		{% endif %}
+	</div>
+    <div><span style='font-weight: 400;'>Drop-off Area: </span>
+		{% if selectedChidlrenAreas.child_area_to is defined %}
+			{{ selectedChidlrenAreas.child_area_to|first }}
+		{% else %}	
+			{{ getAreaTextById(dropAreaID) }}
+		{% endif %}
+	</div>
+</div> 
+
+
+{% set area_from 			= getAreaTextById(pickAreaID) %}
+{% set area_to 				= getAreaTextById(dropAreaID) %}
+{% set showDriverOptions 	= false %}
+
+{% set showDriverOptions_areas_array = [
+	['San Jose Airport', 'Tambor' ],
+	['San Jose Airport', 'Montezuma' ],
+	['San Jose Airport', 'Mal-Pais/Santa Teresa'],
+	['Tambor', 'San Jose Airport'],
+	['Montezuma', 'San Jose Airport'],
+	['Mal-Pais/Santa Teresa', 'San Jose Airport'],
+	['Alajuela', 'Tambor' ],
+	['Alajuela', 'Montezuma' ],
+	['Alajuela', 'Mal-Pais/Santa Teresa'],
+	['Tambor', 'Alajuela'],
+	['Montezuma', 'Alajuela'],
+	['Mal-Pais/Santa Teresa', 'Alajuela'],
+	['San Jose (Downtown)', 'Tambor' ],
+	['San Jose (Downtown)', 'Montezuma' ],
+	['San Jose (Downtown)', 'Mal-Pais/Santa Teresa'],
+	['Tambor', 'San Jose (Downtown)'],
+	['Montezuma', 'San Jose (Downtown)'],
+	['Mal-Pais/Santa Teresa', 'San Jose (Downtown)'],
+	['Costa Rica Marriott Hacienda Belen', 'Tambor' ],
+	['Costa Rica Marriott Hacienda Belen', 'Montezuma' ],
+	['Costa Rica Marriott Hacienda Belen', 'Mal-Pais/Santa Teresa'],
+	['Tambor', 'Costa Rica Marriott Hacienda Belen'],
+	['Montezuma', 'Costa Rica Marriott Hacienda Belen'],
+	['Mal-Pais/Santa Teresa', 'Costa Rica Marriott Hacienda Belen'],
+	['Costa Rica Marriott San Jose (Belen)', 'Tambor' ],
+	['Costa Rica Marriott San Jose (Belen)', 'Montezuma' ],
+	['Costa Rica Marriott San Jose (Belen)', 'Mal-Pais/Santa Teresa'],
+	['Tambor', 'Costa Rica Marriott San Jose (Belen)'],
+	['San Jose Airport (Juan Santamaria Airport SJO)', 'Mal-Pais/Santa Teresa'],
+    ['Alajuela', 'Mal-Pais/Santa Teresa'],
+    ['Costa Rica Marriott San Jose (Belen)', 'Mal-Pais/Santa Teresa'],
+    ['Jaco', 'Mal-Pais/Santa Teresa'],
+    ['Quepos/Manuel Antonio', 'Mal-Pais/Santa Teresa'],
+    ['San Jose (Downtown)', 'Mal-Pais/Santa Teresa'],
+    ['Dominical', 'Mal-Pais/Santa Teresa'],
+    ['Puerto Viejo, Limon', 'Mal-Pais/Santa Teresa'],
+    ['Mal-Pais/Santa Teresa', 'San Jose (Downtown)'],
+    ['Mal-Pais/Santa Teresa', 'Alajuela'],
+    ['Mal-Pais/Santa Teresa', 'Costa Rica Marriott San Jose (Belen)'],
+    ['Mal-Pais/Santa Teresa', 'Dominical'],
+    ['Mal-Pais/Santa Teresa', 'Jaco'],
+    ['Mal-Pais/Santa Teresa', 'Puerto Viejo, Limon'],
+    ['Mal-Pais/Santa Teresa', 'Quepos/Manuel Antonio'],
+    ['Mal-Pais/Santa Teresa', 'San Jose Airport (Juan Santamaria Airport SJO)'],
+    ['Alajuela', 'Montezuma'],
+    ['Costa Rica Marriott San Jose (Belen)', 'Montezuma'],
+    ['Dominical', 'Montezuma'],
+    ['Jaco', 'Montezuma'],
+    ['Quepos/Manuel Antonio', 'Montezuma'],
+    ['San Jose (Downtown)', 'Montezuma'],
+    ['San Jose Airport (Juan Santamaria Airport SJO)', 'Montezuma'],
+    ['Montezuma', 'Alajuela'],
+    ['Montezuma', 'Costa Rica Marriott San Jose (Belen)'],
+    ['Montezuma', 'Dominical'],
+    ['Montezuma', 'Jaco'],
+    ['Montezuma', 'Quepos/Manuel Antonio'],
+    ['Montezuma', 'San Jose (Downtown)'],
+    ['Montezuma', 'San Jose Airport (Juan Santamaria Airport SJO)'],
+
+] %}
+
+{% for destinations in showDriverOptions_areas_array %}
+
+	{% set destination_from = destinations[0] %}
+	{% set destination_to 	= destinations[1] %}
+	
+	{% if ( destination_from|lower|trim in area_from|lower|trim ) and ( destination_to|lower|trim in area_to|lower|trim ) %}
+		{% set showDriverOptions 	= true %}
+	{% endif %}
+	
+{% endfor %}
+
+{% if app.request.get('transportTypes') is not empty %}
+	{% if app.request.get('transportTypes')[0] != 1 and app.request.get('transportTypes')[0] != 2 %}
+		{% set showDriverOptions 	= false %}
+	{% endif %}
+{% else %}
+	{% set showDriverOptions 	= false %}
+{% endif %}
+
+{% if showDriverOptions is defined and showDriverOptions %}
+<div class="twoDriverOptionContainer" style='margin-top: 40px;'> 
+	<div class="impNoticeContainer"> 
+		<p>
+			<strong style="color: #FF5733; text-decoration: underline;">Important Notice:</strong><br>
+			Please note that you will need to take a ferry to reach your final destination. Tickets are about $1.70 per person for the ferry and are not included in our rate. Our driver can help you purchase these before boarding the ferry.
+		</p>
+		<p>
+			<strong> Please select from the 2 options below: </strong>
+		</p>
+		<p><strong>2 Driver Option:</strong> Our 1st driver will pick you up and drive you to the ferry, where you will board the ferry on your own with your luggage. The ferry ride takes approx. 1.5 hours, and once you arrive at the other side, our 2nd driver holding a sign with your name on it will be there to greet you, and bring you to your destination. </p>
+		<p><strong>1 Driver Option:</strong> We use only 1 driver all the way to your destination, where the vehicle will board the ferry with you & your belongings, cross to the other side, and then drive you to your final destination.</p>
+	</div>
+</div>
+
+{% endif %}

@@ -1,0 +1,44 @@
+{% extends "base.html.twig" %}
+
+{% block stylesheets %}
+    {{ parent() }}
+
+    {% if page.css is not null %}{{ page.css|raw }}{% endif %}
+{% endblock %}
+
+{% block title %}{{ page.pageTitle }}{% endblock %}
+{% block meta_title %}{{ page.metaTitle }}{% endblock %}
+{% block meta_description %}{{ page.metaDescription }}{% endblock %}
+{% block meta_keywords %}{{ page.metaKeywords }}{% endblock %}
+
+{% block body %}
+ 
+    <section class="page-header">
+        <div class="container">
+            <div class="d-flex content">
+                <div class="align-self-center">
+                    {% if not page.hideHeader %}<h1>{{ page.pageTitle }}</h1>{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="bg"
+            style="background-image: url('{{ absolute_url(asset('bundles/wicrewcore/images/bg-jeep-boat-jeep.jpg')) }}');"></div>
+    </section> 
+
+    <div class="cms-page">
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    {{ page.pageContent|raw }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+ 
+    {% if page.js is not null %}{{ page.js|raw }}{% endif %}
+{% endblock %}

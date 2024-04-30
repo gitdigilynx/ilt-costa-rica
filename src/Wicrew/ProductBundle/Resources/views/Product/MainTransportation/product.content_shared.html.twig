@@ -1,0 +1,157 @@
+<div class="private-transportation-page">
+    <div class="container">
+        <div class="row benefit-title">
+            <div class="col">
+                <h2>Your Benefits</h2>
+            </div>
+        </div>
+
+        <div class="row benefits">
+            <div class="col-12 col-md">
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <img src="{{ absolute_url(asset('bundles/wicrewcore/images/pricetag.svg')) }}" alt="">
+                    </div>
+                    <div class="benefit-content">
+                        <h4>All-inclusive rates</h4>
+                        <p>There are no hidden surprises. Your affordable, all-inclusive rate covers all taxes, tolls,
+                            and fees.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md">
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <img src="{{ absolute_url(asset('bundles/wicrewcore/images/safe.svg')) }}" alt="">
+                    </div>
+                    <div class="benefit-content">
+                        <h4>Reliable, Convenient & Safe</h4>
+                        <p>Schedule your premium shared shuttle service on your needs from major destinations throughout
+                            Costa Rica, and we’ll be there.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md">
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <img src="{{ absolute_url(asset('bundles/wicrewcore/images/flexibility.svg')) }}" alt="">
+                    </div>
+                    <div class="benefit-content">
+                        <h4>Flexibility</h4>
+                        <p>Daily departures throughout the day with flexible times to select from that suit your needs
+                            all while on a budget.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md">
+                <div class="benefit-item">
+                    <div class="benefit-icon">
+                        <img src="{{ absolute_url(asset('bundles/wicrewcore/images/direction.svg')) }}" alt="">
+                    </div>
+                    <div class="benefit-content">
+                        <h4>Perks</h4>
+                        <p>Our premium shared shuttle service is not only affordable, but also provides perks. Free
+                            on-board refreshments, and WiFi.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row our-fleet-title">
+            <div class="col">
+                <h2>Our Fleet</h2>
+            </div>
+        </div>
+
+        <div class="row our-fleet-block shared-shuttles-fleet">
+            <div class="col-12 col-md">
+                <div class="image-block">
+                    <img src="{{ absolute_url(asset('bundles/wicrewcore/images/our-fleet/hyundai-h-1.jpg')) }}"
+                         alt="Hyundai H-1">
+                </div>
+                <div class="content-block">
+                    <h3>Hyundai H-1</h3>
+                    <ul>
+                        {% set notesList = getVehicleNoteListByName("Hyundai H-1") %}
+                        {% for note in notesList %}
+                            <li>{{ note }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-12 col-md">
+                <div class="image-block">
+                    <img src="{{ absolute_url(asset('bundles/wicrewcore/images/our-fleet/mercedes-sprinter.jpg')) }}"
+                         alt="Mercedes Sprinter">
+                </div>
+                <div class="content-block">
+                    <h3>Mercedes Sprinter</h3>
+                    <ul>
+                        {% set notesList = getVehicleNoteListByName("Mercedes Sprinter") %}
+                        {% for note in notesList %}
+                            <li>{{ note }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-12 col-md">
+                <div class="image-block">
+                    <img src="{{ absolute_url(asset('bundles/wicrewcore/images/our-fleet/coaster-bus.jpg')) }}"
+                         alt="Coaster Bus">
+                </div>
+                <div class="content-block">
+                    <h3>Coaster Bus</h3>
+                    <ul>
+                        {% set notesList = getVehicleNoteListByName("Toyota Coaster") %}
+                        {% for note in notesList %}
+                            <li>{{ note }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="reliable-convenient-safe-block">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <img src="{{ absolute_url(asset('bundles/wicrewcore/images/reliable-convenient-safe.jpg')) }}"
+                     alt="Premium Shared Shuttles">
+
+                <h2>Premium Shared Shuttles</h2>
+                <p>Our premium shared shuttle transportation option is in an air-conditioned minibus and runs between
+                    popular destinations throughout Costa Rica. Every premium shared shuttle service includes a
+                    bilingual driver, water bottle service, beer or juice & WiFi. It operates daily with multiple
+                    departure times throughout the day. They are subject to availability and must be reserved in
+                    advance. Shared shuttle transportation is for budget minded travelers or group sizes of one or two,
+                    and is a convenient, reliable, and an economical way to travel around popular destination in Costa
+                    Rica. However, if your group is larger than 3, then our private transportation service may offer a
+                    better price per person and a more flexible, and personal service. Click here to go to private
+                    transportation.</p>
+                <p>Along the way, there will be at least one stop where passengers can use the facilities, get a snack,
+                    or to just stretch your legs out. Our premium shuttle service provides a door-to-door service,
+                    picking passengers up at an airport or hotel in the starting destination and dropping you off at
+                    your final destination.</p>
+                <p>If your hotel is located outside the area’s main hotel zone the shuttle will not provide this
+                    door-to-door service, and in these cases, a taxi can take you and your group to the shuttle pick-up
+                    or your final hotel stop.</p>
+                <p><strong>Terms and conditions</strong></p>
+                <p>It is possible that this travel will include a stop and vehicle change. Each passenger is allowed one
+                    carry-on and one item of luggage. The carry-on must stay with the passenger at all times, while the
+                    luggage item will be tagged and placed in the luggage compartment. The shuttle company will not be
+                    responsible for loss or damage to carry-on items left unsupervised by the passenger. This includes
+                    carry-on items incorrectly stored with the luggage. Each additional piece of luggage has a cost of
+                    $15.00 (subject to space). All passengers must be at the pick-up point at the scheduled time. Anyone
+                    running rate, 15 minutes allowance will be applied. If for any reason, you miss your shuttle, you
+                    will be able to take the next one at the time specified or pay extra for a private service. No
+                    refunds for no shows. If you need to cancel your shared shuttle service, a written email must be
+                    sent to info@iltcostarica.com at least 48 hours before your shuttle service to be eligible for a
+                    full refund.</p>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,249 @@
+{% block mailcontent %}
+    {% set fullName = orders|first.order.firstName ~ ' ' ~ orders|first.order.lastName %}
+    
+	<div class="contact-content">
+		<div class="header-information">
+			<div>Hi <strong> {{ fullName }}</strong>,</div>
+            <br />
+			<div>Just a friendly reminder about your upcoming service(s) below. Please verify the information is correct.</div>
+            <br />
+		</div>
+        {# @var assignment \App\Wicrew\SaleBundle\Entity\OrderItemHasDriver #}
+        {% for item in orders %}
+            {# @var orderItem \App\Wicrew\SaleBundle\Entity\OrderItem #}
+        
+            <div class="left-panel">
+                
+                <div>
+                    Reservation ID: <span style="color:red"><strong>#RJ{{item.order.id}}</strong></span>
+                </div>
+
+                <div>
+                    Service Type:  
+                    <span style="text-transform:capitalize">
+                    {% if item.product is not null %}
+                        {{ item.product.transportationType.name }}
+                    {% elseif item.type == constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::TYPE_ACTIVITY_REGULAR') %}
+                        {{ item.activity.name }}
+                    {% elseif item.type == constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::TYPE_ACTIVITY_TRANSPORTATION') %}
+                        {{ item.activity.name ~ 'order.items.activity.transportation'|trans }}
+                    {% endif %}
+                    </span> 
+                </div>
+                <div style="font-weight: bold;">
+                    Client Name: <span style="text-transform: capitalize; font-weight: bold;"> {{item.order.firstName ~ ' ' ~ item.order.lastName }} </span>
+                </div>
+                <div style="font-weight: bold;">
+                    Pickup Date: <span >{{ item.pickDate|date("F jS, Y") }}</span>
+                </div>
+                
+
+                {% if item.pickArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}           
+                    <div>
+                        From:  <span >{{ item.pickArea.name }}</span>
+                    </div>      
+                {% else %}
+                    {% if item.pickAddress %}
+                        <div>
+                            From:  <span >{{ item.pickAddress }}</span>
+                        </div>
+                    {% else %}
+                        <div>
+                            From:  <span >{{ item.pickArea.name }}</span>
+                        </div>      
+                    {% endif %}
+                {% endif %}
+
+                {% if item.dropArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}           
+                    <div>
+                        Drop-off:  <span >{{ item.dropArea.name }}</span>
+                    </div>      
+                {% else %}
+                    {% if item.dropAddress %}
+                        <div>
+                            Drop-off:  <span >{{ item.dropAddress }}</span>
+                        </div>
+
+                    {% else %}
+                        <div>
+                            Drop-off:  <span >{{ item.dropArea.name }}</span>
+                        </div>   
+                    {% endif %}
+                {% endif %}
+
+
+                {% if item.pickArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AREA')) and item.dropArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}           
+                    
+                    {% if item.pickTimeTransport %}
+                        <div>
+                            <span style="background: yellow; font-weight: bold;">Pickup  time: {{item.pickTimeTransport|formatNoNull("H:i")}}</span> 
+                        </div>
+                    {% else %}
+                        <div style="font-weight: bold;">
+                            Pickup time:  <span style="color: red;"> <strong>To be confirmed upon confirmation</strong> </span>  
+                        </div>
+                    {% endif %}
+
+                    {% if item.pickTime %}
+                        <div>
+                            Departure Time: <span>{{item.pickTime|formatNoNull("H:i")}}</span>
+                        </div>
+                    {% endif %}
+                {% elseif item.pickArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) and item.dropArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AREA'))  %}
+                    {% if item.pickTime %}
+                        <div>
+                            <span style="background: yellow; font-weight: bold;">
+                                Arrival Time: <span>{{item.pickTime|formatNoNull("H:i")}}</span>
+                            </span>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    {% if item.pickTime %}
+                        <div>
+
+                            <span style="background: yellow; font-weight: bold;">
+                                Pickup Time: <span>{{item.pickTime|formatNoNull("H:i")}}</span> 
+                            </span>
+                        </div>
+                    {% else %}
+                        <div style="font-weight: bold;">
+
+                            Pickup time:  <span style="color: red;"> <strong>To be confirmed upon confirmation</strong> </span>  
+                        </div>
+                    {% endif %}
+                {% endif %} 
+
+                {% if (item.pickAirlineCompany) or (item.dropAirlineCompany) %}
+                    <div>
+                        Airline: <span>{% if item.pickFlightNumber %}{{item.pickAirlineCompany}}{% else %}{{item.dropAirlineCompany}}{% endif %}</span> 
+                    </div>
+                {% endif %}
+
+                {% if (item.pickFlightNumber) or (item.dropFlightNumber) %}
+                    <div>
+                        Flight #: <span>{% if item.pickFlightNumber %}{{item.pickFlightNumber}}{% else %}{{item.dropFlightNumber}}{% endif %}</span> 
+                    </div>
+                {% endif %}
+
+
+                {% if item.activity is not null %}
+                    <div>
+                        Service Time:  <span>{{ item.tourTime|formatNoNull("H:i") }}</span> 
+                    </div> 
+                {% endif %} 
+                {% if item.product is not null %} 
+                    <div>
+                        Vehicle:  <span >{{ item.product.vehicleType.name }}</span> 
+                    </div>
+                {% endif %} 
+                <div>
+                        Adults:  <span>{{ item.adultCount }}</span> 
+                </div>
+                {% if item.childCount > 0 %}
+                    <div>
+                            Children:  <span>{{ item.childCount }}</span> 
+                    </div> 
+                {% endif %}
+
+                {% if item.product is not null %}
+                    <div>
+                        Travel time:
+                        <span >
+                        {% set hour = item.product.duration|round(0, 'floor')  %}
+                        {% set min = (60 * (item.product.duration - hour))|round  %}
+                        {% if hour <= 0 %}
+                            {{ min ~ ' Minutes ' }}
+                        {% elseif hour == 1 %}
+                            {% if min <= 0 %}
+                                {{ hour ~ ' Hour ' }}
+                            {% elseif min >= 1 %}
+                                {{ hour ~ ' Hour ' ~ min ~ ' Minutes ' }}
+                            {% endif %}
+                        {% elseif hour > 1 %}
+                            {% if min <= 0 %}
+                                {{ hour ~ ' Hours ' }}
+                            {% elseif min >= 1 %}
+                                {{ hour ~ ' Hours ' ~ min ~ ' Minutes ' }}
+                            {% endif %}
+                        {% endif %}
+                        </span>                        
+                    </div> 
+                {% endif %} 
+                
+                {% if item.type == constant('\\App\\Wicrew\\SaleBundle\\Entity\\OrderItem::TYPE_PRIVATE_FLIGHT') %}
+                    <div> 
+                        <div>
+                                {{ 'booking.luggage.weight'|trans }}:   {{ item.luggageWeight }}
+                        </div>
+                        <div>
+                                {{ 'booking.passenger.weight'|trans }}:   {{ item.passengerWeight }}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if item.anyTimeRangeFees %}
+                    <br>
+                    <div>
+                        <div><label>{{ 'order.items.range_fees'|trans() }}</label></div>
+                        {% if item.regularTimeFeeRack is not null %}
+                            <div class="inside">
+                                <label>{{ 'product.section.regular_time_range'|trans }}</label> {{ item.regularTimeFeeRack ~ 'currency.symbol'|trans() }}
+                            </div>
+                        {% endif %}
+                        {% if item.flightPickTimeFeeRack is not null %}
+                            <div class="inside">
+                                <label>{{ 'product.section.flight_pickup_time_range'|trans }}</label> {{ item.flightPickTimeFeeRack ~ 'currency.symbol'|trans() }}
+                            </div>
+                        {% endif %}
+                        {% if item.flightDropTimeFeeRack is not null %}
+                            <div class="inside">
+                                <label>{{ 'product.section.flight_drop_off_time_range'|trans }}</label> {{ item.flightDropTimeFeeRack ~ 'currency.symbol'|trans() }}
+                            </div>
+                        {% endif %}
+                    </div> 
+                {% endif %} 
+                {% if item.customerNotes %}
+                    <div>
+                        <br />
+                        <strong style="font-weight:bold;text-decoration: underline;">Notes:</strong><br>
+                        {{ item.customerNotes|raw }}
+                    </div>
+                {% endif %}
+                
+                {% if item.anyAddons or item.anyExtras%}
+                    <br />
+                    <div>
+                        <strong style="text-decoration:underline">Add-on services:  </strong>
+                    </div>
+                    {% if item.anyAddons %}
+                        <div> 
+                            {% for addon in item.addons %}
+                                {% if addon.addonTitle %}
+                                    {{ addon.addonTitle }} - Adults x {{addon.adultQuantity}} , Child x {{addon.childQuantity}}, Extra Transportation <br>
+                                {% else %}
+                                    {{ addon.label|raw }} - {{ addon.rackPrice ~ 'currency.symbol'|trans() }}<br />
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    {% if item.anyExtras %}
+                        <div> 
+                            {% for extra in item.extras %}
+                                {% if extra.addonTitle %}
+                                    {{ extra.addonTitle }} x {{extra.quantity}} <br>
+                                {% else %}
+                                    {{ extra.label|raw }} - {{ extra.rackPrice ~ 'currency.symbol'|trans() }}<br />
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+            <br><br>
+        {% endfor %}
+	</div>
+	<div style="border-top: 1px solid #cacaca;padding-top: 20px;"></div>
+	<div>If you have any questions or concerns, please do not hesitate to contact us.</div> 
+    <br />
+	<div>Thank you,</div>
+{% endblock %}

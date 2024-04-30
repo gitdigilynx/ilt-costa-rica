@@ -1,0 +1,23 @@
+easy_admin:
+    design:
+        menu:
+            - { css_class: 'menu--system', entity: 'SystemConfiguration', label: 'systemconfig.title', icon: 'cogs', permission: 'ROLE_ADMIN' }
+            - { css_class: 'sidebar--close', label: 'Close', icon: 'angle-left', permission: 'ROLE_ADMIN', url: 'javascript:void(null);' }
+    entities:
+        SystemConfiguration:
+            permissions: 'ROLE_ADMIN'
+            disabled_actions: ['new', 'delete']
+            #            permissions: [ROLE_SUPER_ADMIN]
+            label: systemconfig.title
+            icon: 'cogs'
+            class: App\Wicrew\SystemConfigurationBundle\Entity\SystemConfiguration
+            list:
+                fields:
+                    - key
+                    - label
+                    - value
+            form:
+                fields:
+                    - { property: 'key', type_options: { required: true, disabled: true } }
+                    - { property: 'label', type_options: { required: true } }
+                    - { property: 'value', type_options: { required: true } }

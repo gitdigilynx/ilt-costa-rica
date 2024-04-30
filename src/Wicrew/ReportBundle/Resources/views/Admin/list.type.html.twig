@@ -1,0 +1,19 @@
+{% if value == constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::TYPE_PRIVATE_SHUTTLE') %}
+    {{ "report.type.option.private_shuttle"|trans }}
+{% elseif value == constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::TYPE_SHARED_SHUTTLE') %}
+    {{ "report.type.option.shared_shuttle"|trans }}
+{% elseif value == constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::TYPE_PRIVATE_FLIGHT') %}
+    {{ "report.type.option.private_flight"|trans }}
+{% elseif value == constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::TYPE_PRIVATE_JBJ') %}
+    {{ "report.type.option.private_jbj"|trans }}
+{% elseif value == constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::TYPE_SHARED_JBJ') %}
+    {{ "report.type.option.shared_jbj"|trans }}
+{% elseif value == constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::TYPE_RIDING_JBJ') %}
+    {{ "report.type.option.riding_jbj"|trans }}
+{% elseif value == constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::TYPE_WATER_TAXI') %}
+    {{ "report.type.option.water_taxi"|trans }}
+{% elseif value == constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::TYPE_ACTIVITY_REGULAR') %}
+    {{ "report.type.option.activity_regular"|trans }}
+{% elseif value == constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::TYPE_ACTIVITY_TRANSPORTATION') %}
+    {{ "report.type.option.activity_transportation"|trans }}
+{% endif %}

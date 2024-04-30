@@ -1,0 +1,2 @@
+wicrew_vehicletype:
+    resource: "@WicrewVehicleTypeBundle/Resources/config/routes.yaml"

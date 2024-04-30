@@ -1,0 +1,32 @@
+easy_admin:
+    entities:
+        CronLog:
+            permissions: [ROLE_ADMIN, ROLE_SUPER_ADMIN]
+            disabled_actions: ['new', 'edit', 'delete']
+            class: App\Wicrew\CronBundle\Entity\CronLog
+            label: 'cronlog.title'
+            icon: 'list-alt'
+            list:
+                actions: ['show']
+                title: "cronlog.title"
+                fields:
+                    - { property: 'id', label: 'cronlog.id' }
+                    - { property: 'cron', label: 'cronlog.cron' }
+                    - { property: 'executedAt', label: 'cronlog.executed_at', format: 'M d Y H:i:s' }
+                    - { property: 'finishedAt', label: 'cronlog.finished_at', format: 'M d Y H:i:s' }
+                    - { property: 'status', label: 'cronlog.status', template: '@WicrewCron/Admin/field.status.html.twig' }
+                    - { property: 'message', label: 'cronlog.message' }
+                max_results: '%global.sort.pagination.default%'
+                sort: ['executedAt', '%global.sort.desc%']
+            show:
+                title: '%%entity_label%% (#%%entity_id%%)'
+                fields:
+                    - { property: 'id', label: 'cronlog.id' }
+                    - { property: 'cron', label: 'cronlog.cron' }
+                    - { property: 'executedAt', label: 'cronlog.executed_at', format: 'M d Y H:i:s' }
+                    - { property: 'finishedAt', label: 'cronlog.finished_at', format: 'M d Y H:i:s' }
+                    - { property: 'status', label: 'cronlog.status', template: '@WicrewCron/Admin/field.status.html.twig' }
+                    - { property: 'message', label: 'cronlog.message' }
+                actions:
+                    - { name: '-delete' }
+                    - { name: '-edit' }

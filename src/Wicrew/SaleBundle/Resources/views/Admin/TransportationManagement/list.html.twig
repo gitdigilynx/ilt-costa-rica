@@ -1,0 +1,1117 @@
+{% extends "@EasyAdmin/default/list.html.twig" %}
+
+{% set header_css_style = 'background: #D9E2F3' %}
+
+{# Redefine the table header to remove the sorting parameters. #}
+{% block table_head %}
+<div class="bulk_action_row" style="display: none;">
+    <select class="form-select bulk-actions" style="height: 42px; width: 130px; -webkit-appearance: none !important; -moz-appearance: none !important; background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAUCAMAAACtdX32AAAAdVBMVEUAAAD///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAhMdQaAAAAJ3RSTlMAAAECAwQGBwsOFBwkJTg5RUZ4eYCHkJefpaytrsXGy8zW3+Do8vNn0bsyAAAAYElEQVR42tXROwJDQAAA0Ymw1p9kiT+L5P5HVEi3qJn2lcPjtIuzUIJ/rhIGy762N3XaThqMN1ZPALsZPEzG1x8LrFL77DHBnEMxBewz0fJ6LyFHTPL7xhwzWYrJ9z22AqmQBV757MHfAAAAAElFTkSuQmCC); background-position: 100%; background-repeat: no-repeat; border: 1px solid #ccc; padding: 0.5rem;" aria-label="Bulk Actions">  
+        <option selected>Bulk actions</option>
+        <option value="assign_driver">Assign Driver</option>
+    </select>
+    <div class="bulk_driver_assigner"></div>
+</div>
+{% endblock table_head %}
+
+{% block table_body %} 
+    {% for item in paginator.currentPageResults %}
+        {% if not easyadmin_is_granted(_entity_config.list.item_permission, item) %}
+            {% set _number_of_hidden_results = _number_of_hidden_results + 1 %}
+        {% else %}
+            {# Inject table header to be duplicated above each item. #}
+            {# {% if not loop.first %} #}
+            {% if true %}
+                <thead {% if not loop.first %}class="new-section-separator"{% endif %} style="{{ header_css_style }}"> 
+                    {# {{ block('table_head') }}  #}
+                    <tr>
+                        {# {% if _has_batch_actions %} #}
+                            <th width="1px">
+                                {# <span><input type="checkbox" class="form-batch-checkbox-all"></span> #}
+                            </th>
+                        {# {% endif %} #}
+
+                        {% set hide_pick_up_transport = false %}
+
+                        {% for field, metadata in _fields_visible_by_user %}
+                            {% set _column_label = metadata.label|trans(_trans_parameters) %}
+
+                            {% if metadata.label == 'management.pick_up_time' %}
+                                {% if 
+                                    item.pickArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) and 
+                                    item.dropArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AREA'))
+                                %}
+                                    {% set _column_label = 'management.arrival_time'|trans(_trans_parameters) %}
+                                    {% set hide_pick_up_transport = true %}
+                                {% elseif 
+                                    item.pickArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) and 
+                                    item.dropArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT'))
+                                %}
+                                    {% set _column_label = 'management.arrival_time'|trans(_trans_parameters) %}
+                                    {% set hide_pick_up_transport = true %}
+                                {% elseif 
+                                    item.pickArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AREA')) and 
+                                    item.dropArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT'))
+                                %}
+                                    {% set _column_label = 'management.departure_time'|trans(_trans_parameters) %}
+                                {% else %}
+                                    {% set _column_label = 'management.pick_up_time'|trans(_trans_parameters) %}
+                                    {% set hide_pick_up_transport = true %}
+                                {% endif %} 
+                            {% endif %}
+
+                            {% if hide_pick_up_transport and  (metadata.label == 'management.pick_up_time_transport') %}
+                                {% set _column_label = '' %}
+                            {% endif %}
+
+                            <th class="{{ metadata.virtual ? 'virtual' }} {{ metadata.dataType|lower }} {{ metadata.css_class }}" {{ easyadmin_config('design.rtl') ? 'dir="rtl"' }}>
+                                <span>{{ _column_label|raw }}</span>
+                            </th>
+                            {% if metadata.label == 'management.order.partner.commission' %}
+                                <th>
+                                    <span  style="width:200px;"></span>
+                                </th>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if _list_item_actions|length > 0 %}
+                            <th {% if _entity_config.list.collapse_actions %}width="10px"{% endif %} {{ easyadmin_config('design.rtl') ? 'dir="rtl"' }}>
+                                <span class="sr-only">{{ 'list.row_actions'|trans(_trans_parameters, 'EasyAdminBundle') }}</span>
+                            </th>
+                        {% endif %}
+                    </tr>
+                </thead>
+            {% endif %}
+
+            {# the empty string concatenation is needed when the primary key is an object (e.g. an Uuid object) #}
+            {% set _item_id = '' ~ attribute(item, _entity_config.primary_key_field_name) %}
+            <tr data-id="{{ _item_id }}">
+                <td>
+                    <input type="checkbox" class="bulk_actions_checkbox" style="display:none;" value="{{ _item_id }}">
+                </td>
+                {% if _has_batch_actions %}
+                    <td>
+                        <input type="checkbox" class="form-batch-checkbox" value="{{ _item_id }}">
+                    </td>
+                {% endif %}
+
+                {% for field, metadata in _fields_visible_by_user %}
+                    {% set _column_label =  (metadata.label ?: field|humanize)|trans(_trans_parameters)  %}
+
+                    {% set style_hidden = '' %}
+                    {% if hide_pick_up_transport and  (metadata.label == 'management.pick_up_time_transport') %}
+                        {% set style_hidden = 'style="visibility:hidden"' %}
+                    {% endif %}
+                    <td data-name="{{metadata.columnName}}" class="{{ metadata.dataType|lower }} {{ metadata.css_class }}" {{ easyadmin_config('design.rtl') ? 'dir="rtl"' }} {{style_hidden|raw}}>
+                        {{ easyadmin_render_field_for_list_view(_entity_config.name, item, metadata) }}
+                    </td> 
+                    {% if metadata.columnName == 'supplier_commission' %}
+                        <td></td>
+                    {% endif %}
+                {% endfor %}
+
+                {% if _list_item_actions|length > 0 %}
+                    {% set _column_label =  'list.row_actions'|trans(_trans_parameters, 'EasyAdminBundle') %}
+                    <td class="actions">
+                        {% block item_actions %}
+                            {% set _actions_template = _entity_config.list.collapse_actions
+                                ? '@EasyAdmin/default/includes/_actions_dropdown.html.twig'
+                                : '@EasyAdmin/default/includes/_actions.html.twig'
+                            %}
+                            {{ include(_actions_template, {
+                                actions: _list_item_actions,
+                                entity_config: _entity_config,
+                                request_parameters: _request_parameters,
+                                translation_domain: _entity_config.translation_domain,
+                                trans_parameters: _trans_parameters,
+                                item_id: _item_id,
+                                item: item
+                            }, with_context = false) }}
+                        {% endblock item_actions %}
+                    </td>
+                {% endif %}
+            </tr>
+ 
+            {{ block('addons_section') }}
+            {{ block('extras_section') }}
+
+            {{ block('driver_section') }}
+        {% endif %}
+    {% else %}
+        <tr>
+            <td class="no-results" colspan="{{ _fields_visible_by_user|length + 1 }}">
+                {{ 'search.no_results'|trans(_trans_parameters, 'EasyAdminBundle') }}
+            </td>
+        </tr>
+    {% endfor %}
+
+    {% if _number_of_hidden_results > 0 %}
+        <tr class="datagrid-row-empty">
+            <td class="text-center" colspan="{{ _fields_visible_by_user|length + 1 }}">
+                <span class="datagrid-row-empty-message"><i class="fa fa-lock mr-1"></i> {{ 'security.list.hidden_results'|trans({}, 'EasyAdminBundle') }}</span>
+            </td>
+        </tr>
+    {% endif %}
+{% endblock table_body %}
+
+{# addon section #}
+{% block addons_section %}  
+    {% if item.anyAddons %} 
+        {% set currencySymbol = 'currency.symbol'|trans() %}
+        {% set currencyText = 'currency.text'|trans() %}
+        <thead style="{{ header_css_style }}">
+            <tr>
+                {% for i in 1..20 %}
+                <td></td>
+                {% endfor %}
+                <td><span style="padding:0px;">{{'management.addons'|trans()}}</span></td>
+                <td><span style="padding:0px;">{{'management.rack_rate'|trans()}}</span></td>
+                <td><span style="padding:0px;">{{'management.net_rate'|trans()}}</span></td>
+                <td><span style="padding:0px;">{{'management.tax'|trans()}}</span></td>
+                <td><span style="padding:0px;">{{'management.total_rack'|trans()}}</span></td>
+                <td><span style="padding:0px;">{{'management.total_net'|trans()}}</span></td>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody>  
+        {% for addon in item.addons %}
+            <tr>
+                {% for i in 1..20 %}
+                <td></td>
+                {% endfor %}
+                <td>{{ addon.label|raw }}</td>
+                <td>{{ addon.rackPrice }}</td>
+                <td>{{ addon.netPrice }}</td> 
+                <td>{{ addon.tax }}</td> 
+                <td>{{ addon.rackPrice + addon.tax }}</td> 
+                <td>{{ addon.netPrice + addon.tax }}</td> 
+                <td></td>
+            </tr> 
+        {% endfor %} 
+        </tbody>
+    {% endif %}
+{% endblock addons_section %}  
+{# addon section #}
+{# ext section #}
+{% block extras_section %}  
+    {% if item.anyExtras %} 
+        {% set currencySymbol = 'currency.symbol'|trans() %}
+        {% set currencyText = 'currency.text'|trans() %}
+        <thead style="{{ header_css_style }}">
+            <tr>
+                {% for i in 1..20 %}
+                <td></td>
+                {% endfor %}
+                <td><span style="padding:0px;">{{'management.extras'|trans()}}</span></td>
+                <td><span style="padding:0px;">{{'management.rack_rate'|trans()}}</span></td>
+                <td><span style="padding:0px;">{{'management.net_rate'|trans()}}</span></td>
+                <td><span style="padding:0px;">{{'management.tax'|trans()}}</span></td>
+                <td><span style="padding:0px;">{{'management.total_rack'|trans()}}</span></td>
+                <td><span style="padding:0px;">{{'management.total_net'|trans()}}</span></td>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody>  
+        {% for extra in item.extras %}
+            <tr>
+                {% for i in 1..20 %}
+                <td></td>
+                {% endfor %}
+                <td>{{ extra.label|raw }}</td>
+                <td>{{ extra.rackPrice }} </td>
+                <td>{{ extra.netPrice }} </td> 
+                <td>{{ extra.tax }} </td> 
+                <td>{{ extra.rackPrice + extra.tax }} </td> 
+                <td>{{ extra.netPrice + extra.tax }} </td> 
+                <td></td>
+            </tr> 
+        {% endfor %} 
+        </tbody>
+    {% endif %}
+{% endblock extras_section %}  
+{# ext section #}
+
+{# Give each driver its own column. #}
+{% block driver_section %}
+    <thead style="{{ header_css_style }}">
+    {{ block('driver_head') }} 
+    </thead>
+
+    {# @var item \App\Wicrew\SaleBundle\Entity\OrderItem #}
+    {% if item.additionalDrivers|length > 0 %}
+        {# @var driver \App\Wicrew\SaleBundle\Entity\OrderItemHasDriver #}
+        {% for driver in item.additionalDrivers %}
+            <tr data-id="{{ _item_id }}" {{ loop.first ? 'class="first-driver-row"' : '' }}>
+                {% set driverLoopIndex = loop.index0 %}
+                {{ block('driver_row') }}
+            </tr>
+        {% endfor %}
+    {% else %}
+        <tr data-id="{{ _item_id }}" class="first-driver-row">
+            {% set driverLoopIndex = '0' %}
+            {{ block('driver_row') }}
+        </tr>
+    {% endif %}
+{% endblock driver_section %}
+ 
+{% block driver_head %}
+    <tr>
+        {% if _has_batch_actions %}
+            <th width="1px"><span><input type="checkbox" class="form-batch-checkbox-all"></span></th>
+        {% endif %}
+
+        {% set totalDriverColumns = driverFields|length %}
+        {% for field, metadata in driverFields %}
+            {% set continue = true %}
+
+            {% if field == 'priceSeparator' %}
+                {% set remainingColumns = _fields_visible_by_user|length - loop.index0 %}
+                {% set columnsAfterSeparator = loop.revindex0 %}
+                {# Subtract one because the last column is the save action. #}
+                {% set fillerColumns = remainingColumns - columnsAfterSeparator - 1 %}
+
+                {% if fillerColumns > 0 %}
+                    {% set totalDriverColumns = loop.index0 + fillerColumns + columnsAfterSeparator %}
+                    {% for i in range(1, fillerColumns) %}
+                        <th {{ easyadmin_config('design.rtl') ? 'dir="rtl"' }}><span></span></th>
+                    {% endfor %}
+                {% endif %}
+
+                {% set continue = false %}
+            {% endif %}
+
+            {% if continue %}
+                {% set _column_label = metadata.label|trans(_trans_parameters) %}
+
+                {% if loop.index == 9 %}
+                    <th></th>
+                {% endif %}
+                
+                <th class="{{ metadata.virtual ? 'virtual' }} {{ metadata.dataType|lower }}" {{ easyadmin_config('design.rtl') ? 'dir="rtl"' }}>
+                    <span>
+                        {% if field == 'driverLink' %}
+                            <div class="action-new-driver" data-id="{{ _item_id }}" style="cursor: pointer;">{{ 'transport_management.add_driver'|trans|upper }}</div>
+                        {% else %}
+                            {{ _column_label|raw }}
+                        {% endif %}
+                    </span>
+                </th>
+            {% endif %}
+        {% endfor %}
+
+        {# Add in the remaining headers so the number of driver headers matches the number of order item headers. #}
+        {% set leftoverColumns = _fields_visible_by_user|length - totalDriverColumns %}
+        {% if leftoverColumns > 0 %}
+            {% for i in range(1, leftoverColumns) %}
+                <th {{ easyadmin_config('design.rtl') ? 'dir="rtl"' }}>
+                    <span></span>
+                </th>
+            {% endfor %}
+        {% endif %} 
+
+        {% if _list_item_actions|length > 0 %}
+            <th {% if _entity_config.list.collapse_actions %}width="10px"{% endif %} {{ easyadmin_config('design.rtl') ? 'dir="rtl"' }}>
+                <span class="sr-only">{{ 'list.row_actions'|trans(_trans_parameters, 'EasyAdminBundle') }}</span>
+            </th>
+        {% endif %}
+        <th></th>
+    </tr>
+{% endblock driver_head %}
+
+{% block driver_row %}
+    {% if driver is not defined %}
+        {% set driver = null %}
+    {% endif %}
+
+    {% for driverField, driverMetadata in driverFields %}
+        {% set continue = true %}
+
+        {% if driverField == 'priceSeparator' %}
+            {% set remainingColumns = _fields_visible_by_user|length - loop.index %}
+            {% set columnsAfterSeparator = loop.revindex0 %}
+            {% set fillerColumns = remainingColumns - columnsAfterSeparator %}
+
+            {% if fillerColumns > 0 %}
+                {% for i in range(1, fillerColumns) %}
+                    <td {{ easyadmin_config('design.rtl') ? 'dir="rtl"' }}><span></span></td>
+                {% endfor %}
+            {% endif %}
+
+            {% set continue = false %}
+        {% endif %}
+
+        {% if continue %}
+            {% set driverMetadata = driverMetadata|merge({ 'arrayWrapperIndex': driverLoopIndex }) %}
+            {% if loop.index == 9 %}
+                <td></td>
+            {% endif %}
+            <td class="{{ driverMetadata.dataType|lower }} {{ driverMetadata.css_class }}" {{ easyadmin_config('design.rtl') ? 'dir="rtl"' }}>
+                {{ easyadmin_render_field_for_list_view(_driver_entity_config_name, driver, driverMetadata) }}
+            </td>
+        {% endif %}
+    {% endfor %}
+{% endblock driver_row %}
+
+{% block body_javascript %}
+    {{ parent() }}
+    <style>
+
+        div.addNoteModal .modal-dialog {
+            max-width: 600px !important;
+            width: 80%;
+        }
+        textarea.addNewNoteTextArea {
+            width: 100%;
+        }
+        .previous_notes_container {
+            height: 100px;
+            overflow-y: scroll;
+            padding-left: 5px;
+            margin-bottom: 10px;
+            background: #efefef;
+            box-shadow: 0px 0px 8px 0px rgba(209,209,209,1);
+            -webkit-box-shadow: 0px 0px 8px 0px rgba(209,209,209,1);
+            -moz-box-shadow: 0px 0px 8px 0px rgba(209,209,209,1);
+        }
+        .single-note-container {
+            display: flex;
+            align-items: center;
+        }
+
+        button.editNoteBtn {
+            border: none;
+            width: 26px;
+            align-self: flex-end;
+            font-size: 12px;
+        }
+
+        .single-note-content {
+            flex: auto;
+        }
+
+        button.editNoteBtn:hover,
+        .single-note-content:hover + button.editNoteBtn {
+            color: #6174d1;
+        }
+
+        button.editNoteBtn:hover + .single-note-content {
+            color: #6174d1;
+        }
+        .editNoteTextAreaContainer {
+
+            position: absolute;
+            background: #ffffff;
+            display: none;
+            flex-direction: column;
+            padding: 20px;
+            top: 0px;
+            left: 0px;
+            width: 100%;
+            height: 100%;
+        }
+
+        button.btn.btn-editNote {
+            width: 100px;
+            align-self: flex-end;
+            margin-top: 12px;
+            background-color: var(--color-primary);
+            color: var(--text-on-primary);
+        }
+
+        .editNoteTextAreaContainer i.fa-close {
+            align-self: flex-end;
+            margin-bottom: 12px;
+            margin-right: 5px;
+        }
+    </style>
+    <!--suppress JSCheckFunctionSignatures -->
+    <script type="text/javascript">
+        let body = $("body");
+
+        // Press the full-width button on the right side of the page to make it the default.
+        body.removeClass("easyadmin-content-width-normal");
+        body.addClass("easyadmin-content-width-full");
+
+        initDatePicker(body);
+        initTimePicker(body);
+        // $(".form_timepicker").mask("R0:00 SP", {
+        //     translation: {
+        //         "R": {
+        //             pattern: /[012]/,
+        //             optional: true
+        //         },
+        //         "S": {
+        //             pattern: /[AaPp]/,
+        //         },
+        //         "P": {
+        //             pattern: /[Mm]/,
+        //         }
+        //     }
+        // });
+
+        const DRIVER_SELECT_ELEMENT_SELECTOR = "select[name*='driver.id']";
+        const DRIVER2_SELECT_ELEMENT_SELECTOR = "select[name*='supplier.id']";
+        const SEND_EMAIL_CHECKBOX_SELECTOR = "input[name*='sendEmail']";
+        const SEND_EMAIL2_CHECKBOX_SELECTOR = "input[name*='send_email']";
+
+        function updateSendEmailCheckboxVisibility() {
+            let changedInput = $(this).parents("tr").find(SEND_EMAIL_CHECKBOX_SELECTOR);
+            let driverIsDifferent = $(this).val() !== $(this).data("old-id");
+            let emailSentData = changedInput.data("sent-email").toString();
+            let emailWasSent = emailSentData !== "1";
+            if (
+                $(this).val() !== "" &&
+                (driverIsDifferent || emailWasSent)
+            ) {
+                changedInput.parent().removeAttr("hidden");
+            } else {
+                changedInput.parent().attr("hidden", "hidden");
+                changedInput.prop("checked", false);
+            }
+        }
+        function updateSendEmail2CheckboxVisibility() {
+            let changedInput = $(this).parents("tr").find(SEND_EMAIL2_CHECKBOX_SELECTOR);
+            let driverIsDifferent = $(this).val() !== $(this).data("old-id");
+            let emailSentData = changedInput.data("sent-email").toString();
+            let emailWasSent = emailSentData !== "1";
+            if (
+                $(this).val() !== "" &&
+                (driverIsDifferent || emailWasSent)
+            ) {
+                changedInput.parent().removeAttr("hidden");
+            } else {
+                changedInput.parent().attr("hidden", "hidden");
+                changedInput.prop("checked", false);
+            }
+        }
+
+        let driverSelects = $(DRIVER_SELECT_ELEMENT_SELECTOR);
+        driverSelects.each(function () {
+            $(this).data("old-id", $(this).val())
+            $(this).on("change", updateSendEmailCheckboxVisibility);
+        })
+        let driverSelects2 = $(DRIVER2_SELECT_ELEMENT_SELECTOR);
+        driverSelects2.each(function () {
+            $(this).data("old-id", $(this).val())
+            $(this).on("change", updateSendEmail2CheckboxVisibility);
+        })
+
+        /**
+         *
+         * @param {jQuery} row
+         * @param {int} index
+         */
+        function updateRowIndex(row, index) {
+            let newName = "additionalDrivers[" + index + "][";
+            row.find("input, select").each(function () {
+                let name = $(this).attr("name");
+                let match = name.match(/\[([^\[]*)]$/);
+                if (match !== null) {
+                    name = match[1];
+                }
+                $(this).attr("name", newName + name + "]");
+            });
+        }
+
+        /**
+         *
+         * @param {jQuery} that
+         */
+        function removeElementFunc(that) {
+            let parentRow = $(this).parents("tr");
+            parentRow.remove();
+        }
+
+        // Add a data point to know what the next driver index should be if a new driver is added.
+        let newDriverButtons = $(".action-new-driver");
+        newDriverButtons.each(function () {
+            let itemID = $(this).attr("data-id");
+            let firstDriverRow = $(`tr[data-id='${itemID}'].first-driver-row`);
+            let rows = $(`tr[data-id='${itemID}']`);
+
+            let table = firstDriverRow.parents("table");
+            let nextIndex = rows.length - 1;
+            nextIndex = nextIndex.toString();
+            table.data("new-index-for-" + itemID, nextIndex);
+        });
+
+        newDriverButtons.on("click", function () {
+            let itemID = $(this).attr("data-id");
+            let firstDriverRow = $(`tr[data-id='${itemID}'].first-driver-row`);
+
+            let clone = firstDriverRow.clone();
+            clone.removeClass("first-driver-row");
+            clone.find("input, select").val("");
+            clone.find(DRIVER_SELECT_ELEMENT_SELECTOR).on("change", updateSendEmailCheckboxVisibility);
+            clone.find(SEND_EMAIL_CHECKBOX_SELECTOR).parent().attr("hidden", "hidden");
+
+            let removeDriverButtonRow = clone.find(".remove-driver-btn-cell");
+{#            {% include "@WicrewSale/Admin/TransportationManagement/remove_driver_btn.html.twig" %}#}
+            removeDriverButtonRow.append("<button class=\"btn text-danger action-remove-driver\">{{ 'transport_management.remove_driver'|trans }}</button>");
+            removeDriverButtonRow.on("click", null, undefined, removeElementFunc);
+
+            let rows = $(`tr[data-id='${itemID}']`);
+            let lastRow = rows.last();
+            clone.insertAfter(lastRow);
+
+            // Figure out the index of the new row, apply it, then increment the index.
+            let table = firstDriverRow.parents("table");
+            let newIndexStr = table.data("new-index-for-" + itemID);
+            let newIndex = parseInt(newIndexStr);
+            updateRowIndex(clone, newIndex);
+            table.data("new-index-for-" + itemID, (newIndex + 1).toString());
+        });
+
+        $(".action-remove-driver").on("click", null, undefined, removeElementFunc);
+
+        // SAVING INTERNAL NOTE TO ORDER. 
+        $("form.addNewNoteForm").submit(function(e) {
+            e.preventDefault(); // avoid to execute the actual submit of the form.
+            var form        = $(this);    
+            let itemid      = form.attr("data-itemid");
+            let save_btn    = form.children("button.btn-saveNewNote");
+            if ( save_btn.hasClass("loading-button")) { return; }
+            save_btn.addClass("loading-button");
+
+            let saveRowDataBtn = $('button.action-inline-save[value="' + itemid + '"]');
+            // ================================================
+            let parentRow = $(this).parents("tr");
+            let itemID = parentRow.attr("data-id");
+            let rows = $(`tr[data-id='${itemID}']`);
+            let data = {};
+            rows.find("input, select, button").each(function () {
+                $(this).attr("disabled", "disabled");
+                if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                    return;
+                }
+                data[$(this).attr("name")] = $(this).val();
+            });
+
+            let that = $(this);
+            $.ajax({
+                url: '{{ url("transportation_management_save") }}',
+                type: "POST",
+                data: data,
+                success: function (response) {
+                    if (response.status === 'success') {
+                        for (let i = 0; i < response.messages.length; i++) {
+                            alert(response.messages[i]);
+                        }
+                        let driverSelects = $(DRIVER_SELECT_ELEMENT_SELECTOR);
+                        let sentIDs = response['sentIDs'];
+                        for (let i = 0; i < sentIDs.length; i++) {
+                            let strVal = sentIDs[i].toString();
+                            driverSelects.each(function () {
+                                if ($(this).val() === strVal) {
+                                    $(this).data("old-id", strVal);
+                                    let sendEmailCheckbox = $(this).parents("tr").find(SEND_EMAIL_CHECKBOX_SELECTOR);
+                                    sendEmailCheckbox.data("sent-email", "1");
+                                    $(this).trigger("change");
+                                }
+                            });
+                        }
+
+                        let driverRows = rows.slice(1);
+                        let index = 0;
+                        driverRows.each(function () {
+                            let driverSelect = $(this).find(DRIVER_SELECT_ELEMENT_SELECTOR);
+                            driverSelect.data("old-id", driverSelect.val());
+
+                            let sendEmailCheckbox = $(this).find(SEND_EMAIL_CHECKBOX_SELECTOR);
+                            if (sendEmailCheckbox.parent().is(":visible")) {
+                                let oldIDInt = parseInt(driverSelect.data("old-id"));
+                                if (sendEmailCheckbox.is(":checked") && sentIDs.includes(oldIDInt)) {
+                                    sendEmailCheckbox.data("sent-email", "1");
+                                } else {
+                                    sendEmailCheckbox.data("sent-email", "");
+                                }
+                            }
+
+                            // Update indices to match what's in the database now.
+                            updateRowIndex($(this), index);
+                            index++;
+                        })
+
+                        that.removeClass("loading-button");
+                        that.removeAttr("disabled");
+                        rows.find("input, select, button").removeAttr("disabled");
+
+                        $.ajax({
+                        url: '{{ url("save_order_notes") }}',
+                        type: "POST",
+                        data: form.serialize(),
+                        success: function (response) {
+                            if (response.status == 'success') {
+                                $.ajax({
+                                    url: '{{ url("transportation_management_send_email_to_driver_new_notes") }}',
+                                    type: "POST",
+                                    data: {
+                                        "id": itemid
+                                    },
+                                    success: function (response) {
+                                    if (response.status === 'success') {  
+                                        location.reload();
+                                    } else {
+                                        save_btn.removeClass("loading-button");
+                                        alert(response.message);
+                                        return false;
+                                    }
+                                    }
+                                });
+                            } else {
+                                save_btn.removeClass("loading-button");
+                                alert(response.msg);
+                                return false;
+                            }
+                        }
+                    });
+
+                    } else {
+                        alert(response.message);
+                        return false;
+                    }
+                }
+            });
+            // ================================================
+
+            
+        });
+
+        // NOTIFYING DRIVER ABOUT NEW INTERNAL NOTES.
+        $(".btn-notifyDriverNewNote").on("click", function () {
+            if ($(this).hasClass("loading-button")) { return; }
+            $(this).addClass("loading-button");
+
+            let parentRow = $(this).parents("tr");
+            let itemID = parentRow.attr("data-id");
+            let rows = $(`tr[data-id='${itemID}']`);
+            let data = {};
+            rows.find("input, select, button").each(function () {
+                // $(this).attr("disabled", "disabled");
+                if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                    return;
+                }
+                data[$(this).attr("name")] = $(this).val();
+            });
+            let that = $(this);
+            $.ajax({
+                url: '{{ url("activity_management_send_email_to_driver_new_notes") }}',
+                type: "POST",
+                data: data,
+                success: function (response) {
+                    if (response.status === 'success') {  
+                        that.removeClass("loading-button");
+                        that.removeAttr("disabled");
+                        // rows.find("input, select, button").removeAttr("disabled");
+                    } else {
+                        alert(response.message);
+                        return false;
+                    }
+                }
+            });
+        });
+
+        $(".action-inline-save").on("click", function () {
+            if ($(this).hasClass("loading-button")) { return; }
+            $(this).addClass("loading-button");
+
+            let parentRow   = $(this).parents("tr");
+            let itemID = $('input[class="bulk_actions_checkbox"]:checked').val();
+            let rows        = $(`tr[data-id='${itemID}']`);
+            let data = {};
+            rows.find("input, select, button").each(function () {
+                $(this).attr("disabled", "disabled");
+                if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                    return;
+                }
+                data[$(this).attr("name")] = $(this).val();
+            });
+
+            let that = $(this);
+            $.ajax({
+                url: '{{ url("transportation_management_save") }}',
+                type: "POST",
+                data: data,
+                success: function (response) {
+                    if (response.status === 'success') {
+                        for (let i = 0; i < response.messages.length; i++) {
+                            alert(response.messages[i]);
+                        }
+                        let driverSelects = $(DRIVER_SELECT_ELEMENT_SELECTOR);
+                        let sentIDs = response['sentIDs'];
+                        for (let i = 0; i < sentIDs.length; i++) {
+                            let strVal = sentIDs[i].toString();
+                            driverSelects.each(function () {
+                                if ($(this).val() === strVal) {
+                                    $(this).data("old-id", strVal);
+                                    let sendEmailCheckbox = $(this).parents("tr").find(SEND_EMAIL_CHECKBOX_SELECTOR);
+                                    sendEmailCheckbox.data("sent-email", "1");
+                                    $(this).trigger("change");
+                                }
+                            });
+                        }
+
+                        let driverRows = rows.slice(1);
+                        let index = 0;
+                        driverRows.each(function () {
+                            let driverSelect = $(this).find(DRIVER_SELECT_ELEMENT_SELECTOR);
+                            driverSelect.data("old-id", driverSelect.val());
+
+                            let sendEmailCheckbox = $(this).find(SEND_EMAIL_CHECKBOX_SELECTOR);
+                            if (sendEmailCheckbox.parent().is(":visible")) {
+                                let oldIDInt = parseInt(driverSelect.data("old-id"));
+                                if (sendEmailCheckbox.is(":checked") && sentIDs.includes(oldIDInt)) {
+                                    sendEmailCheckbox.data("sent-email", "1");
+                                } else {
+                                    sendEmailCheckbox.data("sent-email", "");
+                                }
+                            }
+
+                            // Update indices to match what's in the database now.
+                            updateRowIndex($(this), index);
+                            index++;
+                        })
+
+                        that.removeClass("loading-button");
+                        that.removeAttr("disabled");
+                        rows.find("input, select, button").removeAttr("disabled");
+                    } else {
+                        alert(response.message);
+                        return false;
+                    }
+                }
+            });
+        });
+
+        $(".action-inline-modify").on("click", function () {
+            if ($(this).hasClass("loading-button")) { return; }
+            $(this).addClass("loading-button");
+
+            let parentRow   = $(this).parents("tr");
+            let itemID = $('input[class="bulk_actions_checkbox"]:checked').val(); 
+            let rows        = $(`tr[data-id='${itemID}']`);;
+            let data = {};
+            rows.find("input, select, button").each(function () {
+                $(this).attr("disabled", "disabled");
+                if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                    return;
+                }
+                data[$(this).attr("name")] = $(this).val();
+            });
+ 
+            location.href = '/admin/order/edit_item?id='+itemID;         
+
+            $(this).removeClass("loading-button");
+            $(this).removeAttr("disabled");
+            rows.find("input, select, button").removeAttr("disabled");
+
+        });
+
+        $(".action-inline-resent-confirmation").on("click", function () {
+            if ($(this).hasClass("loading-button")) { return; }
+            $(this).addClass("loading-button");
+
+            let parentRow   = $(this).parents("tr");
+            let itemID = $('input[class="bulk_actions_checkbox"]:checked').val();  
+			console.log(itemID);
+
+            let rows        = $(`tr[data-id='${itemID}']`);
+            let data = {};
+            rows.find("input, select, button").each(function () {
+                $(this).attr("disabled", "disabled");
+                if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                    return;
+                }
+                data[$(this).attr("name")] = $(this).val();
+            });
+
+            let that = $(this);
+            $.ajax({
+                url: '{{ url("transportation_management_resent_confirmation") }}',
+                type: "POST",
+                data: data,
+                success: function (response) {
+                    if (response.status === 'success') {  
+                        that.removeClass("loading-button");
+                        that.removeAttr("disabled");
+                        rows.find("input, select, button").removeAttr("disabled");
+                    } else {
+                        alert(response.message);
+                        return false;
+                    }
+                }
+            });
+        });
+
+        $(".action-inline-send-email-to-driver").on("click", function () {
+            if ($(this).hasClass("loading-button")) { return; }
+            $(this).addClass("loading-button");
+
+            let parentRow = $(this).parents("tr");
+            let itemID = parentRow.attr("data-id");
+            let rows = $(`tr[data-id='${itemID}']`);
+            let data = {};
+            rows.find("input, select, button").each(function () {
+                $(this).attr("disabled", "disabled");
+                if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                    return;
+                }
+                data[$(this).attr("name")] = $(this).val();
+            });
+
+            let that = $(this);
+            $.ajax({
+                url: '{{ url("transportation_management_send_email_to_driver") }}',
+                type: "POST",
+                data: data,
+                success: function (response) {
+                    if (response.status === 'success') {  
+                        that.removeClass("loading-button");
+                        that.removeAttr("disabled");
+                        rows.find("input, select, button").removeAttr("disabled");
+                    } else {
+                        alert(response.message);
+                        return false;
+                    }
+                }
+            });
+        });
+
+        wi_handle_status_color();
+
+        function wi_handle_status_color() {
+            wi_apply_status_color();
+            $('[name="status"]').change(function() {
+                wi_apply_status_color();
+            });
+        }
+
+        function wi_apply_status_color() {
+            $('[name="status"]').each(function() {
+                let status = $(this).val();
+                let color = '--red';
+
+                if (status == {{constant('App\\Wicrew\\SaleBundle\\Entity\\Order::STATUS_CANCELLED')}}) {
+                    color = '--red';
+                } else if (status == {{constant('App\\Wicrew\\SaleBundle\\Entity\\Order::STATUS_PAID')}}) {
+                    color = '--green';
+                } else if (status == {{constant('App\\Wicrew\\SaleBundle\\Entity\\Order::STATUS_PENDING')}}) {
+                    color = '--orange';
+                }
+
+                $(this).attr('style', 'color: var('+color+')');
+            });
+        }
+
+        wi_handle_confirmation_status_color();
+
+        function wi_handle_confirmation_status_color() {
+            wi_apply_confirmation_status_color();
+            $('[name="confirmationStatus"], [name="confirmation_status"]').change(function() {
+                wi_apply_confirmation_status_color();
+            });
+        }
+
+        function wi_apply_confirmation_status_color() {
+            $('[name="confirmationStatus"], [name="confirmation_status"]').each(function()  {
+                let status = $(this).val();
+                let color = '--red';
+
+                if (status == {{constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::CONFIRMATION_STATUS_UNASSIGNED')}}) {
+                    color = '--orange';
+                } else if (status == {{constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::CONFIRMATION_STATUS_ASSIGNED')}}) {
+                    color = '--yellow';
+                } else if (status == {{constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::CONFIRMATION_STATUS_APPROVED')}}) {
+                    color = '--blue';
+                } else if (status == {{constant('App\\Wicrew\\SaleBundle\\Entity\\OrderItem::CONFIRMATION_STATUS_CONFIRMED')}}) {
+                    color = '--green';
+                }
+
+                $(this).attr('style', 'color: var('+color+')');
+            });
+        }
+
+
+        // BULK ACTIONS SCRIPT 
+        $(document).ready(function() {  
+            $('select.form-select.bulk-actions').change(function(){
+                let selected_option = $(this).find("option:selected").attr('value');
+                // console.log("SELECTED: "+selected_option+"\n");
+                $("div.bulk_driver_assigner").html("");
+                if( selected_option == "assign_driver" ){
+
+                    $( "input.bulk_actions_checkbox" ).show();
+                    $("div.bulk_driver_assigner").append( $(DRIVER_SELECT_ELEMENT_SELECTOR)['0'] );
+
+                    let drivers_arr = {};
+                    $("div.bulk_driver_assigner select option").each(function() {
+                        // alert(this.text + ' ' + this.value);
+                        drivers_arr[ parseInt($(this).val()) ] =  $(this).text().trim();
+                        
+                    });
+                    // drivers_arr.sort();
+                    $("div.bulk_driver_assigner").html("");
+                    $("div.bulk_driver_assigner").append( '<select id="bulkAssignSelect" style="height: 42px; width: 240px; -webkit-appearance: none !important; -moz-appearance: none !important; background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAUCAMAAACtdX32AAAAdVBMVEUAAAD///8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAhMdQaAAAAJ3RSTlMAAAECAwQGBwsOFBwkJTg5RUZ4eYCHkJefpaytrsXGy8zW3+Do8vNn0bsyAAAAYElEQVR42tXROwJDQAAA0Ymw1p9kiT+L5P5HVEi3qJn2lcPjtIuzUIJ/rhIGy762N3XaThqMN1ZPALsZPEzG1x8LrFL77DHBnEMxBewz0fJ6LyFHTPL7xhwzWYrJ9z22AqmQBV757MHfAAAAAElFTkSuQmCC); background-position: 100%; background-repeat: no-repeat; border: 1px solid #ccc; padding: 0.5rem;"></select>' );
+                    $.each(drivers_arr, function(key, value) {   
+                      
+                        $('#bulkAssignSelect').append($("<option></option>").attr("value", key).text(value));
+
+                    });
+                    
+                    // SORTING 
+                    var options_bulk = $('select#bulkAssignSelect option');
+                    var arr_bulk = options_bulk.map(function(_, o) { return { t: $(o).text(), v: o.value }; }).get();
+                    arr_bulk.sort(function(o1, o2) {
+                        var t1 = o1.t.toLowerCase(), t2 = o2.t.toLowerCase();
+                        return t1 > t2 ? 1 : t1 < t2 ? -1 : 0;
+                    });                    
+                    options_bulk.each(function(i, o) {
+                        o.value = arr_bulk[i].v;
+                        $(o).text(arr_bulk[i].t);
+                    });
+                    // SORTING 
+
+                    $("div.bulk_driver_assigner").append( '<button class="btn btn-primary" id="bulkAssignBtn">Assign & Send Email</button>' );
+                    // BULK ASSIGN & SEND BUTTON ON CLICK 
+                    $("button#bulkAssignBtn").on("click", function () {
+                        if ($(this).hasClass("loading-button")) { return; }
+                        $(this).addClass("loading-button");
+                        let selected_driver_val     = $('select#bulkAssignSelect').val();
+                        let selectedCheckboxValues  = $('input.bulk_actions_checkbox:checked').map(function() {
+                            return $(this).val();
+                        }).get();
+                        let final_data = [];
+
+                        if (selectedCheckboxValues.length === 0) {
+                            alert("Please select atleast 1 booking!");
+                            $(this).removeClass("loading-button");
+                            $(this).removeAttr("disabled");
+                            return false;
+
+                        }else{
+                            $.each( selectedCheckboxValues, function( index, selectedCheckboxValue ) {
+                                let parentRow   = $( 'input.bulk_actions_checkbox[value="'+selectedCheckboxValue+'"]' ).parents("tr");
+                                let itemID      = parentRow.attr("data-id");
+                                let rows        = $(`tr[data-id='${itemID}']`);
+                                let data        = {};
+                                rows.find("input, select, button").each(function () {
+                                    $(this).attr("disabled", "disabled");
+                                    if ($(this).is("[type='checkbox']") && !$(this).is(':checked')) {
+                                        return;
+                                    }
+                                    data[$(this).attr("name")] = $(this).val();
+                                });
+                                data["additionalDrivers[0][driver.id]"] = selected_driver_val;
+                                final_data.push(data);
+                                
+                            });
+                            
+                        }
+                        final_data = JSON.stringify(final_data);
+                        let final_to_send = {
+                            data:  final_data,
+                            bulk: 1
+                        };
+
+                        let that = $(this);
+                        $.ajax({
+                            url: '{{ url("transportation_management_bulk_save") }}',
+                            type: "POST",
+                            data: final_to_send,
+                            success: function (response) {
+                                if (response.status === 'success') {  
+                                    $.ajax({
+                                        url: '{{ url("transportation_management_send_bulk_email_to_driver") }}',
+                                        type: "POST",
+                                        data: final_to_send,
+                                        success: function (response) {
+
+                                            if (response.status === 'success') {  
+                                                that.removeClass("loading-button");
+                                                that.removeAttr("disabled");
+                                                location.reload();
+                                            }
+                                        }
+                                    });
+
+                                    
+                                }
+                            }
+                        });
+                    });
+                    
+
+
+
+                }else{
+                    $( "input.bulk_actions_checkbox" ).hide();
+                
+                }
+            });
+        });
+    
+
+
+        // Change position for bulk actions container 
+        $(document).ready(function () {
+            let bulk_actions = $(".bulk_action_row").detach();
+            $("section.content-header").append(bulk_actions);   
+            $(".bulk_action_row").show();
+        });
+    </script>
+
+    <style>
+        .bulk_driver_assigner {
+            display: flex;
+            gap: 32px;
+        }
+
+        .bulk_action_row {
+            display: flex;
+            gap: 32px;
+         
+        }
+
+        select.form-select.bulk-actions, select#bulkAssignSelect {
+            border-radius: var(--border-radius);
+            background: transparent;
+        }
+        section.content-header {
+            position: sticky;
+            background: #fff;
+            width: 100%;
+            top: 0;
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+    {% set _fields_visible_by_user = fields|filter((metadata, field) => easyadmin_is_granted(metadata.permission)) %}
+    {% set _number_of_hidden_results = 0 %}
+    {% set _list_item_actions = easyadmin_get_actions_for_list_item(_entity_config.name) %}
+
+    <table class="table datagrid">
+        <thead style="{{ header_css_style }}">
+        {{ block('table_head') }}
+        </thead>
+
+        <tbody>
+        {{ block('table_body') }}
+        </tbody>
+    </table>
+
+    {% block delete_form %}
+        {% set referer = paginator.currentPage == paginator.nbPages and 1 != paginator.currentPage and 1 == paginator.currentPageResults|length
+            ? path('easyadmin', app.request.query|merge({ page: app.request.query.get('page') - 1 }))
+            : app.request.requestUri
+        %}
+
+        {{ include('@EasyAdmin/default/includes/_delete_form.html.twig', {
+            view: 'list',
+            referer: referer,
+            delete_form: delete_form_template,
+            _translation_domain: _entity_config.translation_domain,
+            _trans_parameters: _trans_parameters,
+            _entity_config: _entity_config,
+        }, with_context = false) }}
+    {% endblock delete_form %}
+{% endblock main %}

@@ -1,0 +1,115 @@
+easy_admin:
+    design:
+        menu:
+            - { entity: 'Report', label: 'report.title', icon: 'line-chart', permission: 'ROLE_ADMIN' }
+    entities:
+        Report:
+            permissions: 'ROLE_ADMIN'
+            label: 'report.title'
+            icon: 'line-chart'
+            class: App\Wicrew\SaleBundle\Entity\OrderItem
+            controller: App\Wicrew\ReportBundle\Controller\Admin\ReportController
+            disabled_actions: ['new', 'edit', 'delete', 'show']
+            list:
+                #                actions:
+                #                    - { name: 'export', label: 'report.export', icon: 'file-excel' }
+                #                collapse_actions: true
+                #                batch_actions:
+                #                    - { name: 'export', ask_confirm: true }
+                filters:
+                    -   property: 'status'
+                        type: 'App\Wicrew\CoreBundle\Form\Filter\ChoiceType'
+                        type_options:
+                            choices:
+                                'order_item.status.option.unpaid': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::STATUS_UNPAID
+                                'order_item.status.option.paid': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::STATUS_PAID
+                                'order_item.status.option.cancelled': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::STATUS_CANCELLED
+                                'order_item.status.option.refunded': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::STATUS_REFUNDED
+                            expanded: true
+                            multiple: true
+                        label: 'report.status'
+                    - { property: 'order', type: 'App\Wicrew\ReportBundle\Form\Filter\OrderId', label: 'report.booking_id' }
+                    -   property: 'type'
+                        mapped: false
+                        type: 'App\Wicrew\CoreBundle\Form\Filter\ChoiceType'
+                        type_options:
+                            choices:
+                                'report.type.option.private_shuttle': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::TYPE_PRIVATE_SHUTTLE
+                                'report.type.option.shared_shuttle': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::TYPE_SHARED_SHUTTLE
+                                'report.type.option.private_flight': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::TYPE_PRIVATE_FLIGHT
+                                'report.type.option.private_jbj': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::TYPE_PRIVATE_JBJ
+                                'report.type.option.shared_jbj': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::TYPE_SHARED_JBJ
+                                'report.type.option.riding_jbj': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::TYPE_RIDING_JBJ
+                                'report.type.option.water_taxi': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::TYPE_WATER_TAXI
+                                'report.type.option.activity_regular': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::TYPE_ACTIVITY_REGULAR
+                                'report.type.option.activity_transportation': !php/const App\Wicrew\SaleBundle\Entity\OrderItem::TYPE_ACTIVITY_TRANSPORTATION
+                            expanded: true
+                            multiple: true
+                    - { property: 'pickDate', type: date, label: 'report.service_date' }
+                    -   property: 'supplierMadeBy'
+                        type: 'App\Wicrew\ReportBundle\Form\Filter\SupplierMadeBy'
+                        label: 'report.supplier_made_by'
+                        mapped: false
+                    -   property: 'supplierBookBy'
+                        type: 'App\Wicrew\ReportBundle\Form\Filter\SupplierBookBy'
+                        label: 'report.supplier_book_by'
+                        mapped: false
+                    -   property: 'commission_report'
+                        mapped: false
+                        type: 'App\Wicrew\ReportBundle\Form\Filter\Commission'
+                        label: 'report.commission'
+                    - { property: 'subtotalRack', label: 'report.rack_rate' }
+                    - { property: 'subtotalNet', label: 'report.tax' } 
+                    -   property: 'refund'
+                        mapped: false
+                        type: 'App\Wicrew\ReportBundle\Form\Filter\Refund'
+                        label: 'report.refund'
+                    - { property: 'totalTax', label: 'report.tax' }
+                    - { property: 'grandTotal', label: 'report.total_rack_rate' }
+                    - { property: 'grandTotalNet', label: 'report.total_net_rate' }
+                    -   property: 'profit_report'
+                        mapped: false
+                        type: 'App\Wicrew\ReportBundle\Form\Filter\Profit'
+                        label: 'report.profit'
+                    -   property: 'paymentType'
+                        type: 'App\Wicrew\ReportBundle\Form\Filter\PaymentType'
+                        mapped: false
+                        type_options:
+                            choices:
+                                'report.payment_type.option.credit_card': !php/const App\Wicrew\SaleBundle\Entity\Order::PAYMENT_TYPE_CREDIT_CARD
+                                'report.payment_type.option.cash': !php/const App\Wicrew\SaleBundle\Entity\Order::PAYMENT_TYPE_CASH
+                                'report.payment_type.option.cheque': !php/const App\Wicrew\SaleBundle\Entity\Order::PAYMENT_TYPE_CHEQUE
+                            expanded: true
+                            multiple: true
+                    -   property: 'user'
+                        type: 'App\Wicrew\ReportBundle\Form\Filter\User'
+                        label: 'report.created_by'
+                        mapped: false 
+                        type_options:
+                            choices:
+                                'report.staff': !php/const App\Entity\User::TYPE_USER_STAFF
+                                'report.website': !php/const App\Entity\User::TYPE_USER_WEBSITE
+                title: 'report.title'
+                fields: 
+                    - { property: 'status', label: 'report.status', template: '@WicrewReport/Admin/list.status.html.twig' }
+                    - { property: 'order', label: 'report.booking_id', template: '@WicrewReport/Admin/list.order.html.twig' }
+                    - { property: 'type', label: 'report.product', sortable: false, template: '@WicrewReport/Admin/list.type.html.twig' } 
+                    - { property: 'pickDate', label: 'report.service_date', format: '%global.date.format%' }
+                    - { property: 'supplier', label: 'report.supplier_made_by' }
+                    - { property: 'order.supplier', label: 'report.supplier_book_by' }
+                    - { property: 'commission_report', label: 'report.commission', mapped: false, css_class: 'text-right', template: '@WicrewReport/Admin/list.commission.html.twig' }
+                    - { property: 'subTotalRack', label: 'report.rack_rate',  css_class: 'text-right', template: '@WicrewReport/Admin/list.dollar_price.html.twig' } 
+                    - { property: 'subTotalNet', label: 'report.net_rate', css_class: 'text-right', template: '@WicrewReport/Admin/list.dollar_price.html.twig' }
+                    - { property: 'refund', label: 'report.refund', mapped: false, css_class: 'text-right', template: '@WicrewReport/Admin/list.refund.html.twig'  }
+                    - { property: 'totalTax', label: 'report.tax', css_class: 'text-right', template: '@WicrewReport/Admin/list.dollar_price.html.twig' }
+                    - { property: 'grandTotal', label: 'report.total_rack_rate', mapped: false, css_class: 'text-right', template: '@WicrewReport/Admin/list.dollar_price.html.twig' } 
+                    - { property: 'grandTotalNet', label: 'report.total_net_rate', mapped: false, css_class: 'text-right', template: '@WicrewReport/Admin/list.dollar_price.html.twig' }
+                    - { property: 'profit_report', label: 'report.profit', mapped: false, css_class: 'text-right', template: '@WicrewReport/Admin/list.profit.html.twig' }
+                    - { property: 'order.paymentType', label: 'report.payment_type', template: '@WicrewReport/Admin/list.payment_type.html.twig' }
+                    - { property: 'order.country', label: 'report.country'}
+                    - { property: 'user', label: 'report.created_by', template: '@WicrewReport/Admin/list.user.html.twig' }
+                max_results: '9999999'
+                sort: ['pickDate', '%global.sort.asc%']
+                # dql_filter: 'entity.status != 3'
+            templates:
+                list: '@WicrewReport/Admin/list.html.twig'

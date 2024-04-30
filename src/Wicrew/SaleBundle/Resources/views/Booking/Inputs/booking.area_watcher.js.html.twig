@@ -1,0 +1,40 @@
+<script type="text/javascript">
+    jQuery(document).on("change", "select[id^=areas_select_]", function () {
+        let selectedArea = $(this).children("option:selected").val();
+        selectedArea = JSON.parse(selectedArea);
+
+        let areaSection = $(this).parents(".col-block").find(".area-type-section");
+        let areaElements = areaSection.find("input");
+        let airportSection = $(this).parents(".col-block").find(".airport-type-section");
+        let airportElements = airportSection.find("input");
+
+        if (
+            selectedArea["type"] === {{ constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AREA') }}
+            && areaSection.is(":hidden")
+        ) {
+            areaSection.removeClass("hidden"); 
+            airportSection.addClass("hidden"); 
+            airportElements.each(function () {
+                $(this).val("");
+                $(this).removeAttr('required');
+            });
+            areaElements.each(function () { 
+                $(this).attr('required', 'required');
+            });
+        } else if (
+            selectedArea["type"] === {{ constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT') }}
+            && areaSection.is(":visible")
+        ) {
+            airportSection.removeClass("hidden");
+            airportSection.attr('required', 'required');
+            areaSection.addClass("hidden"); 
+            areaElements.each(function () {
+                $(this).val("");
+                $(this).removeAttr('required');
+            });
+            airportElements.each(function () { 
+                $(this).attr('required', 'required');
+            });
+        }
+    });
+</script>

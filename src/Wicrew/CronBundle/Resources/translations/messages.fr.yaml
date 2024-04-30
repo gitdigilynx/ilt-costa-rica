@@ -1,0 +1,10 @@
+cronlog.title: Schedule task history
+cronlog.id: ID
+cronlog.cron: Identifier
+cronlog.executed_at: Executed at
+cronlog.finished_at: Finished at
+cronlog.status: Status
+cronlog.status.processing: Processing
+cronlog.status.success: Success
+cronlog.status.error: Error
+cronlog.message: Message

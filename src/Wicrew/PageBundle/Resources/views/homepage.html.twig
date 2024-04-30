@@ -1,0 +1,328 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ 'site.title'|trans() }}{% endblock %}
+
+{% block body %}
+
+    <section class="home-cover">
+        <div class="content">
+            <div class="container">
+                <div class="home-cover-content">
+                    <div class="landing-phrase">
+                        <h1>Discover Costa Rica<br>with Professionals.</h1>
+                        <h2>Private transportation anywhere in Costa Rica. <br>Reliable, Convenient & Safe.</h2>
+                    </div>
+                    <div class="landing-pin">
+                        <a href="{{ getParameterValue('trip_advisor_link') }}" title="TripAdvisor" target="_blank">
+                            <img loading="lazy" src="{{ absolute_url(asset('bundles/wicrewcore/images/tripadvisor-logo.png')) }}" srcset="{{ absolute_url(asset('bundles/wicrewcore/images/tripadvisor-logo.png')) }} 1x, {{ absolute_url(asset('bundles/wicrewcore/images/tripadvisor-logo@2x.png')) }} 2x" alt="Top Rated on TripAdvisor">
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <img class="section-bg" loading="lazy" src="{{ absolute_url(asset('bundles/wicrewcore/images/home/cover-bg.jpg')) }}" alt="">
+        </div>
+    </section>
+
+    <section class="home-search">
+        {% set transportTab = "transportation-search" %}
+        {% set flightTab = "flight-search" %}
+        {% set activityTab = "activities-tab" %}
+        <div class="container">
+            <div class="home-tabs">
+                <button class="home-tab current-tab" data-look-for="{{ transportTab }}">
+                    <span class="home-tab-text"><i class="fas fa-shuttle-van"></i>{{ 'product.transportation'|trans }}</span>
+                </button>
+                <button class="home-tab" data-look-for="{{ activityTab }}">
+                    <span class="home-tab-text"><i class="fa fa-ticket"></i>{{ 'activities.title'|trans }}</span>
+                </button>
+                <button class="home-tab" data-look-for="{{ flightTab }}">
+                    <span class="home-tab-text"><i
+                                class="fas fa-plane"></i>{{ 'product.private.flights'|trans }}</span>
+                </button>
+            </div>
+        </div>
+        {% include "@WicrewProduct/Product/Search/search.private-transports.html.twig"
+            with {
+            "transportTypes": {
+                "0": constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_PRIVATE_SHUTTLE"),
+                "1": constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_SHARED_SHUTTLE")
+            },
+            "additionalClasses": { 0: "tab-section", 1: transportTab },
+            "id": "first-search"
+        } only %}
+        <div class="container tab-section {{ activityTab }}" hidden>
+            <div class="search-container">
+                {% include "@WicrewPage/activities.list.html.twig" %}
+            </div>
+        </div>
+        {% include "@WicrewProduct/Product/Search/search.private-transports.html.twig"
+            with {
+            "transportTypes": {
+                "0": constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_AIRPLANE"),
+            },
+            "additionalClasses": { 0: "tab-section", 1: flightTab },
+            "id": "seconds-search",
+            "hidden": "hidden"
+        } only %}
+    </section>
+
+    <section class="home-content home-populartours-section">
+        <div class="container">
+            <div class="content">
+                <h2>{{ 'homepage.populartours.title'|trans }}</h2>
+            </div>
+            <div class="populartours-listing">
+                {% for i in 1..6 %}
+                    <div class="populartours-item">
+                        <div class="image">
+                            <a href="/{{ ('homepage.populartours_items.link' ~ i)|trans }}" title="{{ ('homepage.populartours_items.title' ~ i)|trans|striptags }}">
+                                <img loading="lazy" src="{{ absolute_url(asset('bundles/wicrewcore/images/home/popular-tour-' ~ i ~ '.jpg')) }}" srcset="{{ absolute_url(asset('bundles/wicrewcore/images/home/popular-tour-' ~ i ~ '.jpg')) }} 1x, {{ absolute_url(asset('bundles/wicrewcore/images/home/popular-tour-' ~ i ~ '@2x.jpg')) }} 2x" alt="{{ ('homepage.populartours_items.title' ~ i)|trans|striptags }}">
+                            </a>
+                        </div>
+                        <div class="content">
+                            <h3>
+                               Tours from {{ ('homepage.populartours_items.title' ~ i)|trans|raw }}
+                            </h3>
+                            <a href="/{{ ('homepage.populartours_items.link' ~ i)|trans }}" title="{{ ('homepage.populartours_items.title' ~ i)|trans|striptags }}">
+                                {{ ('homepage.populartours.btn_text')|trans|raw }}
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="home-content home-justfly-section">
+        <div class="container">
+            <div class="content">
+                <h2>{{ 'homepage.justfly.title'|trans }}</h2>
+                <p>{{ ('homepage.justfly.content')|trans|raw }}</p>
+                <a class="btn-white" href="/{{ ('homepage.justfly.btn_link')|trans }}">
+                    {{ ('homepage.justfly.btn_text')|trans|raw }}
+                </a>
+            </div>
+        </div>
+        <img class="section-bg" loading="lazy" src="{{ absolute_url(asset('bundles/wicrewcore/images/home/justfly-bg.jpg')) }}" alt="">
+    </section>
+
+    <section class="home-content home-tripadvisor-section">
+        <div class="container">
+            <div class="content">
+                <img class="tripadvisor-logo" src="{{ absolute_url(asset('bundles/wicrewcore/images/tripadvisor.svg')) }}" alt="TripAdvisor">
+                <h2>{{ 'homepage.tripadvisor.title'|trans }}</h2>
+                <p>{{ ('homepage.tripadvisor.content')|trans|raw }}</p>
+                <a class="btn-white" href="{{ getParameterValue('trip_advisor_link') }}" target="_blank">
+                    {{ ('homepage.tripadvisor.btn_text')|trans|raw }}
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    {# hide for now #}
+    {# 
+    <section class="home-services">
+        <div class="container">
+            <div class="row service-items">
+                <div class="col-md-3 col-sm-6">
+                    <div class="service-item">
+                        <a href="{{ path('product_transportation', { 'type': 'private-shuttles' }) }}" title="">
+                            <div class="image">
+                                <img src="{{ absolute_url(asset('bundles/wicrewcore/images/home/home-private-shuttles.jpg')) }}"
+                                     alt="">
+                                <span class="label">Private Shuttles</span>
+                                <span class="arrow"></span>
+                            </div>
+                            <div class="content">
+                                <strong>A variety of options to meet your needs.</strong>  Our private shuttles can be
+                                scheduled at any time from anywhere with a door-to-door services + perks.
+                            </div>
+                        </a>
+                    </div>
+                </div> 
+                <div class="col-md-3 col-sm-6">
+                    <div class="service-item">
+                        <a href="{{ path('product_transportation', { 'type': 'shared-shuttles' }) }}" title="">
+                            <div class="image">
+                                <img src="{{ absolute_url(asset('bundles/wicrewcore/images/home/home-shared-shuttles.jpg')) }}"
+                                     alt="">
+                                <span class="label">Shared Shuttles</span>
+                                <span class="arrow"></span>
+                            </div>
+                            <div class="content">
+                                <strong>A variety of options to meet your needs.</strong> Our premium shared shuttles
+                                are economical, and great for budget minded travelers.
+                            </div>
+                        </a>
+                    </div>
+                </div> 
+                <div class="col-md-3 col-sm-6">
+                    <div class="service-item">
+                        <a href="{{ path('wicrew_locations') }}" title="">
+                            <div class="image">
+                                <img src="{{ absolute_url(asset('bundles/wicrewcore/images/home/home-activities.jpg')) }}"
+                                     alt="">
+                                <span class="label">Activities</span>
+                                <span class="arrow"></span>
+                            </div>
+                            <div class="content">
+                                <strong>Costa Rica offers many thrilling ways to submerge yourself in its natural
+                                    elements.</strong> It is the perfect destination for adventure, exploring ecosystems
+                                and connecting with nature.
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                    <div class="service-item">
+                        <a href="{{ path('product_transportation', { 'type': 'private-flight' }) }}" title="">
+                            <div class="image">
+                                <img src="{{ absolute_url(asset('bundles/wicrewcore/images/home/home-private-flights.jpg')) }}"
+                                     alt="">
+                                <span class="label">Private Flights</span>
+                                <span class="arrow"></span>
+                            </div>
+                            <div class="content">
+                                <strong>Enjoy the luxury of flying on our private charter planes</strong> on your
+                                schedule and maximize your experience from the sky, while saving lots of time.
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+    #}
+
+    <section class="home-content home-nature">
+        <div class="container">
+            <div class="content">
+                <h2>Unspoiled Nature, Beaches and Jungles<br> With Abundant Wildlife</h2>
+                <p>It’s one of the world’s most naturally rich destinations, two exquisite coastlines, lush tropical
+                rainforests, over 200 thunderous waterfalls, virgin cloud forests, beautiful white sand beaches and rare wildlife makes
+                Costa Rica a unique place to have an experience you’ll never forget. Whether you’re an adrenaline-junkie
+                who wants to zip-line across 2250 foot long cable above the forest floor or a cool swim underneath the
+                waterfalls. In Costa Rica, enjoying the beauty of nature is a part of our lifestyle. Whether you’re
+                looking for a relaxing break to just enjoy the views of the Pacific sunset, you’ll quickly realize
+                during your trip that this little country is packed with new experiences
+                for everyone.</p>
+            </div>
+        </div>
+        <img class="section-bg" loading="lazy" src="{{ absolute_url(asset('bundles/wicrewcore/images/home/nature-bg.jpg')) }}" alt="">
+    </section>
+
+    <section class="home-content home-bullets">
+        <div class="container">
+            <div class="content">
+                <h2>Your Visit to Costa Rica</h2>
+                Before your visit, there are some important things to know about Costa Rica. The following travel tips
+                for Costa Rica will help you understand the country better. The busiest travel time in Costa Rica is
+                during Christmas and New Years, and the week until Easter Sunday, which is known as Holy Week. If you
+                plan to travel during these weeks, you must book a hotel in advance-but it is best to plan another trip
+                to Costa Rica.
+            </div>
+
+            <div class="content-with-image">
+                {% for i in 1..8 %}
+                    <div class="row content-with-image-item">
+                        <div class="col-md-6 col-image">
+                            <div class="image">
+                                <img src="{{ absolute_url(asset('bundles/wicrewcore/images/home/home-content-' ~ i ~ '.jpg')) }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-content">
+                            <div class="content">
+                                <h3>
+                                    <span class="number">{{ "%02d"|format(i) }}.</span>{{ ('homepage.bullets.headline' ~ i)|trans|raw }}
+                                </h3>
+                                {{ ('homepage.bullets.justify' ~ i)|trans|raw }}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+        </div>
+    </section>
+
+    {% include "@WicrewPage/testimonials.html.twig" %}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+        $(function () {
+            $(".home-tab").on("click", function () {
+                let lookingFor = $(this).attr("data-look-for");
+                $(".tab-section").each(function () {
+                    if ($(this).hasClass(lookingFor)) {
+                        $(this).removeAttr("hidden");
+                    } else {
+                        $(this).attr("hidden", "hidden");
+                    }
+                });
+
+                $(".home-tab").each(function () {
+                    if ($(this).attr("data-look-for") === lookingFor) {
+                        $(this).addClass("current-tab");
+                    } else {
+                        $(this).removeClass("current-tab");
+                    }
+                });
+            });
+            $('#book-now').click(function() {
+                $([document.documentElement, document.body]).animate({
+                    scrollTop: $(".home-search").offset().top - 62
+                }, 500);
+            });
+
+            function doAjaxDisplayLimitMessage() {
+                var vehicle_data = [];
+
+                $('.vehicle-search-box:visible').each(function() {
+                    var search_to = $(this).find('.search-to').val();
+                    var child_count = $(this).find('.search-child-count').val();
+                    var adult_count = $(this).find('.search-adult-count').val(); 
+                    var search_from = $(this).find('.search-from').val();
+                    var passenger_count = parseInt(child_count) + parseInt(adult_count);
+                    
+                    if (!search_to || !passenger_count || !search_from) return;
+
+                    vehicle_data.push({search_to: search_to, search_from: search_from, passenger_count: passenger_count});
+                });
+ 
+                $('#submit-search').prop('disabled', true);
+                $.ajax({
+                    url: "{{ path('product_displayLimitMessage') }}",
+                    method: 'POST',
+                    data: {vehicle_data: vehicle_data},
+                    success: function(r) {
+                        console.log(r)
+                        if (r.displayLimitMessage) {
+                            $('#submit-search').prop('disabled', true);
+                            $('.passenger-limit-banner').removeAttr('hidden');
+                        } else {
+                            if (!window.limitIsReached) {
+                                $('#submit-search').prop('disabled', false);
+                                $('.passenger-limit-banner').attr('hidden', 'hidden');
+                            }
+                        }
+                    }
+                });
+            }
+
+            doAjaxDisplayLimitMessage();
+
+            //
+            $('.search-from, .search-to').change(function() {
+                doAjaxDisplayLimitMessage();
+            });
+
+            $('.pd-plus, .pd-minus').click(function() {
+                doAjaxDisplayLimitMessage();
+            });
+        })
+    </script>
+{% endblock %}

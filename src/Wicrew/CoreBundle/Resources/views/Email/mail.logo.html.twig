@@ -1,0 +1,9 @@
+<div class="logo"> 
+    <a href="{{ url('homepage') }}" title="">
+        {% if isUsedInPdf is defined and isUsedInPdf %} 
+            <img src="{{ imageToBase64('bundles/wicrewcore/images/logo_new.png') }}" alt="" style="width: 164px;">
+        {% else %}
+            <img src="{{ absolute_url(asset('bundles/wicrewcore/images/logo_new.png')) }}" alt="" style="width: 164px;">
+        {% endif %}
+    </a>
+</div>

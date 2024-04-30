@@ -1,0 +1,38 @@
+report.title: Reports
+report.export: Export
+report.service_date: Service date
+report.product: Service type
+report.booking_id: 'Booking #'
+report.created_at: Created at
+report.type.option.private_shuttle: Private shuttle
+report.type.option.shared_shuttle: Shared shuttle
+report.type.option.private_flight: Private flight
+report.type.option.private_jbj: Private Jeep-Boat-Jeep
+report.type.option.shared_jbj: Shared Jeep-Boat-Jeep
+report.type.option.riding_jbj: Riding Jeep-Boat-Jeep
+report.type.option.water_taxi: Water taxi
+report.type.option.activity_regular: Activity regular
+report.type.option.activity_transportation: Activity transportation
+report.supplier_made_by: Supplier
+report.supplier_book_by: Affiliate
+report.net_rate: Net rate
+report.rack_rate: Rack rate
+report.vehicle_price: Vehicle price
+report.adult_price: Adult price
+report.kid_price: Kid price
+report.commission: Commision / Promo Payout
+report.tax: Taxes
+report.profit: Profit
+report.payment_type: Payment type
+report.payment_type.option.credit_card: Credit card
+report.payment_type.option.cash: Cash
+report.payment_type.option.cheque: Cheque
+report.created_by: Created by
+report.website: Website
+report.total: Total
+report.status: Status
+report.refund: Refund
+report.total_rack_rate: Total Rack
+report.total_net_rate: Net Rack
+report.country: Country
+report.staff: Staff 

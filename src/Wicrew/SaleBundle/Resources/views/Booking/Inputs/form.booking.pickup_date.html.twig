@@ -1,0 +1,15 @@
+{% if alternateTitleFlightDate is defined %}
+    {% set labelText = alternateTitleFlightDate %}
+{% else %}
+    {% set labelText = 'booking.pickupdate'|trans %}
+{% endif %}
+{% set readonly = false %}
+
+<input type="text" id="{{ pickupDateID }}"
+       {% if readonly is not defined or not readonly %}
+            class="form_datepicker updates-summary-of-{{ bookingNumber }}"
+       {% endif %}
+       name="{{ postDataSection }}[pickUpDate]"
+       required="required" placeholder="mm dd, yyyy" {% if pickupDate is defined and pickupDate is not null %} value="{{ pickupDate|date("F d, Y") }}" {% endif %}/>
+
+<label class="floating-label" for="{{ pickupDateID }}">{{ labelText }}</label>

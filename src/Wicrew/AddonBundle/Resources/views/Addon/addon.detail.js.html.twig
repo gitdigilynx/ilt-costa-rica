@@ -1,0 +1,118 @@
+<script type="text/javascript">
+    function updateAddonLabel(elm) {
+        let spanElement = elm.parent().find("span");
+        if (elm.is(':checked')) {
+            spanElement.text("{{ 'addon.remove'|trans() }}");
+        } else {
+            spanElement.text("{{ 'addon.add'|trans() }}");
+        }
+    }
+
+    $(function () {
+
+    let addonContainer = $("#{{ id }}");
+    addonContainer.find("[id^=addon_]").on("click", function () {
+        updateAddonLabel($(this));
+
+        let addonGroupElement = $(this).parents(".addon-group-item");
+        if ($(this).is(":checked")) {
+            addonGroupElement.addClass('active');
+
+            if (!addonGroupElement.hasClass("addon-type-checkbox")) {
+                let updateSummary = false;
+                addonGroupElement.find("[id^=addonOption_]").each(function () {
+                    $(this).prop("checked", true);
+                    updateSummary = true;
+                });
+                if (updateSummary) {
+                    addonGroupElement.find("[id^=addonOption_]").first().trigger("input");
+                }
+            }
+        } else {
+            addonGroupElement.removeClass('active');
+
+            if (!addonGroupElement.hasClass("addon-type-checkbox")) {
+                let updateSummary = false;
+                addonGroupElement.find("[id^=addonOption_]:checked").each(function () {
+                    $(this).prop("checked", false);
+                    updateSummary = true;
+                });
+                if (updateSummary) {
+                    addonGroupElement.find("[id^=addonOption_]").first().trigger("input");
+                }
+            }
+        }
+    });
+
+    addonContainer.find("[id^=addonOption_]").on("click", function () {
+        let addonOption = $(this).parents(".addon-item");
+        if ($(this).is(":checked")) {
+            if ($(this).attr("type") === "radio") {
+                addonContainer.find(".addon-item").removeClass("active");
+                addonContainer.find(".addon-item input").not(this).prop('checked', false);
+            }
+
+            addonOption.addClass('active');
+        } else {
+            addonOption.removeClass('active');
+        }
+
+        let addonGroupElement = $(this).parents(".addon-group-item");
+        if ($(this).is(":checked") && !addonGroupElement.hasClass("active")) {
+            // Option is selected -> hit the "Add" button.
+            let addonButtonElement = addonGroupElement.find("[id^=addon_]");
+            addonButtonElement.trigger("click");
+        } else if (addonGroupElement.hasClass("active") && addonGroupElement.find('[id^=addonOption_]:checked').length < 1) {
+            // Option is deselected -> hit the "Remove" button if no other options are selected.
+            let addonButtonElement = addonGroupElement.find("[id^=addon_]");
+            addonButtonElement.trigger("click");
+        }
+    });
+
+    addonContainer.find(".pd-minus").on("click", function () {
+        let inputElement = $(this).siblings("input").first();
+        let displayElement = $(this).siblings(".pd-value").first();
+        let val = parseInt(inputElement.val().toString());
+        if (val > 0) {
+            val--;
+            inputElement.val(val);
+            displayElement.text(val);
+            inputElement.trigger("input");
+        }
+        handleAddRemoveAddon(this);
+    });
+
+    addonContainer.find(".pd-plus").on("click", function () {
+        let inputElement = $(this).siblings("input").first();
+        let displayElement = $(this).siblings(".pd-value").first();
+        let val = parseInt(inputElement.val().toString());
+        val++;
+        inputElement.val(val);
+        displayElement.text(val);
+        inputElement.trigger("input");
+        handleAddRemoveAddon(this);
+    });
+
+    });
+
+    function handleAddRemoveAddon(element) { 
+        $childAdultAddonQuantities = $(element).closest('.addon-item-listing').find('[name^="product"][name$="\[quantity\]"]');
+        let hasQuantity = false;  
+        $childAdultAddonQuantities.each(function() { 
+            if ($(this).val() != '0') {
+                hasQuantity = true;
+            }
+        });
+
+        $addonAddRemoveButton = $(element).closest('.addon-item-listing').parent().find('.addon-add-remove-button'); 
+        if (hasQuantity) {
+            if (!$addonAddRemoveButton.is(':checked')) {
+                $addonAddRemoveButton.click();
+            }
+        } else {
+            if ($addonAddRemoveButton.is(':checked')) {
+                $addonAddRemoveButton.click();
+            }
+        }  
+    }
+</script>

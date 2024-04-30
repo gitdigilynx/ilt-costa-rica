@@ -1,0 +1,8 @@
+{% set driverAssigned = item is not null and item.driver is not null %}
+{% set emailSent = item is not null and item.sendEmail is null %}
+<div class="sent-email-btn-wrapper">
+    <label {{ driverAssigned and not emailSent ? '': 'hidden' }}>
+        {{ 'transport_management.email.driver'|trans }} <input type="checkbox" data-sent-email="{{ driverAssigned and emailSent }}"
+           name="{{ entity_config['nameInputArrayWrapper'] ~ '[' ~ field_options['arrayWrapperIndex'] ~ ']' ~ '[' ~ field_options['property'] ~ ']' }}">
+    </label>
+</div>

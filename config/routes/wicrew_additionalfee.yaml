@@ -1,0 +1,2 @@
+#wicrew_additionalfee:
+#    resource: "@WicrewAdditionalFeeBundle/Resources/config/routes.yaml"

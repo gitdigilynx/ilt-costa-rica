@@ -1,0 +1,94 @@
+<script type="text/javascript">
+    // $(document).on("ready", function () {
+    //Remove item from cart
+    $(document).on('click', '[class^=remove-item]', function () {
+        if (confirm('{{ "delete.confirm"|trans() }}')) {
+            let bookingNumber = $(this).data('booking-number');
+            $.ajax({
+                url: '{{ url("sale_cart_delete") }}',
+                type: "POST",
+                data: {bookingNumber: bookingNumber},
+                success: function (response) {
+                    if (response.status === 'success') {
+                        window.location.replace("{{ url('sale_cart') }}");
+                    } else {
+                        alert(response.message);
+                        return false;
+                    }
+                }
+            });
+        }
+    });
+    // remove addon from cart
+    $(document).on('click', '[class^=remove-addon]', function () {
+        if (confirm('{{ "delete.confirm"|trans() }}')) {
+            let bookingNumber = $(this).data('booking-number');
+            let addonindex = $(this).data('addon-id');
+            let addontype = $(this).data('addon-type');
+            $.ajax({
+                url: '{{ url("sale_cart_delete_addon") }}',
+                type: "POST",
+                data: {bookingNumber: bookingNumber, addonindex: addonindex, addontype: addontype},
+                success: function (response) {
+                    if (response.status === 'success') {
+                        window.location.replace("{{ url('sale_cart') }}");
+                    } else {
+                        alert(response.message);
+                        return false;
+                    }
+                }
+            });
+        }
+    });
+
+    // remove addon from cart
+    $('.proceed-checkout').on('click', function (event) { 
+        event.preventDefault();
+        let notes = {};
+        $('.item-customer-notes').each(function() {
+            notes[$(this).data('bookingNumber')] = $(this).val();
+        });
+        
+        $.ajax({
+            url: '{{ url("sale_cart_udpate_note") }}',
+            type: "POST",
+            data: {notes: notes},
+            success: function (response) {
+                if (response.status === 'success') {
+                    window.location.replace("{{ url('sale_checkout') }}");
+                } else {
+                    alert(response.message);
+                    return false;
+                }
+            }
+        });
+    });
+    $('.add-to-cart-and-continue-btn').on('click', function (event) { 
+        event.preventDefault();
+        let notes = {};
+        $('.item-customer-notes').each(function() {
+            notes[$(this).data('bookingNumber')] = $(this).val();
+        });
+        
+        $.ajax({
+            url: '{{ url("sale_cart_udpate_note") }}',
+            type: "POST",
+            data: {notes: notes},
+            success: function (response) {
+                if (response.status === 'success') {
+                    window.location.replace("{{ url('homepage') }}");
+                } else {
+                    alert(response.message);
+                    return false;
+                }
+            }
+        });
+    });
+ 
+ 
+    $( window ).on("load", function() {
+        $('html, body').animate({
+            scrollTop: $("#scrollToThis").offset().top - 150
+        }, 2000);
+    });
+</script>

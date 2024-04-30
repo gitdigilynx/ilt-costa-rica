@@ -1,0 +1,617 @@
+{% extends "@WicrewCore/Email/main.email.html.twig" %}
+
+{% block titlemail %}
+    {{ 'email.confirm.order'|trans() }}
+{% endblock %}
+
+{% block mailcontent %}
+<p>Hello {{order.fullName}},</p>
+<br>
+<p> Thank you for choosing <span class="em-contact-label">I Love Travel Costa Rica</span>. #1 on TripAdvisor, and for a reason! <a href="https://www.tripadvisor.ca/Attraction_Review-g309293-d9875168-Reviews-ILT_Costa_Rica-San_Jose_San_Jose_Metro_Province_of_San_Jose.html"> Click here</a> </p>
+<p> Please find the rate(s) for your private transfer(s) below. Rates are per trip, <strong>NOT</strong> per person. Attached are images of the vehicle we will be using for this service and are recent models with A/C.</p>
+<p> All our private transfers include an English-speaking driver, personalized meet & greet, complimentary bottled water, Wi-Fi, and stops at your leisure for photographs, meals, grocery store, or restroom breaks. </p>
+<br>
+
+<h2>Details</h2>
+{# @var item \App\Wicrew\SaleBundle\Entity\OrderItem #}
+{% for item in order.items %}
+    <div class="item-box">
+        <div class="item-header">
+            {% if item.product %}{{ item.product.transportationType.name }}{% elseif item.activity %}{{ item.activity.name }}{% endif %}
+            - {{ item.pickDate|formatNoNull('F jS, Y') }}
+        </div>
+
+        <div class="item-info">
+            <div class="item-vehicle-info" style="width: 200px;">
+                {% set imageURL = getOrderItemImage(item) %}
+                {% if isUsedInPdf is defined and isUsedInPdf %} 
+                    {% if imageURL is not null %}
+                        <img src="{{ imageToBase64(imageURL) }}"
+                            width="{{ getParameterValue('global_image_vehicletype_width') }}">
+                    {% else %}
+                        <img src="{{ imageToBase64('bundles/wicrewcore/images/placeholder.png') }}"
+                            alt="{{ 'core.image404'|trans }}">
+                    {% endif %} 
+                {% else %}
+                    {% if imageURL is not null %}
+                        <img src="{{ app.request.getSchemeAndHttpHost() ~ imageURL }}"
+                            width="{{ getParameterValue('global_image_vehicletype_width') }}">
+                    {% else %}
+                        <img src="{{ absolute_url(asset('bundles/wicrewcore/images/placeholder.png')) }}"
+                            alt="{{ 'core.image404'|trans }}">
+                    {% endif %} 
+                {% endif %}
+            </div>
+            <div class="item-trip-info" style="width: 660px;">
+                <table>
+                    <tr>
+                        <td style="width: 300px">
+                            <div><strong>Customer name:</strong> {{ item.order.firstname ~ ' ' ~ item.order.lastname }} </div>
+
+                            <div><strong>Date:</strong> {{ item.pickDate|formatNoNull('F jS, Y') }}</div>
+                            {% if item.pickAddress != "" %} 
+                                <div><span class="item-trip-label">Pick-up Area:</span> {{ item.pickArea.name }}</div>
+                                <div><span class="item-trip-label">Pick-up Location:</span> {{ item.pickAddress }}</div>
+                            {% else %}
+                                <div><span class="item-trip-label">Pick-up Location:</span> {{ item.pickArea.name }}</div>
+                            {% endif %}
+                            {% if item.product %}
+                                {% if ( item.pickArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) ) %} 
+                                    <div><strong>Pick-up Time :</strong> {{ item.pickTime|formatNoNull('H:i') }} </div>
+                                {% elseif (item.dropArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT'))) %} 
+                                    <div><strong>Pick-up Time :</strong> 
+                                        {% if item.pickTimeTransport == "" %} 
+                                            <span style="color:red;">Will be added on confirmation email</span>
+                                        {% else %}
+                                            {{ item.pickTimeTransport|formatNoNull('H:i') }}
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <div><strong>Pick-up Time :</strong> {{ item.pickTime|formatNoNull('H:i') }}</div> 
+                                {% endif %}
+                            {% else %}
+                             <div><strong>Pick-up Time :</strong> 
+                                {% if item.pickTime == "" %} 
+                                    <span style="color:red;">Will be added on confirmation email</span>
+                                {% else %}
+                                    {{ item.pickTime|formatNoNull('H:i') }}
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            <div><strong>Adults :</strong> {{ item.adultCount }}</div>
+                            <div><strong>Children :</strong> {{ item.childCount }}</div>
+                        </td>
+                        <td>
+                            {% if item.dropAddress != "" %} 
+                                <div><span class="item-trip-label">Drop-off Area:</span> {{ item.dropArea.name }}</div>
+                                <div><span class="item-trip-label">Drop-off Location:</span> {{ item.dropAddress }}</div>
+                            {% else %}
+                                <div><span class="item-trip-label">Drop-off Location:</span> {{ item.dropArea.name }}</div>
+                            {% endif %} 
+                            {% if item.pickArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) and (item.pickAirlineCompany != '' or item.pickFlightNumber != '') %}
+                                {% if item.pickAirlineCompany != '' %}
+                                    <div><span
+                                        class="item-trip-label">Airline:</span> {{ item.pickAirlineCompany }}
+                                    </div>{% endif %}
+                                {% if item.pickFlightNumber != '' %}
+                                    <div><span
+                                        class="item-trip-label">Flight #:</span> {{ item.pickFlightNumber }}
+                                    </div>{% endif %} 
+                            {% endif %}  
+                            {% if item.dropArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) and (item.dropAirlineCompany != '' or item.dropFlightNumber != '') %}
+                                {% if item.dropAirlineCompany != '' %}
+                                    <div><span
+                                        class="item-trip-label">Airline:</span> {{ item.dropAirlineCompany }}
+                                    </div>{% endif %}
+                                {% if item.dropFlightNumber != '' %}
+                                    <div><span
+                                        class="item-trip-label">Flight #:</span> {{ item.dropFlightNumber }}
+                                    </div>{% endif %}
+                            {% endif %}
+                            <div>
+                                {% if item.product %}
+                                    
+                                    {% if item.pickArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) and item.dropArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}
+                                        {% if item.pickTime %}
+                                            <div>
+                                                <strong>Arrival Time: </strong><span>{{item.pickTime|formatNoNull("H:i")}}</span> 
+                                            </div>
+                                            <br />
+                                        {% endif %}
+                                    {% elseif item.dropArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}           
+                                        {% if item.pickTime %}
+                                            <div>
+                                                <strong>Departure Time: </strong><span>{{item.pickTime|formatNoNull("H:i")}}</span> 
+                                            </div>
+                                            <br />
+                                        {% endif %}
+                                    {% elseif item.pickArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}           
+                                        {% if item.pickTime %}
+                                            <div>
+                                                <strong>Arrival Time: </strong><span>{{item.pickTime|formatNoNull("H:i")}}</span> 
+                                            </div>
+                                            <br />
+                                        {% endif %}
+                                    {% endif %}
+                                {% elseif item.activity %}
+                                    <span class="item-trip-label">Tour Time:</span> {{ item.tourTime|formatNoNull('H:i') }}
+                                {% endif %}
+                            </div>
+                        </td> 
+                    </tr>
+                    {% if item.customerNotes %}
+                        <tr>
+                            <td colspan="2">
+                                <div class="item-trip-label item-notes-header">Notes:</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">{{ item.customerNotes|raw }}</td>
+                        </tr>
+                    {% endif %}
+                    <tr>
+                        <td colspan="2">
+                            {% if item.anyAddons and item.anyExtras %}<br><div><strong style="text-decoration: underline;">Extras & Add-ons:</strong></div>{% endif %}
+                            {% if item.anyAddons %}
+                                {% if not item.anyAddons %}<br>{% endif %}
+                                <div>
+                                    <label style="text-decoration: underline;font-weight:bold;">{{ 'booking.addons'|trans() }}:</label>
+                                    {% for addon in item.addons %}
+                                        <div class="inside">
+                                            {{ addon.label|raw }} - {{ addon.rackPrice ~ 'currency.symbol'|trans() }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            {% if item.anyExtras %}
+                                {% if item.anyExtras %}<br>{% endif %}
+                                <div>
+                                    <label style="text-decoration: underline;font-weight:bold;">{{ 'booking.extras'|trans() }}:</label>
+                                    {% for extra in item.extras %}
+                                        <div class="inside">
+                                            {{ extra.label|raw }} - {{ extra.rackPrice ~ 'currency.symbol'|trans() }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endfor %}  
+
+<h2>Summary</h2>
+<div class="purchase-summary">
+    <div class="client-contact-info" style="width: 270px;">
+        <div class="client-name">{{ order.fullName }}</div>
+    </div>
+    <div class="client-charges" style="width: 100%;">
+        <table>
+            {% set itemTaxes = 0 %}
+            {% set enabledTimeRange = false %}
+            {% for item in order.items %}
+                {% set itemPrice = item.subtotalRack %}
+                {% set itemTaxes = itemTaxes + (itemPrice * 0.13) %}
+                {% if item.anyTimeRangeFees %}
+                    {% set enabledTimeRange = true %}
+                    {% if item.regularTimeFeeRack is not null %}
+                        {% set itemPrice = itemPrice - item.regularTimeFeeRack %}
+                        {% set itemTaxes = itemTaxes + ( item.regularTimeFeeRack * 0.13 ) %}
+                    {% endif %}
+                    {% if item.flightPickTimeFeeRack is not null %}
+                        {% set itemPrice = itemPrice - item.flightPickTimeFeeRack %}
+                        {% set itemTaxes = itemTaxes + ( item.flightPickTimeFeeRack * 0.13 ) %}
+                    {% endif %}
+                    {% if item.flightDropTimeFeeRack is not null %}
+                        {% set itemPrice = itemPrice - item.flightDropTimeFeeRack %}
+                        {% set itemTaxes = itemTaxes + ( item.flightDropTimeFeeRack * 0.13 ) %}
+                    {% endif %}
+                {% endif %} 
+
+                <tr>
+                    <td class="charges-label-col"><span class="item-trip-label">{% if item.product %}{{ item.product.transportationType.name }}{% elseif item.activity %}{{ item.activity.name }}{% endif %}</span> </td>
+                    <td>{{ 'currency.symbol'|trans }}{{ itemPrice|number_format(2, '.', ',') }} {{ 'currency.text'|trans }}</td>
+                </tr>
+                
+                {% if item.anyTimeRangeFees %}
+                    {% if item.regularTimeFeeRack is not null %}
+                        <tr>
+                            <td class="charges-label-col"><span class="item-trip-label"> {{ 'product.section.regular_time_range'|trans }}</span></td>
+                            <td>{{ 'currency.symbol'|trans() ~ item.regularTimeFeeRack|number_format(2, '.', ',') }} {{ 'currency.text'|trans }}</td>
+                        </tr>
+                    {% endif %}
+                    {% if item.flightPickTimeFeeRack is not null %}
+                        <tr>
+                            <td class="charges-label-col"><span class="item-trip-label"> {{ 'product.section.flight_pickup_time_range'|trans }}</span></td>
+                            <td>{{ 'currency.symbol'|trans() ~ item.flightPickTimeFeeRack|number_format(2, '.', ',') }} {{ 'currency.text'|trans }}</td>
+                        </tr>
+                    {% endif %}
+                    {% if item.flightDropTimeFeeRack is not null %}
+                        <tr>
+                            <td class="charges-label-col"><span class="item-trip-label"> {{ 'product.section.flight_drop_off_time_range'|trans }}</span></td>
+                            <td>{{ 'currency.symbol'|trans() ~ item.flightDropTimeFeeRack|number_format(2, '.', ',') }} {{ 'currency.text'|trans }}</td>
+                        </tr>
+                    {% endif %}
+                {% endif %} 
+            {% endfor %}
+            <tr class="charges-taxes-row">
+                <td class="charges-label-col"><span class="item-trip-label">Taxes, Fees & Charges</span></td>
+                <td>{{ 'currency.symbol'|trans }}{{ itemTaxes|number_format(2, '.', ',') }} {{ 'currency.text'|trans }}</td>
+            </tr>
+            {% for discount in order.discountValues %}
+                <tr class="charges-taxes-row">
+                    <td class="charges-label-col"><span class="item-trip-label">{{ discount.discount.name }}</span></td>
+                    <td>-{{ 'currency.symbol'|trans }}{{ discount.discountRack }} {{ 'currency.text'|trans }}</td>
+                </tr>
+            {% endfor %}
+            <tr>
+                <td>
+                    <div class="item-trip-label charges-total-col">Grand Total:</div>
+                </td>
+                <td>
+                    <div class="item-trip-label charges-total-col">{{ 'currency.symbol'|trans }}{{ order.grandTotal['grandTotal'] }} {{ 'currency.text'|trans }}</div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<p style="margin-top: 24px;"> We also offer a price match guarantee. If you see the same service at a lower rate from a competitor, we’ll try to match it.</p>
+<p> When you’re ready to reserve, you can book directly online at <a href="http://www.iltcostarica.com/">www.iltcostarica.com</a> or by emailing us at <a href="mailto:info@iltcostarica.com">info@iltcostarica.com</a> with all your details. </p>
+<p> We accept Visa, Mastercard, and American Express. All transactions are secured via encryption. If you need to cancel for any reason, just email us 48 hours before your service for a refund excluding the credit card fees! </p>
+<p> If you have any questionsor concerns, please do not hesitate to contact us. </p>
+<p> Thank you, </p>
+{% if isUsedInPdf is defined and isUsedInPdf %}
+    <img src="{{ imageToBase64( 'signature-email-ILT.jpg' ) }}" alt="" style="width: 74%;">
+{% else %} 
+    <img src="signature-email-ILT.jpg" alt="" style="width: 74%;">
+{% endif %}
+
+<div style = "display:block; clear:both; page-break-after:always;"></div>{# page break if pdf #}
+
+<div class="important-information">    
+    <h3 style="text-align: center;">RESERVATION & CANCELLATIONS TERMS</h3>
+    <p style="margin-bottom:11px"><br />
+    I, CUSTOMER NAME (hereinafter &quot;Customer&quot;) hereby authorize I Love Travel Costa Rica S.R.L.&nbsp;(hereinafter &quot;ILT Costa Rica&quot;) to charge my credit card in accordance with the terms and conditions set forth below. I understand that any charges will show on my billing statement as &quot;ILT Costa Rica&quot;.<br />
+    <br />
+    <br />
+    <strong>Reservations Terms:</strong><br />
+    <br />
+    All reservations must be submitted via online booking through the website <a href="https://www.iltcostarica.com" rel="noopener noreferrer" target="_blank">www.iltcostarica.com</a> or via email <a href="mailto:info@iltcostarica.com">info@iltcostarica.com</a> and must be paid at the time of booking. The customer has read and verified the details and dates of the services and by continuing with payment agrees that everything is correct.<br />
+    <br />
+    <strong>Cancellation Terms: Private Transfers Shuttles</strong></p>
+
+    <ul>
+        <li style="margin-bottom: 11px;">All cancellation requests must be emailed to <a href="mailto:info@iltcostarica.com">info@iltcostarica.com</a> at least 48 hours before your service for a full refund to apply, excluding the credit card fees (5%).</li>
+        <li style="margin-bottom: 11px;">All cancellation requests during the &quot;HOLIDAY SEASON&quot; season from December 5th - January 4th, must be emailed to <a href="mailto:info@iltcostarica.com">info@iltcostarica.com</a> at least 72 hours before your service for a full refund to apply, excluding the credit card fees (5%).</li>
+        <li style="margin-bottom: 11px;">Any changes to your reservation must be sent via email to <a href="mailto:info@iltcostarica.com">info@iltcostarica.com</a> at least 24 hours before your transfer service, subject to availability.</li>
+        <li style="margin-bottom: 11px;">For any changes that require a refund, credit card fees of 5% will be applied.</li>
+        <li style="margin-bottom: 11px;">No shows are considered as cancellations and are non-refundable.</li>
+        <li style="margin-bottom: 11px;">Private airport pick-ups will be re-scheduled without any charge if your flight is delayed, and arrival is within the same day.</li>
+        <li style="margin-bottom: 11px;">Failure to contact ILT Costa Rica with flight cancellation or delay information in a timely manner may be considered reservation abandonment and may result in forfeiture of fare.</li>
+    </ul>
+
+    <p style="margin-bottom:11px"><br />
+    <strong>Modifications:</strong><br />
+    <br />
+    We are happy to accommodate any service modifications made up to 24 hours from the time of the Service; the only fees, penalties, and time restrictions ILT Costa Rica (I Love&nbsp;Travel Costa Rica S.R.L) will impose on the Customer are those which are imposed by the applicable service providers and not under our control. Last-minute modification requests (24-48hrs from the time of service) must be directed by email at <a href="mailto:info@iltcostarica.com">info@iltcostarica.com</a>. Any service or modification request cannot be considered confirmed or guaranteed and is subject to availability or until Customer makes new payment arrangements if there is a price increase, and ILT Costa Rica (I Love&nbsp;Travel Costa Rica S.R.L) provides Customer with updated confirmations. The customer has read and verified the details and dates of the Services and by continuing with payment online agrees that everything is correct.<br />
+    <br />
+    ILT Costa Rica (I Love Travel Costa Rica S.R.L) is not responsible for delays caused by accidents, civil disturbances, emergency medical situations, mechanical malfunction, damage to the highway, extreme weather, or other acts of God. We are not responsible for direct or indirect consequences of our performance, or lack thereof, including, but not limited to, failure to arrive on time for a flight, meeting, or another event, and loss of lodging reservation or another service due to late arrival. ILT Costa Rica offers a 100% money-back guarantee in the event we do not provide the service paid for, subject to our limits of liability.<br />
+    <br />
+    Travel insurance is strongly advised. A &quot;cancel for any reason&quot; type plan allows the most flexibility to completely mitigate anything that may come up.<br />
+    <br />
+    <strong>Assumption Of Risk; Hold Harmless And Indemnity Terms:</strong><br />
+    <br />
+    I Love Travel&nbsp;Costa Rica Travel S.R.L (ILT Costa Rica), together with its affiliates, partners, owners, directors, officers, agents, and employees (collectively, &ldquo;I Love&nbsp;Travel Costa Rica S.R.L (ILT Costa Rica) indemnified parties&rdquo;) act only as agents selling travel related services and booking such services. while we strive only to work with the best service providers, I Love&nbsp;Travel Costa Rica S.R.L (ILT Costa Rica) indemnified parties are in no way liable for any act or omission made by any service provider, the results of which may include but are not limited to damages, loss, or injuries to the customer or other travelers paid for or traveling with the customer. you acknowledge and agree that I Love Travel Costa Rica S.R.L (ILT Costa Rica) indemnified parties have performed reasonable due diligence into helping put together connections with third-party service providers that suit your expressly stated preferences, but that in each occasion the ultimate decision to select specific requested services and engage specific third-party service providers is solely and exclusively the customer&#39;s decision, and is based on the customer&rsquo;s own investigation into the options available to the customer, and not solely on the advice or recommendation of I Love&nbsp;Travel Costa Rica S.R.L (ILT Costa Rica) indemnified parties. additionally, the activities involved in the requested services may involve dangerous activities, unfamiliar locations and other risks associated with traveling abroad. please be aware that the customer is solely and exclusively responsible for their own well-being and for their belongings and possessions, and that customer is engaging in each of the requested services and related activities at the customer&rsquo;s own risk, and the customer hereby expressly assumes that risk. I Love&nbsp;Travel Costa Rica S.R.L (ILT Costa Rica) indemnified parties cannot and shall not be held liable for any damages, losses, or injuries occasioned by your travels or the services of third-party service providers, or that are outside its realm of control. I Love Travel Costa Rica S.R.L. (ILT Costa Rica)&nbsp;is not responsible for any disclaims, and all liability related to any and all services provided on the <a href="https://www.iltcostarica.com" rel="noopener noreferrer" target="_blank">www.iltcostarica.com</a> website. accordingly, any use of services will be made at the traveler&rsquo;s own risk.<br />
+    <br />
+    <strong>Booking over the Platform:</strong><br />
+    <br />
+    If you choose to enter a transaction with I Love Costa Rica S.R.L. (ILT Costa Rica) for the booking of any services, you agree and understand that you are entering into an agreement with ILT Costa Rica (I Love&nbsp;Travel Costa Rica S.R.L), suppliers, and third-party suppliers in Costa Rica, and you agree to accept any terms, conditions, rules and restrictions associated with the services imposed by the suppliers. You acknowledge and agree that we I Love Travel Costa Rica S.R.L.&nbsp;only sell tickets and are not the operator of any services in Costa Rica, and that, with the exception of our obligation to reserve the services and to transfer the payment hereunder, we disclaim all liability arising from or related to the services provided or any such agreements between you and the suppliers. Upon your payment of the services purchased from <a href="https://www.iltcostarica.com" rel="noopener noreferrer" target="_blank">www.iltcostarica.com</a> I Love Travel Costa Rica S.R.L.(ILT Costa Rica), your payment obligation to the suppliers is fulfilled, and I Love Travel Costa Rica S.R.L.(ILT Costa Rica), will remit to the suppliers the respective payment. We process payments through a third party (payment service provider). The Listing for services specifies the final price and will appear as (&ldquo;ILT Costa Rica, Montreal, Qc&rdquo;).<br />
+    <br />
+    <strong>Early &amp; Late-Night Surcharges:</strong><br />
+    <br />
+    All rides between 10 p.m. and 4 a.m. will incur an additional flat fee of $45.00 USD on top of the regular rate.<br />
+    <br />
+    <strong>Reservation Abandonment:</strong><br />
+    <br />
+    Reservation abandonment occurs when I Love&nbsp;Travel Costa Rica S.R.L (ILT Costa Rica) or its suppliers cannot find the customer at the designated pick-up location and cannot reach the customer for further instruction using the contact number provided within a reasonable time period, so as not to jeopardize pick-up of other rides/passengers.<br />
+    <br />
+    <strong>Extra Stops:</strong><br />
+    <br />
+    1 hour is included in our rates for stops at your leisure for photographs, meals, grocery store, or restroom breaks. Customers who wish to add any additional time for stop(s) can purchase additional time at a cost of $50.00 USD per hour.<br />
+    <br />
+    <strong>Services:</strong><br />
+    <br />
+    All services will be provided by ILT Costa Rica (I Love&nbsp;Travel Costa Rica S.R.L), or its suppliers, partners, or third-party service providers when necessary.<br />
+    <br />
+    <strong>Payments:</strong><br />
+    <br />
+    All amounts are in USD currency. Customers must pay at the time of booking to secure advance reservations. All charges are processed at the time of booking and are refundable following the terms outlined in the cancellation policy.<br />
+    <br />
+    <strong>Personal Identification:</strong><br />
+    <br />
+    Our operators and staff reserve the right to request personal identification from customers with reservations exceeding $200. Failure to provide personal identification matching information on file may result in the inability of the company to service the reservation.<br />
+    <br />
+    <strong>Short Notice Reservations:</strong><br />
+    <br />
+    Short notice reservations are reservations made less than 24 hours prior to the requested service. We are unable to guarantee service availability for short-notice reservations. Please email us at <a href="mailto:info@iltcostarica.com">info@iltcostarica.com</a> for availability, and an agent will get back to you within 30 minutes to confirm. Short notice reservations are only during work hours only. There are no refunds for reservations made in less than 48 hours.<br />
+    <br />
+    <strong>Luggage:</strong><br />
+    <br />
+    Depending on which vehicle is selected, the client must respect the total amount of luggage allowed for that sized vehicle. (H-1 up to 6 passengers) (HIACE up to 9 passengers) (Sprinter or similar up to 12 passengers) (Coaster up to 18 passengers) (Rosa up to 23 passengers) (Buses between 24 - 52 passengers)</p>
+
+    <ul>
+        <li style="margin-bottom: 11px;">1 checked luggage piece, such as a medium/large suitcase or large duffel bag weighing 50 pounds or less each; and</li>
+        <li style="margin-bottom: 11px;">1 carry-on item, such as purses, laptop cases, briefcases, small suitcases, and backpacks.</li>
+        <li style="margin-bottom: 11px;">Large items such as surfboards must be indicated at the time of booking. Extra fees may apply after booking.</li>
+    </ul>
+
+    <p style="margin-bottom:11px"><br />
+    The customer is responsible for properly specifying any extra luggage he or she intends to bring onto the vehicle during the booking process. Failure to specify in advance may result in additional fees or the need for an additional vehicle, or the inability of the company to service the reservation.<br />
+    <br />
+    <strong>Smoking:</strong><br />
+    <br />
+    Smoking is not permitted in any of our vehicles.<br />
+    <br />
+    <strong>User Error:</strong><br />
+    <br />
+    The customer is responsible for providing accurate information at the time of booking. When he/she provides information for travel, the customer agrees that the information will be accurate.<br />
+    <br />
+    ILT Costa Rica (I Love&nbsp;Travel Costa Rica S.R.L) is not responsible for mistakes made by customers while using the service, its official websites, or mobile applications.<br />
+    <br />
+    Confirmation emails are provided at the time of booking to allow customers to review details of their reservation in advance of the reservation. Additionally, automated reminder emails will be sent the day before pickup, allowing the customer time to make any changes in advance of the service.<br />
+    <br />
+    <strong>Excursions:</strong></p>
+
+    <ul>
+        <li style="margin-bottom: 11px;">All cancellation requests must be emailed to <a href="mailto:info@iltcostarica.com">info@iltcostarica.com</a> at least 72&nbsp;hours&nbsp;before your reservation for a full refund, excluding the credit card fees (5%).</li>
+        <li style="margin-bottom: 11px;">Any changes to your reservation must be sent via email to <a href="mailto:info@iltcostarica.com">info@iltcostarica.com</a> at least 48 hours before your service.</li>
+        <li style="margin-bottom: 11px;">In case we need to cancel a tour, we might offer you another tour that is of the same amount or refund the total amount.</li>
+        <li style="margin-bottom: 11px;">No shows of any services purchased, are considered as cancellations and are non-refundable.</li>
+        <li style="margin-bottom: 11px;">Once travel commences, there will be no refunds made on unused portions.</li>
+    </ul>
+
+    <p style="margin-bottom:11px"><br />
+    <strong>Luxury Hotels &amp; Villas:</strong><br />
+    <br />
+    ILT Costa Rica (I Love Travel&nbsp;Costa Rica S.R.L) is making the reservation on behalf of the client, and any issues of any kind with the hotel(s) selected must be taken up with the hotel(s) itself. If for any reason a refund needs to be applied after ILT Costa Rica (I Love Travel Costa Rica S.R.L) &amp; the specified hotel have agreed upon, a refund will be applied to the same credit card used when making the booking excluding the 5% credit card fees.<br />
+    <br />
+    If canceled less than 15 days prior to arrival, NO REFUND. If 15 to 21 days prior to arrival: 20% plus any service provider [Hotel] penalties. If 22 to 45 days prior to arrival: 10% plus any service provider [Hotel] penalties. If more than 45 days prior to arrival, you are charged only the $50.00 plus any service provider [Hotel] penalties. Service Provider [Hotel] penalties can be as strict as Cancellations 91+ days prior to arrival - 95% refund if canceled. 60-90 days 45% refund. 46-59 days 20% refund. 45 days or less prior to arrival No refund. No refunds for no-shows or unused portions of accommodations or packages. No refunds due to airline delays, strikes, political unrest, or Acts of God including Hurricanes. Travel insurance is strongly advised.<br />
+    <br />
+    <strong>Flights:</strong></p>
+
+    <ul>
+        <li style="margin-bottom: 11px;">Flights are charged in full at the time of booking and NO REFUND will be issued in case of no shows, international flight delays, or international flight cancellation.</li>
+        <li style="margin-bottom: 11px;">The latest a Private Flight can depart is 4:00pm due to Costa Rican aviation policies.</li>
+        <li style="margin-bottom: 11px;">A Passenger who is unable to travel due to exceptional circumstances must submit a claim and a copy of any supporting documentation (e.g., death certificate in the case of death of a parent, child, spouse, or civil partner) to our customer service team. This certificate should be sent to the&nbsp;e-mail address <a href="mailto:info@iltcostarica.com">info@iltcostarica.com</a>.</li>
+        <li style="margin-bottom: 11px;">Upon receiving this certificate, we will assess the convenience of issuing a credit, refund, or ticket exchange, considering the exceptional circumstances involved.</li>
+        <li style="margin-bottom: 11px;">Specifically, in case of hospitalization or death of a family member, ONLY A MEDICAL OR DISFUNCTION CERTIFICATE, will be accepted as proof and, in either case, must be submitted 24 hours before the flight. Claims received after this period will not be admitted. The claimant must have notified us by email prior to the departure of the corresponding flight.</li>
+        <li style="margin-bottom: 11px;">We recommend that Passengers acquire appropriate travel insurance to cover this type of event.</li>
+        <li style="margin-bottom: 11px;">Any changes to your flight date or time must be sent via email to <a href="mailto:info@iltcostarica.com">info@iltcostarica.com</a> at least 48 hours before your service. We cannot guarantee that we will be able to accommodate your changes, and is subject to availability. No refunds will be provided.</li>
+        <li style="margin-bottom: 11px;">All passengers must respect the set weight maximum limit that is on their reservation, otherwise, the flight can be canceled with no refund. If the weather does not permit us to fly, then a full refund will be applied and an alternate transportation method will be put in place with a new charge. If a full refund must be applied, this will exclude the 5% credit card fees</li>
+        <li style="margin-bottom: 11px;">We are not responsible for cancellations due to poor weather conditions. It is recommended that passengers acquire travel insurance, which should cover the costs derived from delays or cancellations of this type.</li>
+        <li style="margin-bottom: 11px;">If a flight is canceled because of any of (but not limited to) the following circumstances, which would not have been possible to avoid: Air traffic control, Climate, Security alerts, strikes, Flight safety eventualities, Accidents, or Runway closures, we will not be responsible for any compensation. However, we will help passengers to reprogram travel to their destination on the following flight pending availability.</li>
+        <li style="margin-bottom: 11px;">The airline may change, cancel, alter or delay the itinerary of any flight at any time for safety reasons or for forces beyond our control that justify such changes.<br />
+        &nbsp;</li>
+    </ul>
+
+    <p style="margin-bottom:11px"><strong>Airport Arrivals Pick-ups:</strong></p>
+
+    <ul>
+        <li>
+        <p>If you&#39;re arriving at either the San Jose Airport or Liberia Airport, our drivers will always be waiting for you outside the airport holding an I Love Travel Costa Rica sign with your name on it. Please look for our logo on the sign.&nbsp;</p>
+        </li>
+    </ul>
+
+    <ul>
+        <li>
+        <p>Please show him your confirmation email or print it out to confirm it&#39;s you.</p>
+        </li>
+    </ul>
+
+    <p><strong>Home Rental Pick-ups:</strong></p>
+
+    <ul>
+        <li>
+        <p>Please remember to inform the property manager that our driver will be coming to pick you up and to allow him to enter the property.</p>
+        </li>
+    </ul>
+    
+    <ul>
+        <li>
+        <p>Please provide detailed instructions on how to get to the property, and property contact details in case we need to call them. If a 4x4 is required, please let us know via email at <a href="mailto:info@iltcostarica.com">info@iltcostarica.com</a>&nbsp;as an additional fee will apply varying between $15.00 USD - $50.00 USD per way for up to 3 passengers depending on the location of the home rental.</p>
+        </li>
+    </ul>
+
+
+    <p><strong>Baggage Allowance:</strong></p>
+
+    <ul>
+        <li>
+        <p>Please respect the vehicles limit of baggage + carry-on capacity when selecting a vehicle for your booking.
+        If you have extra luggage, then please select the next larger vehicle available. Failing to do so, may occur
+        in delays if we need to reschedule a larger vehicle last minute + extra fees.</p>
+        </li>
+    </ul>
+    
+    <p style="margin-bottom:11px"><br />
+    I have read the above agreement and its terms and conditions, and I accept them in their entirety.<br />
+    <br />
+    I agree to pay the total amount for the Requested Services. I agree to pay in accordance with the Cancellation Terms set forth above. I understand that in the event of a cancellation or service modification, I am responsible for all applicable fees and penalties charged by the individual service providers.</p>
+
+    <p style="margin-bottom:11px">&nbsp;</p>
+
+    <p style="margin-bottom:11px"><strong>Emergency Contact:</strong></p>
+
+    <p>If for any reason you do not see our driver, please use any of the following methods to contact us.</p>
+
+    <p><strong>U.S. / CAN:</strong>&nbsp; 1-800-993-8696&nbsp; (press 1, then 1 again to reach our customer support)<br />
+    <strong>Costa Rica:</strong> +506 7078 7854<br />
+    <strong>WhatsApp:</strong> +506&nbsp; 7078 7854 &nbsp;<br />
+    <strong>Email:</strong> <a href="mailto:info@iltcostarica.com">info@iltcostarica.com</a><br />
+    <strong>Web:</strong> <a href="https://www.iltcostarica.com" rel="noopener noreferrer" target="_blank">www.iltcostarica.com</a><br />
+    <br />
+    <br />
+    Thank you for choosing ILT Costa Rica (I Love&nbsp;Travel Costa Rica S.R.L).</p>
+
+    {% if isUsedInPdf is defined and isUsedInPdf %}
+        <p style="height:200px"></p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block additionalCSS %}
+<style>
+    img {
+        max-width: unset;
+    }
+
+    .booking-complete {
+        text-align: center;
+        font-size: 1.5em;
+    }
+
+    .booking-reference-text {
+        margin: 5px 0 20px 0;
+    }
+
+    /* For whatever reason wkhtmltopdf wipes the font size on spans, so this needs to be an inline div. */
+    .booking-number {
+        display: inline;
+        color: red;
+    }
+
+    h2 {
+        border-bottom: 1px solid #cacaca;
+        width: 100%;
+        font-size: 1.8em;
+    }
+
+    h3 {
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+
+    h4 {
+        margin-bottom: 0;
+        text-transform: uppercase;
+    }
+
+    .item-box {
+        border-bottom: 1px solid #cacaca;
+        margin-bottom: 10px;
+    }
+
+    .item-header {
+        background-color: #646464;
+        text-align: center;
+        color: white;
+        font-size: 1.5em;
+    }
+
+    .item-info {
+        display: -webkit-box; /* wkhtmltopdf uses this one */
+        display: flex;
+    }
+
+    /* wkhtmltopdf uses this */
+    .purchase-summary > div {
+        -webkit-box-flex: 1;
+        -webkit-flex: 1;
+        flex: 1;
+    }
+
+    .item-vehicle-info {
+        max-width: {{ getParameterValue('global_image_vehicletype_width')|intVal + 20 }}px;
+    }
+
+    .vehicle-notes-list {
+        padding-left: 10px;
+    }
+
+    .item-trip-info {
+        margin: 5px 0 2px 0;
+        padding: 5px;
+
+        flex-grow: 1;
+        background-color: #F9F9F9;
+    }
+
+    .item-trip-label {
+        font-weight: bold;
+    }
+
+    .item-notes-header {
+        text-decoration: underline;
+        margin-top: 10px;
+    }
+
+    .purchase-summary {
+        display: -webkit-box; 
+        display: flex;
+        flex-wrap: nowrap;
+        padding: 5px 3px;
+        background: #F9F9F9;
+        width: 100%;
+        min-height: 180px;
+    }
+
+    .purchase-summary > div {
+        -webkit-box-flex: 1;
+        -webkit-flex: 1;
+        flex: 1;
+    }
+
+    .client-contact-info, .client-charges {
+        padding: 5px 0;
+    }
+
+    .client-contact-info {
+        border-right: 1px solid black;
+        flex-basis: 300px;
+    }
+
+    .client-name {
+        margin-top: 20px;
+    }
+
+    .client-charges {
+        padding-left: 10px;
+    }
+
+    .client-charges table {
+        border-spacing: 0;
+    }
+
+    .client-charges td {
+        padding: 0 8px 0 0;
+    }
+
+    .charges-label-col {
+        min-width: 200px;
+    }
+
+    .charges-taxes-row td {
+        border-bottom: 1px solid black;
+    }
+
+    .charges-total-col {
+        margin-top: 20px;
+    }
+
+    .important-information {
+        background-color: #F9F9F9;
+        padding: 10px 5px;
+    }
+
+    .em-contact-label {
+        font-weight: bold;
+    }
+
+    .info-bullet-list li {
+        list-style: initial;
+    }
+</style>
+{% endblock %}

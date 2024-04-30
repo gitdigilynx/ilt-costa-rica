@@ -1,0 +1,6 @@
+services:
+    wicrew.vehicletype.utils:
+        class: App\Wicrew\VehicleType\Service\VehicleTypeService
+        arguments: ["@wicrew.core.utils"]
+        public: true
+

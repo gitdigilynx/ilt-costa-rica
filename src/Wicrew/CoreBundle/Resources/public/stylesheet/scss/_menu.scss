@@ -1,0 +1,103 @@
+.megamenu {
+    position: absolute;
+    z-index: 5000;
+    max-height: 100vh;
+    
+    overflow-y: hidden; /* When 100vh is smaller than the height of the menu it begins to leak, so hide it. */
+    top: -100vh;
+    left: 0;
+    width: 100%;
+    padding: 60px 0;
+    background-color: $dark-blue;
+    transform: translateY(0vh);
+    pointer-events: none;
+    transition: transform 0.65s cubic-bezier(0.32, 0.08, 0.24, 1) 0s;
+ 
+    &.open {
+        transform: translateY(calc(100vh + 64px));
+        pointer-events: initial;
+    }
+
+    @media (max-width: 991px) {
+        top: 6vh;
+        left: -127vw;
+        &.open { 
+            transform: translateX(calc(127vw)) translateY(0);
+        }
+    }
+     
+    .menu-title {
+        font-size: 14px;
+        font-weight: 400;
+        letter-spacing: 2px;
+        color: #646976;
+        text-transform: uppercase;
+        margin-bottom: 35px;
+    }
+
+    .menu-items {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        li {
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 2.2em;
+            letter-spacing: 2px;
+        }
+    }
+
+    .has-left-line {
+        padding-left: 70px;
+        border-left: 1px solid #646976;
+
+        @media (max-width: 991px) {
+            padding-left: 40px;
+        }
+    }
+
+
+    @media (max-width: 767px) {
+        text-align: center;
+        overflow-y: scroll;
+        -webkit-overflow-scrolling: touch; // mobile safari
+        height: calc(100vh - 64px);
+        padding: 60px 0;
+
+        .menu-title {
+            margin-bottom: 15px;
+        }
+
+        .menu-items {
+            margin-bottom: 20px;
+        }
+
+        .has-left-line {
+            padding-left: 15px;
+            border: 0;
+        } 
+    }
+
+}
+
+.hamburger-icon {
+    display:none!important;
+}
+.desktop-menu {
+    width: 65%;
+    text-align:center;
+    height: 100%;
+}
+
+@media (max-width: 991px) {
+    .desktop-menu {
+        width: 32%;
+    }
+    .arrow-down-icon {
+        display: none!important;
+    }
+    .megamenu-desktop-transportation, .megamenu-desktop-company, .main-menu-contact {
+        display:none;
+    }
+} 

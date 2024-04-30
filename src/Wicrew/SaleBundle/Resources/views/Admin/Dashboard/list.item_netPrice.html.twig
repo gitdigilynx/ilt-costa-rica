@@ -1,0 +1,26 @@
+{# @var item \App\Wicrew\SaleBundle\Entity\OrderItem #}
+{% if item.type is same as "private_jbj" %}
+    {% set total_passengers         = item.adultCount + item.childCount %}
+    {% if total_passengers > 5 %}
+        {% set additional_passengers    = total_passengers - 5 %}
+    {% else %}
+        {% set additional_passengers    = 0 %}        
+    {% endif %}    {% set additional_p_cost        = additional_passengers * 25 %}
+    {% set november1st = '2023-11-01' %}
+    {% if item.pickDate|date('Y-m-d') >= november1st and item.product.novemberFixedNetPrice != 0 %}
+        {{ ( item.product.novemberFixedNetPrice + additional_p_cost )|number_format(2, '.', ',') }}
+    {% else %}
+        {{ ( item.product.fixedNetPrice + additional_p_cost )|number_format(2, '.', ',') }}
+    {% endif %}
+{% elseif item.type is same as "private_shuttle" and item.product.fixedNetPrice %}
+    {% set november1st = '2023-11-01' %}
+    {% if item.pickDate|date('Y-m-d') >= november1st and item.product.novemberFixedNetPrice != 0 %}
+        {{  item.product.novemberFixedNetPrice|number_format(2, '.', ',') }}
+    {% else %}
+        {{  item.product.fixedNetPrice|number_format(2, '.', ',') }}
+    {% endif %}
+{% elseif item.type is same as "activity_regular" and item.activity.adultNetPrice and item.activity.childNetPrice %}
+    {{ ( (item.activity.adultNetPrice * item.adultCount) + (item.activity.childNetPrice * item.childCount) )|number_format(2, '.', ',') }} 
+{% else %}
+    {{ item.titleNetPrice|number_format(2, '.', ',') }}
+{% endif %}

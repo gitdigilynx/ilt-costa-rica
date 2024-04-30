@@ -1,0 +1,44 @@
+easy_admin:
+    site_name: 'ILT Costa rica (1961)'
+    design:
+        assets:
+            css:
+                - '/bundles/wicrewcore/stylesheet/glyphicon.min.css'
+                - '/bundles/wicrewcore/stylesheet/custom-admin.min.css'
+                - '/bundles/wicrewcore/stylesheet/jquery-ui.css'
+                - '/bundles/wicrewcore/stylesheet/style.css'
+                - '/bundles/wicrewcore/javascript/jquery.fancybox.min.css'
+                - '/bundles/wicrewcore/stylesheet/jquery.timepicker.min.css'
+            js:
+                - '/bundles/wicrewcore/javascript/jquery-ui.js'
+                - '/bundles/wicrewcore/javascript/core.js'
+                - '/bundles/wicrewcore/javascript/jquery.fancybox.min.js'
+                - '/bundles/wicrewcore/javascript/jquery.dl_timepicker.min.js'
+                - '/bundles/wicrewcore/javascript/dayjs.min.js'
+                - '/bundles/wicrewcore/javascript/jquery.mask.min.js'
+
+        menu:
+            - { entity: 'User', label: 'Users', icon: 'user-circle', permission: ROLE_ADMIN }
+            - { entity: 'CronLog', label: 'cronlog.title', icon: 'calendar-alt', permission: ROLE_ADMIN }
+            - { entity: 'Area', label: 'areas.title', icon: 'map-marker-alt', permission: ROLE_ADMIN }
+            - { entity: 'AreaChildren', label: 'Child Areas', icon: 'map-marker-alt', permission: ROLE_ADMIN }
+            -   label: 'product.transportation'
+                icon: 'shuttle-van'
+                permission: ROLE_ADMIN
+                children:
+                    - { entity: 'VehicleType', label: 'transportation.vehicletype', icon: 'car-alt', permission: ROLE_ADMIN }
+                    - { entity: 'Vehicle', label: 'transportation.vehicle', icon: 'car-alt', permission: ROLE_ADMIN }
+                    - { entity: 'Product', label: 'product.products', icon: 'suitcase', permission: ROLE_ADMIN }
+            - { entity: 'Order', label: 'sale.order', icon: 'calendar-check', permission: ROLE_EMPLOYEE }
+            -   label: 'archives'
+                css_class: 'menu--archives'
+                icon: 'trash'
+                permission: ROLE_ADMIN
+                children:
+                    - { entity: 'ProductArchive', label: 'product.products', icon: 'suitcase', permission: ROLE_ADMIN}
+                    - { entity: 'ActivityArchive', label: 'activity.title', icon: 'comment-dollar', permission: ROLE_ADMIN}
+                    - { entity: 'OrderArchive', label: 'Orders', icon: 'calendar-check', permission: ROLE_ADMIN}
+    formats:
+        date: 'M d Y'
+        time: 'H:i'
+        datetime: 'M d Y H:i'

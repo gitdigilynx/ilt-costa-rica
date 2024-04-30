@@ -1,0 +1,25 @@
+{% form_theme form _self %}
+
+{# addon #}
+{% block _addon_custom_options_widget %}
+    <script> const FORM_TYPE = "{{ constant('App\\Wicrew\\AddonBundle\\Entity\\Addon::FORM_TYPE_ADDON') }}"; </script>
+    {# {% include "@WicrewAddon/Admin/form-parts/prices.html.twig" %} #}
+    {% use "@WicrewCore/Form/collection-table-container.html.twig" %}
+    {{ block('collection_table_container') }}
+{% endblock %}
+{% block addon_option_item_widget %}
+    {% use "@WicrewCore/Form/collection-item-container.html.twig" %}
+    {{ block('collection_item_container') }}
+{% endblock %}
+
+{# extra #}
+{% block _extra_custom_options_widget %}
+    <script> const FORM_TYPE = "{{ constant('App\\Wicrew\\AddonBundle\\Entity\\Addon::FORM_TYPE_EXTRA') }}"; </script>
+    {# {% include "@WicrewAddon/Admin/form-parts/prices.html.twig" %} #}
+    {% use "@WicrewCore/Form/collection-table-container.html.twig" %}
+    {{ block('collection_table_container') }}
+{% endblock %}
+{% block extra_option_item_widget %}
+    {% use "@WicrewCore/Form/collection-item-container.html.twig" %}
+    {{ block('collection_item_container') }}
+{% endblock %}

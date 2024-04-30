@@ -1,0 +1,2 @@
+wicrew_block:
+    resource: "@WicrewBlockBundle/Resources/config/routes.yaml"

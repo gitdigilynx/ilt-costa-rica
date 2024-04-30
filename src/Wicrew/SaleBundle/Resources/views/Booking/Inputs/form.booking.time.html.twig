@@ -1,0 +1,38 @@
+{% if alternateTitleFlightTime is defined %}
+	{% set labelText = alternateTitleFlightTime %}
+{% else %}
+	{% set labelText = 'booking.pickuptime'|trans %}
+{% endif %}
+{% set readonly = false %}
+
+<input type="text" id="{{ pickupTimeID }}" class="booking-pickup-time" name="{{ postDataSection }}[pickUpTime]" required="required" {% if pickupTime is not null and pickupTime is not iterable %} value="{{ pickupTime|date("H:i") }}" {% elseif pickupTime is not null and pickupTime is iterable %} value="{{ pickupTime[bookingNumber]|date("H:i") }}" {% endif %} data-arrival-text="{{ labelText }}" data-preferred-flight-time-text="{{ 'Please enter your preferred Flight Departure Time for your Private Flight' }}" readonly/>
+
+{# Dummy input to trigger summary updating after the mask validates the above input. #}
+<input type="hidden" class="updates-summary-of-{{ bookingNumber }}">
+<label class="floating-label" for="{{ pickupTimeID }}">{{ alternateTitle is defined ? 'booking.service.time'|trans : labelText }}</label>
+
+
+<style>
+	.booking-time-block .floating-label-wrap {
+		width: 100%;
+	}
+
+	div.floating-label-w-icon .floating-label[for^="pickup_time"] {
+		top: 10px;
+	}
+	@supports (-webkit-touch-callout: none) {
+		/* CSS specific to iOS devices */ 
+		div.floating-label-w-icon .floating-label[for^="pickup_time"] {
+			top: -12px;
+		}	
+	}
+
+</style>
+<script>
+$( document ).ready(function() {
+    if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+		$("input.booking-pickup-time").removeAttr("readonly");
+	}
+});
+</script>
+

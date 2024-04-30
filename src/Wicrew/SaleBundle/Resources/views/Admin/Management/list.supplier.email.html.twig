@@ -1,0 +1,7 @@
+{% set supplier = item.order.supplier %}
+{% set has_email = (item.supplier is not null and item.supplier.email is not null) %}
+{% if has_email%}
+  Yes
+{% else %}
+  No
+{% endif %}

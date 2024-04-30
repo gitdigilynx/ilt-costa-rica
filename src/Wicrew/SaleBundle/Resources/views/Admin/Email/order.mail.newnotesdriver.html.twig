@@ -1,0 +1,62 @@
+{% extends "@WicrewCore/Email/main.email.html.twig" %}
+
+{% block titlemail %}{{ 'order.mail.assigndriver.subject'|trans() }}{% endblock %}
+
+{% block mailcontent %}
+    <div class="contact-content">
+        <div class="header-information">
+            <div>Hi <strong>{{ toAdmin ? 'Admin' : driver.firstname }}</strong>, Hope all is well.</div> <br>
+            <div>You've received an update note for the following service:</div><br>
+        </div>
+        <ul class="list-content" style="padding-left: 0px;margin-top: 0px;">
+            {% for orderItem in orders %}   
+                <li style="margin: 0px;">
+                    <h3 style="margin: 0px;"> 
+                        <span>Client: </span> {{orderItem.order.firstName ~ ' ' ~ orderItem.order.lastName }}  
+                    </h3><br> 
+                    <div><label>Booking Number:</label> #RJ{{ orderItem.order.id }}</div> 
+                    <div><label>Tour Date:</label> {{ orderItem.pickDate|formatNoNull('F jS, Y') }}</div> 
+                    {% if orderItem.pickAddress != "" %} 
+                        <div><label>Pick-up Area:</label> {{ orderItem.pickArea.name }}</div>
+                        <div><label>Pick-up Location:</label> {{ orderItem.pickAddress }}</div>
+                    {% else %}
+                        <div><label>Pick-up Location:</label> {{ orderItem.pickArea.name }}</div>
+                    {% endif %} 
+                    {% if orderItem.dropAddress != "" %} 
+                        <div><label>Drop-off Area:</label> {{ orderItem.dropArea.name }}</div>
+                        <div><label>Drop-off Location:</label> {{ orderItem.dropAddress }}</div>
+                    {% else %}
+                        <div><label>Drop-off Location:</label> {{ orderItem.dropArea.name }}</div>
+                    {% endif %} 
+                    <div><label>Tour Time:</label> {{ orderItem.tourTime|formatNoNull('H:i') }}</div> 
+                    <div><strong>Adults:</strong> {{ orderItem.adultCount }}</div>
+                    {% if orderItem.childCount > 0 %}
+                        <div><strong>Children:</strong> {{ orderItem.childCount }}</div>  
+                    {% endif %}
+                    <br>
+                    
+                     <div>
+                        <span style="font-weight:bold;text-decoration: underline;">Driver Notes:</span><br>
+                        {% set internal_notes_arr = orderItem.order.notes|split('<br><br>') %}
+                        {% for internal_note in internal_notes_arr %}
+                            {% set internal_notes_display = internal_note|split(']: ') %}
+                            {% for internal_note_final in internal_notes_display %}
+                                {% if loop.index == 2 %}
+                                    <div>{{ internal_note_final }}</div>
+                                {% endif %}    
+                            {% endfor %}
+
+                        {% endfor %}
+                    </div>
+                </li> 
+            {% endfor %}
+        </ul>
+    </div>  
+    <div>If you have any questions, please email operations@iltcostarica.com.</div><br>
+    <div>Thank you,</div>
+
+{% endblock %}
+
+{% block mailfooter %}
+    {% include "@WicrewCore/Email/main.email.footer.html.twig" with {'emailfooter': 'info@iltcostarica.com'} %}
+{% endblock %} 

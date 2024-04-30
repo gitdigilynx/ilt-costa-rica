@@ -1,0 +1,12 @@
+{% extends "@WicrewCore/Email/main.email.html.twig" %}
+
+{% block titlemail %}{% endblock %}
+
+{% block mailcontent %}
+    {{ "order.mail.payment.body1"|trans({ "{{ customerName }}": customerName, "{{ orderNumber }}": orderNumber, "{{ orderDetails }}": orderDetails, "{{ link }}": link })|raw }} <br/>
+    {{ "order.mail.payment.body2"|trans|raw }}
+{% endblock %} 
+
+{% block mailfooter %}
+    {% include "@WicrewCore/Email/main.email.footer.html.twig" with {'emailfooter': 'info@iltcostarica.com'} %}
+{% endblock %} 

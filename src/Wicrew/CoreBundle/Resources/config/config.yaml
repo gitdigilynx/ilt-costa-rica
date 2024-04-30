@@ -1,0 +1,7 @@
+imports:
+    - { resource: "@WicrewCoreBundle/Resources/config/doctrine.yaml" }
+    - { resource: "@WicrewCoreBundle/Resources/config/easy_admin.yaml" }
+    #    - { resource: "@WicrewCoreBundle/Resources/config/monolog.yaml" }
+    - { resource: "@WicrewCoreBundle/Resources/config/services.yaml" }
+    - { resource: "@WicrewCoreBundle/Resources/config/framework.yaml" }
+    - { resource: "@WicrewCoreBundle/Resources/config/security.yaml" }

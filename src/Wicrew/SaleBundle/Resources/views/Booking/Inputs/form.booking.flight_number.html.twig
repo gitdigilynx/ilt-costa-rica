@@ -1,0 +1,11 @@
+{% set identifier = type ~ '_' ~ bookingNumber %}
+{% set areaPostName = postDataSection ~ '[area_' ~ type ~ ']' %}
+
+<div class="airport-type-section ">
+    <div class="row-block">
+        <div class="floating-label-wrap">
+            {% include "@WicrewSale/Booking/Inputs/_partials/input.flight_number.html.twig"%}
+        </div>
+    </div>
+</div>
+

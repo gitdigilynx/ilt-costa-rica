@@ -1,0 +1,9 @@
+services:
+    wicrew.product.utils:
+        class: App\Wicrew\ProductBundle\Service\ProductService
+        arguments: ["@wicrew.core.utils"]
+        public: true
+    wicrew.product.filter.transportationtype:
+        class: App\Wicrew\ProductBundle\Form\Filter\TransportationType
+        arguments: ["@wicrew.core.utils"]
+        public: true

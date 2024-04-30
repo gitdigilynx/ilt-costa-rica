@@ -1,0 +1,5 @@
+{% if item.hasAssignedDriver() %}
+    {{ "order_item.partner.assigned"|trans() }}
+{% else %}
+    {{ "order_item.partner.unassigned"|trans() }}
+{% endif %}

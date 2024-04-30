@@ -1,0 +1,670 @@
+{% extends "base.html.twig" %}
+{% if products is defined %}
+    {% if not (products|first).transportationType.isJeepBoatJeepType() %}
+        {% set bookingTitle = (products|first).transportationType.name %}
+    {% else %}
+        {% set bookingTitle = 'product.jeepboatjeep'|trans() %}
+    {% endif %}
+    {% set bannerSource = (products|first).transportationType.headerPath %}
+    {% set bookingFor = 'transport' %}
+{% elseif activities is defined %}
+    {% set bookingTitle = 'activity.information'|trans %}
+    {% set bannerSource = "@WicrewActivity/Headers/header.activity.html.twig" %}
+    {% set bookingFor = 'activity' %}
+{% endif %}
+
+{% block title %}{{ bookingTitle ~ ' - ' ~ 'booking.title'|trans }}{% endblock %}
+
+{% block body %}
+    {% block banner %}
+        {% set preTitle = '' %}
+        {% if products is defined %}
+            {% if (products|first).transportationType.id == constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_JEEP_BOAT_JEEP_PRIVATE") %}
+                {% set preTitle = 'product.jbj.jeep-boat-jeep-private'|trans() %}
+            {% else %}
+                {% set preTitle = 'product.jbj.jeep-boat-jeep-shared'|trans() %}
+            {% endif %}
+        {% endif %}
+        {% if activities is defined %}
+            {% include bannerSource with { "preTitle": preTitle, "subTitle": "Booking", 'activities': activities } only %}
+        {% else %}
+            {% include bannerSource with { "preTitle": preTitle, "subTitle": "Booking" } only %}
+        {% endif %} 
+    {% endblock banner %}
+
+    {% if formAction is not defined %}
+        {% include "@WicrewSale/Booking/breadcrumbs.html.twig" with { progress: 3, type: bookingFor } only %}
+    {% endif %}
+    <style>
+        .hotelZone-checkbox {
+            display: block;
+            cursor: pointer;
+            user-select: none;
+            margin-bottom: 12px;
+        }
+        .hotelZone-checkbox input {
+            display: none;
+        }
+        .singleHotelZone {
+            padding: 20px;
+            width: 100%;
+            position: relative;
+            height: 132px;
+            background: #ffffff 0% 0% no-repeat padding-box;
+            border: 1px solid #AAACB4;
+            border-radius: 5px;
+            opacity: 1;
+            display: flex;
+        }
+        .hotelZone-checkbox input:checked + .singleHotelZone {
+            background: #2D6EB2 0% 0% no-repeat padding-box;
+            color: #fff;
+        }
+        .zone-right-side {
+            flex: 20%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        .zone-left-side {
+            flex: 80%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .zone-title {
+            font: normal normal 600 14px/21px Poppins;
+        }
+        .zone-price {
+            font: normal normal 600 21px/31px Poppins;
+        }
+        .zone-description {
+            font: normal normal normal 14px/21px Poppins;
+        }
+        .zone-title i {
+            margin-right: 5px;
+        }
+        p.zone-heading {
+            padding-left: 0px;
+            padding-top: 3px;
+            display: block;
+        }
+        .transportation-heading {
+            background: #2D6EB2 0% 0% no-repeat padding-box;
+            font: normal normal 300 24px/30px Poppins;
+            letter-spacing: 0px;
+            color: #FFFFFF;
+            opacity: 1;
+            padding: 12px 25px;
+            margin-bottom: 20px;
+        }
+        .transportation-list ul {padding-left: 20px;}
+        .transportation-list ul li::marker {
+            color: #2D6EB2;
+        }
+        .transportation-list ul li {
+            margin-bottom: 12px;
+        }
+        div.select_zone {
+            background: #FFFFFF 0% 0% no-repeat padding-box;
+            border: 1px solid #DADBDF;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            padding: 20px 15px;
+        }
+        .faq{
+            margin: 15px 0px;
+        }
+        .faq .question{
+            text-decoration: none;
+            cursor: pointer;
+            letter-spacing: 0px;
+            color: #000000;
+            font-family: "Poppins", sans-serif;
+            font-style: normal;
+            font-weight: normal;
+            font-size: 14px;
+            line-height: 21px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        .faq .question i {
+            line-height: 21px;
+        }
+        .fa-chevron-up{color: #2D6EB2;}
+        .text-blue{color: #2D6EB2;}
+        .book-wth-img{
+            height:70px;width:70px;border-radius:100%
+        }
+        .question span {
+        }
+        .answer {
+            font: normal normal normal 12px/20px Poppins;
+        }
+        a.a-help_centre {
+            color: #2D6EB2;
+            display: block;
+            width: 100%;
+            text-align: center;
+            text-decoration: underline;
+            font: normal normal 600 14px/21px Poppins;
+            padding-top: 15px;
+        }
+        .faq .question span {
+            flex: 1;
+        }
+        .faq-heading-container > p {
+            color: #2D6EB2;
+            letter-spacing: 0px;
+            font-family: "Poppins", sans-serif;
+            font-style: normal;
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 27px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .why_us_heading {text-align: left;letter-spacing: 0px;color: #000000;opacity: 1;font-family: "Poppins", sans-serif;font-style: normal;font-weight: normal;font-size: 18px;line-height: 27px;margin-bottom: 22px;}
+        .reason-icon {
+            width: 50px;
+            height: 50px;
+            background: #2D6EB2 0% 0% no-repeat padding-box;
+            border-radius: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 24px;
+        }
+        .reason-left-side {
+            display: flex;
+        }
+        .single_reason {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        .reason-title {
+            font: normal normal medium 12px/18px Poppins;
+            letter-spacing: 0px;
+            color: #2D6EB2;
+            font-family: "Poppins", sans-serif;
+            font-style: normal;
+            font-weight: 500;
+            font-size: 12px;
+            line-height: 18px;
+        }
+        .reason-description {
+            font-family: "Poppins", sans-serif;
+            font-style: normal;
+            font-weight: 300;
+            font-size: 12px;
+            line-height: 18px;
+            max-width: 200px;
+        }
+    </style>    
+    <div class="booking-form">
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    {% if referrer is not null %}
+                        <div class="step-back"><a href="{{ referrer }}">{{ 'booking.back.to.search'|trans() }}</a></div>
+                    {% endif %}
+                </div>
+                <div class="notices"></div>
+            </div>
+        </div>
+
+        {% if formAction is not defined %}
+            {% set formAction = url('sale_addtocart') %}
+        {% endif %}
+        {{ form_start(form, {'attr': {'id': 'form_booking', 'class': 'validate-form', 'autocomplete': 'off', 'novalidate': 'novalidate', 'action': formAction }}) }}
+        {{ form_errors(form) }}
+        {{ form_widget(form._token) }}
+
+        <div class="booking-section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-8 left-panel"> 
+                        <h2>{{ bookingTitle }}</h2>
+                        <div class="booking-objects">
+                            {% block bookingObjects %}
+                                {% if summaries is not empty %}
+                                    {% set bookingNumber = summaries | keys | first %}
+                                {% else %}
+                                    {% set bookingNumber = 1 %}
+                                {% endif %}
+                                {% set selectedChidlrenAreas = [] %}
+                                {% if dl_childAreas is defined and dl_childAreas|length > 0 %}
+                                    {% set selectedChidlrenAreas = dl_childAreas %}
+                                {% endif %}
+                                {% if custom_services is defined and custom_services|length > 0 %}
+                                    {% for custom_service in custom_services %}
+                                        <div class="custom_service_{{bookingNumber}}_{{loop.index0}}">
+                                            <input type="hidden" class="customService" name='{{custom_service.label}}' data-label='{{custom_service.label}}' value='{{custom_service.rackPrice}}' /> 
+                                            <input type="hidden" name='products[{{bookingNumber}}][custom_services][{{loop.index0}}][{{custom_service.label}}]' value='{{custom_service.rackPrice}}' /> 
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                                {% if products is defined %}
+                                    {% if (products|first).transportationType.isJeepBoatJeepType() and dl_actionType == "edit_item" %}
+                                        {% set postDataSection = 'products[' ~ bookingNumber ~ ']' %}
+                                        {% if (products|first).transportationType.id == constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_JEEP_BOAT_JEEP_PRIVATE") %}
+                                            {% include "@WicrewProduct/Product/Booking/detail.private_jbj.html.twig" %}
+                                        {% else %}
+                                            {% include "@WicrewProduct/Product/Booking/detail.jbj.html.twig" %}
+                                        {% endif %}
+
+                                        {% include "@WicrewProduct/Product/Booking/booking.products.js.html.twig" %}
+                                    {% else %}
+                                        {# @var product \App\Wicrew\ProductBundle\Entity\Product #}
+                                        {% if summaries is not empty %}
+                                            {% for product in products %}
+                                                {% set postDataSection = 'products[' ~ bookingNumber ~ ']' %}
+                                                
+                                                {% if product.transportationType.id == constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_PRIVATE_SHUTTLE") %}
+                                                    {% include "@WicrewProduct/Product/Booking/detail.private_shuttle.html.twig" with { "selectedChidlrenAreas": selectedChidlrenAreas } %}
+                                                
+                                                {% elseif product.transportationType.id == constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_SHARED_SHUTTLE") %}
+                                                    {% include "@WicrewProduct/Product/Booking/detail.shared_shuttle.html.twig" with { "selectedChidlrenAreas": selectedChidlrenAreas } %}
+                                                
+                                                {% elseif product.transportationType.id == constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_WATER_TAXI") %}
+                                                    {% include "@WicrewProduct/Product/Booking/detail.water_taxi.html.twig" %}
+                                                
+                                                {% elseif product.transportationType.id == 3 %}
+                                                    {% set jbj_products_new = [] %}
+                                                
+                                                    {% for jbj_product in jbj_products %}
+
+                                                        {% if product.areaFrom.id == jbj_product.areaFrom.id and product.areaTo.id == jbj_product.areaTo.id  %}
+                                                            {% set jbj_products_new = jbj_products_new|merge( [ jbj_product ] ) %}
+                                                        {% endif %}
+                                                    {% endfor %}
+
+                                                    {% include "@WicrewProduct/Product/Booking/detail.water_taxi.html.twig" with { "jbj": "shared", 'jbj_products': jbj_products_new } %}
+                                                {% elseif product.transportationType.id == 4 %}
+                                                    {% include "@WicrewProduct/Product/Booking/detail.water_taxi.html.twig" with { "jbj": "private" } %}
+                                                {% endif %}
+
+                                                {% set bookingNumber = bookingNumber + 1 %}
+                                            {% endfor %}
+                                        {% else %}
+                                            {% if (products|first).transportationType.isJeepBoatJeepType() %}
+                                                {% set postDataSection = 'products[' ~ bookingNumber ~ ']' %}
+                                                {% if (products|first).transportationType.id == constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_JEEP_BOAT_JEEP_PRIVATE") %}
+                                                    {% include "@WicrewProduct/Product/Booking/detail.private_jbj.html.twig" %}
+                                                {% else %}
+                                                    {% include "@WicrewProduct/Product/Booking/detail.jbj.html.twig" %}
+                                                {% endif %}
+
+                                                {% include "@WicrewProduct/Product/Booking/booking.products.js.html.twig" %}
+                                            {% endif %}
+                                            {% set bookingNumber = bookingNumber + 1 %}
+                                        {% endif %}
+                                        {% include "@WicrewProduct/Product/Booking/booking.products.js.html.twig" %}
+                                    {% endif %}
+                                {% elseif activities is defined %}
+                                    {% for activity in activities %}
+                                        {% set postDataSection = 'products[' ~ bookingNumber ~ ']' %}
+
+                                        {% include "@WicrewActivity/Booking/detail.activity.html.twig" with { "dl_actionType": dl_actionType, "all_activities": all_activities } %}
+
+                                        {% set bookingNumber = bookingNumber + 1 %}
+                                    {% endfor %}
+                                {% endif %}
+                            {% endblock %}
+                        </div>
+                    </div>
+                    {% include "@WicrewCore/Google/place.html.twig" with {
+                        "targetFields": placeGG
+                    } %}
+                    <div class="col-md-4 right-panel">
+                        {% if dl_actionType == "edit_item" %}
+                            {% include "WicrewSaleBundle:Booking/Base:summary.html.twig" with { "summaries": summaries, "discountValues": discountValues } only %}
+
+                        {% else %}
+                            {% include "WicrewSaleBundle:Booking/Base:summary.html.twig" with { "summaries": summaries } only %}
+                        {% endif %}
+
+                        <div class="booking-btn-block">
+                            <div class="row-block">
+                                {% block addToCartButton %}
+                                    <button type="submit" class="btn-black lg-btn">
+                                        {% if submitButtonText is defined %}{{ submitButtonText }}{% else %}{{ 'proceed.to.check.out'|trans() }}{% endif %}
+                                    </button>
+                                {% endblock %}
+                            </div>
+                            <div class="row-block">
+                                {% block addToCartAndContinueButton %}
+                                    {% if referrer is not null and not app.session.has('orderID') %}
+                                        <button type="submit" class="add-to-cart-and-continue-btn" name="backToReferrer" value="{{ referrer }}">{{ 'add.to.cart.and.continue'|trans() }}</button>
+                                    {% endif %}
+                                {% endblock %}
+                            </div>
+                        </div>  
+                        {% set allProductTypes = [] %}
+                        {% if products is defined %}
+                            {% for product in products %}
+                                {% set allProductTypes = allProductTypes|merge([product.transportationType.id]) %}
+                            {% endfor %}
+                        {% elseif activities is defined %}
+                            {% set allProductTypes = allProductTypes|merge(['activity']) %}
+                        {% endif %}
+
+                        <div class='select_zone'>
+                            <div class="faq-heading-container">
+                                <p><i class="fas fa-question-circle"></i> FAQs</p>
+                                {% if 'activity' in allProductTypes %}
+                                    <div class="faq">
+                                        <div class="question">
+                                            <span>What is the cancellation policy for Activities?</span> 
+                                            <i class="fas fa-chevron-down"></i>
+                                        </div>
+                                        <div class="answer" style="display: none;">
+                                            If you need to cancel your reservation for any reason, we require a written email <a href="mailto:info@iltcostarica.com">info@iltcostarica.com</a>  at least 48 hours before your service. A full refund will apply excluding the credit card fees of 5%.
+                                        </div>
+                                    </div>
+                                    <div class="faq">
+                                        <div class="question">
+                                            <span>What happens if my hotel or villa is located outside of the hotel zone?</span> 
+                                            <i class="fas fa-chevron-down"></i>
+                                        </div>
+                                        <div class="answer" style="display: none;">
+                                            An additional transportation fee will apply depending on your location. You will receive an email informing you about this.
+                                        </div>
+                                    </div>
+                                    <div class="faq">
+                                        <div class="question">
+                                            <span>What should I wear for activities in Costa Rica?</span> 
+                                            <i class="fas fa-chevron-down"></i>
+                                        </div>
+                                        <div class="answer" style="display: none;">
+                                            Dress comfortably and consider the activity. For adventure activities, wear appropriate footwear, comfortable clothing, and sun protection. You will find a list of what to bring for each activity on the website and in your confirmation email.
+                                        </div>
+                                    </div>
+                                {% elseif constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_PRIVATE_SHUTTLE") in allProductTypes or constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_SHARED_SHUTTLE") in allProductTypes %}
+                                    <div class="faq">
+                                        <div class="question">
+                                            <span>What is the cancellation policy for Transportation?</span> 
+                                            <i class="fas fa-chevron-down"></i>
+                                        </div>
+                                        <div class="answer" style="display: none;">
+                                            In the event that you need to cancel your reservation, please send a written email to <a href="mailto:info@iltcostarica.com">info@iltcostarica.com</a> at least 48 hours prior to your scheduled service. A full refund will be issued, excluding the 5% credit card fees. Your timely communication is appreciated, and we strive to ensure a transparent cancellation process.
+                                        </div>
+                                    </div>
+                                    <div class="faq">
+                                        <div class="question">
+                                            <span>Where do I find my driver at the airport?</span> 
+                                            <i class="fas fa-chevron-down"></i>
+                                        </div>
+                                        <div class="answer" style="display: none;">
+                                            Your driver will be outside of the customs area holding an <strong>“I Love Travel Costa Rica”</strong> sign with your name on it. If you are having trouble finding the driver, please contact us through email, live chat, or phone. Please provide your full name & an ILT Costa Rica agent will instruct you on where to find your driver. <strong style="text-decoration: underline;">Please be aware of individuals at the airport who are not affiliated with our company and may try to take advantage by demanding money from you. Kindly disregard their approaches and proceed directly to our designated meeting point.</strong> Always talk to us directly to avoid any confusion.<br><br>
+                                            <strong>Email:</strong> info@iltcostarica.com<br>
+                                            <strong>WhatsApp Chat:</strong> +506 7078 7854<br>
+                                            <strong>Phone:</strong> +506 7078 7854 or 1-800-993-8696<br>
+                                        </div>
+                                    </div>
+                                    <div class="faq">
+                                        <div class="question">
+                                            <span>Do drivers wait in case of flight delays?</span> 
+                                            <i class="fas fa-chevron-down"></i>
+                                        </div>
+                                        <div class="answer" style="display: none;">Absolutely, we provide continuous flight monitoring around the clock. Our drivers are promptly informed of any changes to your flight's arrival time. Should your flight be delayed and you receive new flight details, kindly email us at <a href="mailto:info@iltcostarica.com">info@iltcostarica.com</a> as soon as possible so we can make the necessary adjustments to ensure your transportation plans remain seamless. Your satisfaction is important to us.
+                                        </div>
+                                    </div>
+                                {% elseif constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_JEEP_BOAT_JEEP_SHARED") in allProductTypes or constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_JEEP_BOAT_JEEP_PRIVATE") in allProductTypes %}
+                                    <div class="faq">
+                                        <div class="question">
+                                            <span>What is the cancellation policy for the Jeep-boat Jeep?</span> 
+                                            <i class="fas fa-chevron-down"></i>
+                                        </div>
+                                        <div class="answer" style="display: none;">
+                                            If you need to cancel your reservation for any reason, we kindly ask that you send a written email to <a href="mailto:info@iltcostarica.com">info@iltcostarica.com</a> at least 48 hours before your scheduled service to receive a full refund excluding the credit card fees of 5%. This cancellation policy is in place to facilitate efficient scheduling and ensure availability for other travelers. We appreciate your understanding and timely communication in these situations.
+                                        </div>
+                                    </div>
+                                    <div class="faq">
+                                        <div class="question">
+                                            <span>What are the advantages of using the Jeep-Boat-Jeep service? </span> 
+                                            <i class="fas fa-chevron-down"></i>
+                                        </div>
+                                        <div class="answer" style="display: none;">
+                                            Advantages include saving time compared to a longer road journey, enjoying stunning views of Lake Arenal and the surrounding landscapes, and experiencing a combination of different modes of transportation.
+                                        </div>
+                                    </div>
+                                    <div class="faq">
+                                        <div class="question">
+                                            <span>Can I bring luggage on the Jeep-Boat-Jeep service?</span> 
+                                            <i class="fas fa-chevron-down"></i>
+                                        </div>
+                                        <div class="answer" style="display: none;">
+                                            Yes, you can bring luggage with you on the journey (1 suitcase + carry-on per person). Please note that for both services (shared and private), passengers should expect to carry their bags/luggage to and from the boat. There may be a crew assisting you on this, but it cannot be assured. Mud can be present and note that it is a natural characteristic of the area and the transportation service. We would suggest taking precautions to safeguard your luggage from the mud.
+                                        </div>
+                                    </div>
+                                {% elseif constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_WATER_TAXI") in allProductTypes or constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_WATER_TAXI_PRIVATE") in allProductTypes %}
+                                    <div class="faq">
+                                        <div class="question">
+                                            <span>What is the cancellation policy for the Water-Taxi service?</span> 
+                                            <i class="fas fa-chevron-down"></i>
+                                        </div>
+                                        <div class="answer" style="display: none;">
+                                            If you need to cancel your reservation for any reason, we kindly ask that you send a written email to  <a href="mailto:info@iltcostarica.com">info@iltcostarica.com</a> at least 48 hours prior to your scheduled service to receive a full refund excluding the credit card fees of 5%. This cancellation policy is in place to facilitate efficient scheduling and ensure availability for other travelers. We appreciate your understanding and timely communication in these situations.
+                                        </div>
+                                    </div>
+                                    <div class="faq">
+                                        <div class="question">
+                                            <span>Can I bring luggage on the Water Taxi service?</span> 
+                                            <i class="fas fa-chevron-down"></i>
+                                        </div>
+                                        <div class="answer" style="display: none;">
+                                            Yes, you can bring luggage with you on the journey (1 suitcase + carry-on per person). Additional fees may apply for additional luggage. We would suggest taking precautions to safeguard your luggage from the water.
+                                        </div>
+                                    </div>
+                                    <div class="faq">
+                                        <div class="question">
+                                            <span>What are the advantages of using the water taxi service between Montezuma and Jaco?</span> 
+                                            <i class="fas fa-chevron-down"></i>
+                                        </div>
+                                        <div class="answer" style="display: none;">
+                                            The water taxi service provides a scenic and efficient way to travel between Montezuma and Jaco, avoiding longer overland routes. It offers a unique coastal perspective and may save travel time. You can also add an extension to visit other locations such as Santa Teresa or Manuel Antonio.
+                                        </div>
+                                    </div>
+                                {% elseif constant("App\\Wicrew\\ProductBundle\\Entity\\TransportationType::TYPE_AIRPLANE") in allProductTypes %}
+                                    <div class="faq">
+                                        <div class="question">
+                                            <span>What is the cancellation policy for Private Flights?</span> 
+                                            <i class="fas fa-chevron-down"></i>
+                                        </div>
+                                        <div class="answer" style="display: none;">
+                                            If you need to cancel your reservation for any reason, we require a written email at <a href="mailto:info@iltcostarica.com">info@iltcostarica.com</a>. Please also refer to our terms and conditions here. (<a href='/reservations-policy'>Terms & Conditions</a>)
+                                            <br>
+                                            -72 hours before the flight the penalty will be 25%
+                                            <br>
+                                            -48 hours before the flight the penalty will be 50%
+                                            <br>
+                                            -24 hours before the flight the penalty will be 100%
+                                        </div>
+                                    </div>
+                                    <div class="faq">
+                                        <div class="question">
+                                            <span>How far in advance can I make a reservation?</span> 
+                                            <i class="fas fa-chevron-down"></i>
+                                        </div>
+                                        <div class="answer" style="display: none;">
+                                            We recommend making reservations in advance to ensure availability and secure your booking. This can be done through the website or <a href='/product/transportation/private-flight'>here</a>. For last-minute reservations, please email us at <a href="mailto:info@iltcostarica.com">info@iltcostarica.com</a> to inquire about availability. During the holiday season, it's especially important to book ahead to secure your reservation.
+                                        </div>
+                                    </div>
+                                    <div class="faq">
+                                        <div class="question">
+                                            <span>Where do we meet the representative after we exit the airport?</span> 
+                                            <i class="fas fa-chevron-down"></i>
+                                        </div>
+                                        <div class="answer" style="display: none;">
+                                            If you are arriving at either international airport (SJO or LIR), the representative will be waiting outside the airport holding a sign with your name on it. They will be ready to assist you with getting you to the plane and boarding the plane to ensure a smooth transition to your travel experience. If you have any questions or need further assistance, please don't hesitate to contact us at. We're here to ensure your journey is comfortable and hassle-free.    
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                
+                                <a href='/faq' class='a-help_centre'>Visit the help centre</a>  
+                            </div>
+                        </div>
+
+                        <div class='select_zone why_us'>
+                            <div class="why_us_heading">Why book with us ?</div>
+                            
+                            <div class="single_reason">
+                                <div class="reason-left-side">
+                                    <div class="reason-icon"><i class="fas fa-star"></i></div>
+                                </div>
+                                <div class="reason-right-side">
+                                    <div class="reason-title">100% Refund Guarantee</div>
+                                    <div class="reason-description">Cancel up to 48 hours before your service</div>
+                                </div>
+                            </div>
+                            <div class="single_reason">
+                                <div class="reason-left-side">
+                                    <div class="reason-icon"><i class="fas fa-universal-access"></i></div>
+                                </div>
+                                <div class="reason-right-side">
+                                    <div class="reason-title">Personalized Service</div>
+                                    <div class="reason-description">We cater to the unique needs and preferences of each traveler </div>
+                                </div>
+                            </div>
+                            <div class="single_reason">
+                                <div class="reason-left-side">
+                                    <div class="reason-icon"><i class="fas fa-suitcase-rolling"></i></div>
+                                </div>
+                                <div class="reason-right-side">
+                                    <div class="reason-title">Safety and Reliability</div>
+                                    <div class="reason-description">Your safety is our top priority & our commitment to reliability ensures you reach your destinations on time.</div>
+                                </div>
+                            </div>
+                            <div class="single_reason">
+                                <div class="reason-left-side">
+                                    <div class="reason-icon"><i class="fas fa-users"></i></div>
+                                </div>
+                                <div class="reason-right-side">
+                                    <div class="reason-title">Exceptional Customer Service</div>
+                                    <div class="reason-description">We go the extra mile to ensure your satisfaction</div>
+                                </div>
+                            </div>
+                            <div class="single_reason">
+                                <div class="reason-left-side">
+                                    <div class="reason-icon"><i class="fas fa-map-marked-alt"></i></div>
+                                </div>
+                                <div class="reason-right-side">
+                                    <div class="reason-title">Local Expertise</div>
+                                    <div class="reason-description">We'll help you explore the best that this beautiful country has to offer.</div>
+                                </div>
+                            </div>
+                            <div class="single_reason">
+                                <div class="reason-left-side">
+                                    <div class="reason-icon"><i class="fas fa-lock"></i></div>
+                                </div>
+                                <div class="reason-right-side">
+                                    <div class="reason-title">Safe & Secure Payment</div>
+                                    <div class="reason-description">All our bookings are secure with the highest encryption</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {# @var firstProduct \App\Wicrew\ProductBundle\Entity\Product #}
+        {% if products is defined %}
+            {% set firstProduct = (products|first) %}
+            <div class="detail-booking-section">
+                <div class="container"> 
+                    <div class="row detail-booking-contact">
+                        <div class="col">
+                            <p><strong>Have Questions ?</strong></p>
+                            <p>Contact us, we'd love to speak with you.</p>
+                            <p><strong>Call:</strong> {% include "@WicrewPage/tel.html.twig" %}</p>
+                            <p><strong>Email us:</strong> {% include "@WicrewPage/email.html.twig" %}</p>
+                        </div>
+                    </div> 
+                </div>
+            </div>
+        {% endif %}
+        {{ form_end(form) }}
+    </div>
+<script>
+    $( window ).on("load", function() {
+        $('html, body').animate({
+            scrollTop: $(".booking-form .product-info-block .vehicle-type").offset().top - 280
+        }, 2000);
+    });
+
+    $(document).ready(function() {
+        $('.question').on('click', function() {
+            $(this).next('.answer').slideToggle();
+            if ($(this).find('i').hasClass('fa-chevron-down')) {
+                $(this).find('i').removeClass('fa-chevron-down').addClass('fa-chevron-up');
+                $(this).find('span').addClass('text-blue');
+            } else {
+                $(this).find('i').removeClass('fa-chevron-up').addClass('fa-chevron-down');
+                $(this).find('span').removeClass('text-blue');
+            }
+        });
+    });
+</script>
+{% endblock %}
+
+{% block javascripts %}
+    
+    {{ parent() }}
+
+    {% if areaFrom_id is defined %}
+        <script>
+            $(document).ready(function () {
+                var options = $('select#departure-at option');
+                var values = $.map(options ,function(option) {
+                    return option;
+                });
+                $( values ).each(function( index, element ) {
+                    if(element == ''){
+                        return true;
+                    }
+                    element = $.parseJSON(element);
+                    $( element ).each(function( key, select_val ) {
+                        if( ( select_val.fromID == {{ areaFrom_id }} ) && ( select_val.toID == {{ areaTo_id }} ) ){
+                            $("select#departure-at").val( JSON.stringify(select_val) ).trigger('change');
+                        }
+                    });
+                });
+            });
+        </script>
+    {% endif %}
+    {% if dl_childAreas is defined and dl_childAreas|length > 0 %} {# SELECTING THE CHILD AREA IS EXISTS #}
+    <script>
+        $(document).ready(function () {
+            let dl_childAreas = {{dl_childAreas|json_encode|raw}};
+            $.each(dl_childAreas, function( trip_id, children_areas ) {
+                if ('child_area_from' in children_areas) {
+                    var childsArray = $.map(children_areas.child_area_from, function(value, key) {
+                        return value;
+                    });
+                    
+                    var firstChild = childsArray[0];
+                    $('input#additionalFee_search_from_'+trip_id).val(firstChild).change();
+                }
+                if ('child_area_to' in children_areas) {
+                    var childstoArray = $.map(children_areas.child_area_to, function(value, key) {
+                        return value;
+                    });
+                    
+                    var firsttoChild = childstoArray[0];
+                    $('input#additionalFee_search_to_'+trip_id).val(firsttoChild).change();
+                }
+            });
+        });
+    </script>
+    {% endif %} {# SELECTING THE CHILD AREA IS EXISTS #}
+    
+
+    {% include "@WicrewSale/Booking/Base/form.booking.js.html.twig" with {"count_totalBooking": count_totalBooking} %}
+    
+{% endblock %}

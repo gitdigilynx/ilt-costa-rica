@@ -1,0 +1,77 @@
+easy_admin:
+    design:
+        menu:
+            - { entity: 'Partner', label: 'partner.title', icon: 'handshake', permission: ROLE_ADMIN }
+    entities:
+        Partner:
+            permissions:
+                list: [ 'ROLE_ADMIN' ]
+                new: [ 'ROLE_ADMIN' ] 
+                edit: [ 'ROLE_ADMIN' ]
+                delete: [ 'ROLE_ADMIN' ] 
+            controller: App\Wicrew\PartnerBundle\Controller\Admin\PartnerController
+            label: 'partner.title'
+            icon: 'handshake'
+            class: App\Wicrew\PartnerBundle\Entity\Partner
+            list:
+                title: 'partner.title'
+                actions:
+                    - { name: 'new', label: 'partner.new_action'}
+
+                fields:
+                    - { property: 'bizName', label: 'partner.biz_name' }
+                    - { property: 'bizTel', label: 'partner.biz_tel' }
+                    - { property: 'type', label: 'partner.type', sortable: false, template: '@WicrewPartner/Admin/list.field.type.html.twig' }
+                    - { property: 'commission', label: 'partner.commission' }
+                max_results: '%global.sort.pagination.default%'
+                sort: ['createdAt', '%global.sort.desc%']
+
+            form:
+                form_options: { attr: { novalidate: novalidate } }
+                fields:
+                    - { type: 'tab', label: 'partner.tab.general' }
+
+                    - { type: 'group', label: 'partner.group.business_information', columns: 6 }
+                    - { property: 'bizName', label: 'partner.biz_name' }
+                    - { property: 'bizAddress', label: 'partner.biz_address' }
+                    - { property: 'bizCity', label: 'partner.biz_city' }
+                    - { property: 'bizProvince', label: 'partner.biz_province' }
+                    - { property: 'bizCountry', label: 'partner.biz_country' }
+                    - { property: 'bizTel', label: 'partner.biz_tel' }
+
+                    - { type: 'group', label: 'partner.group.services_and_status', columns: 6 }
+                    -   property: 'transportationTypes'
+                        label: 'partner.transportation_types'
+                        type: 'choice'
+                        type_options:
+                            choices:
+                                'partner.transportation_type.options.private_shuttle': !php/const App\Wicrew\PartnerBundle\Entity\Partner::TRANSPORTATION_TYPE_PRIVATE_SHUTTLE
+                                'partner.transportation_type.options.shared_shuttle': !php/const App\Wicrew\PartnerBundle\Entity\Partner::TRANSPORTATION_TYPE_SHARED_SHUTTLE
+                                'partner.transportation_type.options.private_flight': !php/const App\Wicrew\PartnerBundle\Entity\Partner::TRANSPORTATION_TYPE_PRIVATE_FLIGHT
+                                'partner.transportation_type.options.water_taxi_boat': !php/const App\Wicrew\PartnerBundle\Entity\Partner::TRANSPORTATION_TYPE_WATER_TAXI_BOAT
+                                'partner.transportation_type.options.jeep_boat_jeep': !php/const App\Wicrew\PartnerBundle\Entity\Partner::TRANSPORTATION_TYPE_JEEP_BOAT_JEEP
+                                'partner.transportation_type.options.activity': !php/const App\Wicrew\PartnerBundle\Entity\Partner::TRANSPORTATION_TYPE_ACTIVITY
+                            expanded: true
+                            multiple: true
+                    -   property: 'type'
+                        label: 'partner.type'
+                        type: 'choice'
+                        type_options:
+                            choices:
+                                'partner.type.options.none': 0
+                                'partner.type.options.driver': !php/const App\Wicrew\PartnerBundle\Entity\Partner::TYPE_DRIVER
+                                'partner.type.options.affiliate': !php/const App\Wicrew\PartnerBundle\Entity\Partner::TYPE_AFFILIATE
+                                'partner.type.options.supplier': !php/const App\Wicrew\PartnerBundle\Entity\Partner::TYPE_SUPPLIER
+                                'partner.type.options.travel_agent': !php/const App\Wicrew\PartnerBundle\Entity\Partner::TYPE_TRAVEL_AGENT
+                                'partner.type.options.partner': !php/const App\Wicrew\PartnerBundle\Entity\Partner::TYPE_PARTNER
+                            expanded: false
+                            multiple: false
+                    - { property: 'commission', label: 'partner.commission', type_options: { required: true }, help: 'partner.commission.help' }
+                    - { property: 'notes', label: 'partner.notes' }
+
+                    - { type: 'group', label: 'partner.group.contact_information', columns: 6 }
+                    - { property: 'firstname', label: 'partner.firstname' }
+                    - { property: 'lastname', label: 'partner.lastname' }
+                    - { property: 'email', label: 'partner.email' }
+                    - { property: 'tel', label: 'partner.tel' }
+                    - { property: 'telExt', label: 'partner.tel_ext', columns: 2 }

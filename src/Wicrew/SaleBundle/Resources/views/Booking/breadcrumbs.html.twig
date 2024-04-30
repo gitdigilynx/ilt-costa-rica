@@ -1,0 +1,13 @@
+<div class="container booking-breadcrumbs-wrapper">
+    <ul class="booking-breadcrumbs">
+        <li class="{{ (progress == 1) ? 'current' : '' }}"><span class="bread-text">Search</span></li>
+        <li class="{{ (progress == 2) ? 'current' : '' }}"><span class="bread-text">
+{#                {% if type is defined and type == "transport" %}Select Vehicles{% elseif type is defined and type == "activity" %}Select Activity{% else %}Select Products{% endif %}#}
+                Selection
+            </span>
+        </li>
+        <li class="{{ (progress == 3) ? 'current' : '' }}"><span class="bread-text">Review</span></li>
+        <li class="{{ (progress == 4) ? 'current' : '' }}"><span class="bread-text">Confirmation</span></li>
+    </ul>
+</div>
+

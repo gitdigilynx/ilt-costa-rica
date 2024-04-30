@@ -1,0 +1,338 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ 'product.transportation'|trans }} - {{ 'action.search'|trans }}{% endblock %}
+
+{% block body %}
+    {% if bannerSource is not null %}
+        {% include bannerSource %}
+    {% endif %}
+
+    {% if not error %}
+        {% include "@WicrewSale/Booking/breadcrumbs.html.twig" with { progress: 2, type: 'transport' } only %}
+
+        <div class="container-bg-secondary">
+            {% include "@WicrewProduct/Product/Search/search.private-transports.html.twig"
+                with { "trips": trip, "tripType": tripType, "transportTypes": transportTypes, "hidden": "hidden" } only %}
+        </div>
+    {% endif %}
+
+    {% if results|length <= 0 %}
+        {% if error %}
+            <div class="container">
+                <strong style="color: red">{{ 'vehicle.error'|trans }}</strong>
+            </div>
+        {% endif %}
+    {% else %}
+
+        <div class="container search-result-header" style="padding-bottom: 30px">
+            <h1>{{ 'select_transportation'|trans }}</h1>
+        </div>
+
+        <form name="form" method="post" id="form_result_vehicle" class="form_result_vehicle" action="{{ url("start_booking") }}" novalidate="novalidate">
+            {% set canBook = true %}
+            {% for result in results %} 
+                {% if loop.index % 2 == 1 %}
+                    <div class="container-bg-secondary search-result-listing">
+                {% endif %}
+                <div class="container search-results" data-result-index="{{ loop.index }}">
+                    {% set pickAreaID = trip[loop.index]["pickArea"] %}
+                    {% set dateFrom = trip[loop.index]['dateFrom'] %}
+                    {% set dateTo = trip[loop.index]['dateTo'] %}
+                    {% include "@WicrewProduct/Product/Search/ride.header.html.twig"
+                        with { index: loop.index, pickAreaID: pickAreaID, dropAreaID: trip[loop.index]["dropArea"], dateFrom: dateFrom, dateTo: dateTo } only %}
+                    <div class="search-results-value">
+                        <h3>{{ 'search.results'|trans({"count": result|length}) }}
+                    </div>
+
+                    <div class="vehicle-list">
+                        {% if result|length > 0 %}
+                            {% set bookingNumber = loop.index %}
+    
+                            {% if ( (other_private|length > 0) and (other_private[loop.index]|length > 0) ) or ( (other_airport|length > 0) and (other_airport[loop.index] is defined) and (other_airport[loop.index]|length > 0) ) or ( (other_shared|length > 0) and (other_shared[loop.index]|length > 0) ) %}
+                                {% set bookingNumber = loop.index %}
+                            {% endif %}
+
+                            {% for product in result %}
+                                {# @var product \App\Wicrew\ProductBundle\Entity\Product #}
+                                {% set reverseAreas = pickAreaID != product.areaFrom.id %}
+                                {% include "@WicrewProduct/Product/Search/product.result.detail.html.twig"
+                                    with { "product": product, "reverseAreas": reverseAreas,
+                                    "bookingNumber": bookingNumber, "transportTypes": transportTypes, "dateFrom": dateFrom, "dateTo": dateTo, 
+                                    "onlyOneBooking": results|length < 2 } only %}
+                            {% endfor %}
+                        {% else %}
+                            {% set canBook = false %}
+                            <h3 class="destination-detail">{{ 'vehicle.noresult'|trans() }}</h3>
+                        {% endif %}
+                        
+                        {% if ( (other_private|length > 0) and (other_private[loop.index]|length > 0) ) or ( (other_airport|length > 0) and (other_airport[loop.index] is defined)  and (other_airport[loop.index]|length > 0) ) or ( (other_shared|length > 0) and (other_shared[loop.index]|length > 0) ) %}
+                            <div class="container search-result-header" style="padding-bottom: 30px">
+                                <h1>Other options</h1>
+                            </div>
+                        {% endif %}
+                      
+                        {# SHOWING OTHER PRIVATE OPTIONS #}
+                         {% if other_private|length > 0 %}
+                            {% if other_private[loop.index]|length > 0 %}
+                                {% set bookingNumber = loop.index %}
+                                {% for product in other_private[loop.index] %}
+                                    {# @var product \App\Wicrew\ProductBundle\Entity\Product #}
+                                    {% set reverseAreas = pickAreaID != product.areaFrom.id %}
+                                    {% include "@WicrewProduct/Product/Search/product.result.detail.html.twig" with { "product": product, "dateFrom": dateFrom, "dateTo": dateTo,  "reverseAreas": reverseAreas, "bookingNumber": bookingNumber, "transportTypes": transportTypes, "onlyOneBooking": results|length < 2 } only %}
+                                {% endfor %}
+                            {% endif %}
+                        {% endif %}
+                        {# SHOWING OTHER PRIVATE OPTIONS #}
+                        
+                        {# SHOWING OTHER SHARED OPTIONS #}
+                        {% if other_shared|length > 0 %}
+                            {% if other_shared[loop.index]|length > 0 %}
+                                {% set bookingNumber = loop.index %}
+                                {% for product in other_shared[loop.index] %}
+                                    {# @var product \App\Wicrew\ProductBundle\Entity\Product #}
+                                    {% set reverseAreas = pickAreaID != product.areaFrom.id %}
+                                    {% include "@WicrewProduct/Product/Search/product.result.detail.html.twig" with { "product": product,  "dateFrom": dateFrom, "dateTo": dateTo, "reverseAreas": reverseAreas, "bookingNumber": bookingNumber, "transportTypes": transportTypes, "onlyOneBooking": results|length < 2 } only %}
+                                {% endfor %}
+                            {% endif %}
+                        {% endif %}
+
+                        {# SHOWING OTHER SHARED OPTIONS #}
+                        
+                        {# SHOWING OTHER AIRPORT OPTIONS #}
+                        {% if other_airport|length > 0 %}
+                            {% if (other_airport[loop.index] is defined) and other_airport[loop.index]|length > 0 %}
+                                {% set bookingNumber = loop.index %}
+                                {% for product in other_airport[loop.index] %}
+                                    {# @var product \App\Wicrew\ProductBundle\Entity\Product #}
+                                    {% set reverseAreas = pickAreaID != product.areaFrom.id %}
+                                    {% include "@WicrewProduct/Product/Search/product.result.detail.html.twig" with { "product": product, "dateFrom": dateFrom, "dateTo": dateTo,  "reverseAreas": reverseAreas, "bookingNumber": bookingNumber, "transportTypes": transportTypes, "onlyOneBooking": results|length < 2 } only %}
+                                {% endfor %}
+                            {% endif %}
+                        {% endif %}
+                        {# SHOWING OTHER PRAIRPORTIVATE OPTIONS #}
+
+                    </div>
+
+                    {# Pass along data from search fields. #}
+                    <input type="hidden" name="adultCounts[{{ loop.index }}]"
+                           value="{{ trip[loop.index]['adultCount'] }}">
+
+                    <input type="hidden" name="childCounts[{{ loop.index }}]"
+                           value="{{ trip[loop.index]['childCount'] }}">
+
+                    <input type="hidden" name="pickDates[{{ loop.index }}]"
+                           value="{{ trip[loop.index]['dateFrom'] }}">
+
+                    {# Include the pick area ID so we know if the areas need to be swapped. #}
+                    <input type="hidden" name="pickAreas[{{ loop.index }}]"
+                           value="{{ trip[loop.index]['pickArea'] }}">
+                    <input type="hidden" name="dropAreas[{{ loop.index }}]"
+                           value="{{ trip[loop.index]['dropArea'] }}">
+
+                    {% if loop.last and canBook and results|length > 1 %}
+                        <div class="submit-container">
+                            {% set is_multi_destination = loop.index != 1 %}
+                            {% if is_multi_destination  %}
+                                <button class="select_vehicles_btn ck-button">Select all vehicles</button>
+                            {% endif %}
+                       
+                            <input type="submit" value="{% if is_multi_destination  %}Next{% else %}{{ 'booknow'|trans() }}{% endif %}"
+                                   class="select-vehicle btn-black lg-btn"/>
+                        </div>
+                        <div class="clearfix"></div>
+                    {% endif %}
+                </div>
+
+                {% if loop.index % 2 == 1 %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+            
+            <input type="hidden" name="referrer" value="{{ app.request.uri }}" />
+        </form>        
+    {% endif %}
+
+    {# HERE INSERT CODE FOR OTHER OPTIONS  #}
+    <style>
+    .page-product_search .search-result-listing .search-results{
+        padding-top: 0px;
+        padding-bottom: 0px;
+    }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+        $(function () {  
+                
+            $( window ).on("load", function() {
+                $([document.documentElement, document.body]).animate({
+                    scrollTop: $( '.product-result-item' ).offset().top - 90
+                }, 800);
+            });
+            let checkboxes = $('input[name^="productIDs"]');
+            checkboxes.each(function () {
+                if ($(this).is(":checked")) {
+                    $(this).siblings("span").text("{{ "vehicle.deselect"|trans }}");
+                    $(this).closest(".product-result-item").addClass("active");
+                }
+            });
+
+            checkboxes.on("change", function () {
+                if ($(this).is(":checked")) {
+                    $(this).siblings("span").text("{{ "vehicle.deselect"|trans }}");
+                    let chosenValue = $(this).val();
+
+                    let results = $(this).closest(".search-results");
+                    results.find(".ck-button input:checked").each(function () {
+                        if ($(this).val() !== chosenValue) {
+                            $(this).prop("checked", false);
+                            $(this).trigger("change");
+                        }
+                    });
+
+                    let html = $("html");
+                    let nextResultIndex = html.data("next-ride-index");
+                    if (results.attr("data-result-index") === "1") {
+                        if (nextResultIndex === undefined) {
+                            let nextResult = $(".search-results[data-result-index='2']");
+                            if (typeof(nextResult) !== "undefined" && nextResult.length > 0) {
+                                scrollToValidationError(nextResult.offset().top);
+                                html.data("next-ride-index", "3");
+                            }
+                        }
+                    } else {  
+                        if (nextResultIndex !== undefined) { 
+                            let currentIndex = parseInt(results.attr("data-result-index"));
+                            if ((currentIndex + 1).toString() === nextResultIndex) {
+                                let nextResult = $(`.search-results[data-result-index='${nextResultIndex}']`);
+                                if (nextResult !== undefined && nextResult.length > 0) {
+                                    scrollToValidationError(nextResult.offset().top);
+                                }
+
+                                html.data("next-ride-index", (currentIndex + 2).toString());
+                            } else {
+                                html.data("next-ride-index", "-1");
+                            }
+                        } else {  
+                            html.data("next-ride-index", "-1"); 
+                        }
+                        if ($('.ck-button input:checked').length == {{results|length}}) {
+                            let inputSubmit = $('input[type="submit"].select-vehicle');
+                            scrollToValidationError(inputSubmit.offset().top - 100);
+                        }
+                    }
+
+                    $(this).closest(".product-result-item").addClass("active");
+                    results.find(".error-msg").remove();
+                } else {
+                    $(this).siblings("span").text("{{ "vehicle.select"|trans }}");
+                    $(this).closest(".product-result-item").removeClass("active");
+                }
+            });
+
+            $(".book-now").on("click", function (e) {
+                e.preventDefault();
+                let checkbox = $(this).siblings(".ck-button");
+                checkbox = checkbox.find("input");
+                checkbox.attr("checked", "checked");
+                checkbox.trigger("change");
+
+                let selectedVehicleType = $(this).data('vehicletype');
+                let selectedDate        = $(this).parents('.product-result-item').find('span.pick_date').text().trim();
+                let selectedAreaFrom    = $(this).parents('.product-result-item').find('span.pick_area').text().trim();
+                let selectedAreaTo      = $(this).parents('.product-result-item').find('span.drop_area').text().trim();
+
+                let that = $(this);
+                $.ajax({
+                    url:'/check/vehicle/availability',
+                    type: "GET",
+                    dataType: "json",
+                    data: {
+                        "selectedVehicleType": selectedVehicleType,
+                        "selectedDate": selectedDate,
+                        "selectedAreaFrom": selectedAreaFrom,
+                        "selectedAreaTo": selectedAreaTo,
+                    },
+                    async: true,
+                    success: function (data) {
+
+                        if(data == 'not-available'){
+                            let p = $('<p class="error-msg">The vehicle selected is not available. Please change the vehicle or contact us to check for availability at {% include "@WicrewPage/email.html.twig" %}. Thank you! </p>');
+                            p.insertBefore( that.parents('form').find(".vehicle-list") );
+                        }else{
+                            $(".form_result_vehicle").submit();
+                        }
+                    }
+                });
+
+            });
+
+            $(".form_result_vehicle").on("submit", function () {
+                let anyErrors = false;
+                
+                let search_results = $(this).find(".search-results");
+                search_results.each(function () {
+                    $(this).find(".error-msg").remove();    
+
+                    let selects = $(this).find(".ck-button input:checked");
+                    if (selects.length < 1) {
+                        let p = $("<p class='error-msg'>{{ 'please.select.a.vehicle'|trans }}</p>");
+                        p.insertBefore($(this).find(".vehicle-list"));
+
+                        if (!anyErrors) {
+                            scrollToValidationError($(this).offset().top);
+                            anyErrors = true;
+                        }
+                    }
+                });
+
+                return !anyErrors;
+            });
+        });
+
+    {# @see https://atomiks.github.io/tippyjs/v6/all-props/ #}
+    if ($('#price-match-tooltip').length > 0) {
+        tippy('#price-match-tooltip', {
+            content: '<p>If you see the same service we provide offered at a lower price from a competitor, we’ll match it. It’s that simple! <a href="#priceMatchModal" rel="modal:open" style="color:white;text-decoration: underline;">Click for more details</a></p>',
+            allowHTML: true,
+            interactive: true,
+            trigger: 'mouseenter focus click',
+        });
+    }
+
+    $( "button.select_vehicles_btn" ).on("click",function(e) {
+        e.preventDefault();
+
+        $( ".container.search-results" ).each(function( index ) {
+            $( this ).find(".product-result-item").first().find('input[type="checkbox"]').prop('checked', true);
+        });
+    });
+
+    </script>
+
+    <style>
+    .search-results .submit-container {
+        margin-bottom: 40px;
+    }
+    button.select_vehicles_btn.ck-button {
+        cursor: pointer;
+        color: white;
+        line-height: 42px;
+        letter-spacing: 1px;
+        white-space: nowrap;
+        padding: 0px  10px;
+        border: none;
+        background-color: #2e6eb2;
+        border-radius: 50px;
+        width: auto;
+        min-width: 168px;
+        height: 48px;
+        overflow: unset;
+        transition: all 0.5s;
+        font-size: 12px;
+    }
+    </style>
+{% endblock %}
+

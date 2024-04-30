@@ -1,0 +1,338 @@
+{% extends "@WicrewCore/Email/main.email.html.twig" %}
+
+{% block titlemail %}
+    {{ 'email.confirm.order'|trans() }}
+{% endblock %}
+
+{% if order.quote %}
+    {% set booking_text = 'quote' %}
+{% else %}
+    {% set booking_text =  'booking' %}
+{% endif %}
+
+{% block mailcontent %}
+    <div class="booking-complete">
+        Your pickup time will be at {{ orderItem.pickTimeTransport|formatNoNull('H:i') }}
+        <div class="booking-reference-text">{{booking_text|capitalize}}  Reference: <div class="booking-number">#RJ{{ order.id }}</div></div>
+    </div>
+ 
+    <h2>Reservation details</h2>
+    {# @var item \App\Wicrew\SaleBundle\Entity\OrderItem #}
+    {% for item in order.items %}
+        {% if orderItem.id == item.id %}
+        <div class="item-box">
+            <div class="item-header">
+                {% if item.product %}{{ item.product.transportationType.name }}{% elseif item.activity %}{{ item.activity.name }}{% endif %}
+                - {{ item.pickDate|formatNoNull('F jS, Y') }}
+            </div>
+
+            <div class="item-info">
+                <div class="item-vehicle-info">
+                    {% set imageURL = getOrderItemImage(item) %}
+                    {% if isUsedInPdf is defined and isUsedInPdf %} 
+                        {% if imageURL is not null %}
+                            <img src="{{ imageToBase64(imageURL) }}"
+                                width="{{ getParameterValue('global_image_vehicletype_width') }}">
+                        {% else %}
+                            <img src="{{ imageToBase64('bundles/wicrewcore/images/placeholder.png') }}"
+                                alt="{{ 'core.image404'|trans }}">
+                        {% endif %}
+                    {% else %}
+                        {% if imageURL is not null %}
+                            <img src="{{ app.request.getSchemeAndHttpHost() ~ imageURL }}"
+                                width="{{ getParameterValue('global_image_vehicletype_width') }}">
+                        {% else %}
+                            <img src="{{ absolute_url(asset('bundles/wicrewcore/images/placeholder.png')) }}"
+                                alt="{{ 'core.image404'|trans }}">
+                        {% endif %} 
+                    {% endif %} 
+                    {% if item.product %}
+                        {% set vehicleNotes = getVehicleNoteList(item.product.vehicleType) %}
+                        <ul class="info-bullet-list vehicle-notes-list">
+                        {% for note in vehicleNotes %}
+                            <li>{{ note|raw }}</li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="item-trip-info">
+                    <table>
+                        <tr>
+                            <td style="min-width: 200px">
+                                <div><strong>Date:</strong> {{ item.pickDate|formatNoNull('F jS, Y') }}</div>
+                                {% if item.pickAddress != "" %} 
+                                    <div><span class="item-trip-label">Pick-up Area:</span> {{ item.pickArea.name }}</div>
+                                    <div><span class="item-trip-label">Pick-up Location:</span> {{ item.pickAddress }}</div>
+                                {% else %}
+                                    <div><span class="item-trip-label">Pick-up Location:</span> {{ item.pickArea.name }}</div>
+                                {% endif %}
+                                <div><strong>Pick-up Time :</strong> {{ orderItem.pickTimeTransport|formatNoNull('H:i') }}</div> 
+                                <div><strong>Adults :</strong> {{ item.adultCount }}</div>
+                                <div><strong>Children :</strong> {{ item.childCount }}</div>
+                            </td>
+                            <td>
+                                {% if item.dropAddress != "" %} 
+                                    <div><span class="item-trip-label">Drop-off Area:</span> {{ item.dropArea.name }}</div>
+                                    <div><span class="item-trip-label">Drop-off Location:</span> {{ item.dropAddress }}</div>
+                                {% else %}
+                                    <div><span class="item-trip-label">Drop-off Location:</span> {{ item.dropArea.name }}</div>
+                                {% endif %} 
+                                {% if item.pickArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) and (item.pickAirlineCompany != '' or item.pickFlightNumber != '') %}
+                                    {% if item.pickAirlineCompany != '' %}
+                                        <div><span
+                                            class="item-trip-label">Airline:</span> {{ item.pickAirlineCompany }}
+                                        </div>{% endif %}
+                                    {% if item.pickFlightNumber != '' %}
+                                        <div><span
+                                            class="item-trip-label">Flight #:</span> {{ item.pickFlightNumber }}
+                                        </div>{% endif %} 
+                                {% endif %}  
+                                {% if item.dropArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) and (item.dropAirlineCompany != '' or item.dropFlightNumber != '') %}
+                                    {% if item.dropAirlineCompany != '' %}
+                                        <div><span
+                                            class="item-trip-label">Airline:</span> {{ item.dropAirlineCompany }}
+                                        </div>{% endif %}
+                                    {% if item.dropFlightNumber != '' %}
+                                        <div><span
+                                            class="item-trip-label">Flight #:</span> {{ item.dropFlightNumber }}
+                                        </div>{% endif %}
+                                {% endif %}
+                                <div>
+                                    {% if item.product %}
+                                        {% if item.pickArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}
+                                            {% if item.pickTime %}
+                                                <div>
+                                                    <strong>Arrival Time: </strong><span>{{item.pickTime|formatNoNull("H:i")}}</span> 
+                                                </div>
+                                                <br />
+                                            {% endif %}
+                                        {% elseif item.dropArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}           
+                                            {% if item.pickTime %}
+                                                <div>
+                                                    <strong>Departure Time: </strong><span>{{item.pickTime|formatNoNull("H:i")}}</span> 
+                                                </div>
+                                                <br />
+                                            {% endif %}
+                                        {% elseif item.pickArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) and item.dropArea.type is same as(constant('\\App\\Wicrew\\ProductBundle\\Entity\\Area::TYPE_AIRPORT')) %}           
+                                            {% if item.pickTime %}
+                                                <div>
+                                                    <strong>Arrival Time: </strong><span>{{item.pickTime|formatNoNull("H:i")}}</span> 
+                                                </div>
+                                                <br />
+                                            {% endif %}
+                                        {% else %}
+                                            {% if item.pickTime %}
+                                                <div>
+                                                    <strong>Pick-up Time: </strong><span>{{item.pickTime|formatNoNull("H:i")}}</span>
+                                                </div>
+                                                <br />
+                                            {% endif %}
+                                        {% endif %}
+                                    {% elseif item.activity %}
+                                        <span class="item-trip-label">Tour Time:</span> {{ item.tourTime|formatNoNull('H:i') }}
+                                    {% endif %}
+                                </div>
+                            </td> 
+                        </tr>
+                        <tr>
+                            <td> 
+                            </td>
+                            <td></td>
+                        </tr>
+                        {% if item.customerNotes %}
+                            <tr>
+                                <td colspan="2">
+                                    <div class="item-trip-label item-notes-header">Notes:</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">{{ item.customerNotes|raw }}</td>
+                            </tr>
+                        {% endif %}
+                        <tr>
+                            <td colspan="2">
+                                {% if item.anyAddons %}
+                                    <div>
+                                        <label>{{ 'booking.addons'|trans() }}:</label>
+                                        {% for addon in item.addons %}
+                                            <div class="inside">
+                                                {{ addon.label|raw }} - {{ addon.rackPrice ~ 'currency.symbol'|trans() }}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if item.anyExtras %}
+                                    <div>
+                                        <label>{{ 'booking.extras'|trans() }}:</label>
+                                        {% for extra in item.extras %}
+                                            <div class="inside">
+                                                {{ extra.label|raw }} - {{ extra.rackPrice ~ 'currency.symbol'|trans() }}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    {% endfor %}  
+  
+{% endblock %}
+
+{% block additionalCSS %}
+    <style>
+        img {
+            max-width: unset;
+        }
+
+        .booking-complete {
+            text-align: center;
+            font-size: 1.5em;
+        }
+
+        .booking-reference-text {
+            margin: 5px 0 20px 0;
+        }
+
+        /* For whatever reason wkhtmltopdf wipes the font size on spans, so this needs to be an inline div. */
+        .booking-number {
+            display: inline;
+            color: red;
+        }
+
+        h2 {
+            border-bottom: 1px solid #cacaca;
+            width: 100%;
+            font-size: 1.8em;
+        }
+
+        h3 {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        h4 {
+            margin-bottom: 0;
+            text-transform: uppercase;
+        }
+
+        .item-box {
+            border-bottom: 1px solid #cacaca;
+            margin-bottom: 10px;
+        }
+
+        .item-header {
+            background-color: #646464;
+            text-align: center;
+            color: white;
+            font-size: 1.5em;
+        }
+
+        .item-info {
+            display: -webkit-box; /* wkhtmltopdf uses this one */
+            display: flex;
+        }
+
+        /* wkhtmltopdf uses this */
+        .purchase-summary > div {
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            flex: 1;
+        }
+
+        .item-vehicle-info {
+            max-width: {{ getParameterValue('global_image_vehicletype_width')|intVal + 20 }}px;
+        }
+
+        .vehicle-notes-list {
+            padding-left: 10px;
+        }
+
+        .item-trip-info {
+            margin: 5px 0 2px 0;
+            padding: 5px;
+
+            flex-grow: 1;
+            background-color: #F9F9F9;
+        }
+
+        .item-trip-label {
+            font-weight: bold;
+        }
+
+        .item-notes-header {
+            text-decoration: underline;
+            margin-top: 10px;
+        }
+
+        .purchase-summary {
+            display: -webkit-box; /* wkhtmltopdf uses this one */
+            display: flex;
+            flex-wrap: nowrap;
+            padding: 5px 3px;
+            background: #F9F9F9;
+            width: 100%;
+            min-height: 180px;
+        }
+
+        /* wkhtmltopdf uses this */
+        .purchase-summary > div {
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            flex: 1;
+        }
+
+        .client-contact-info, .client-charges {
+            padding: 5px 0;
+        }
+
+        .client-contact-info {
+            border-right: 1px solid black;
+            flex-basis: 300px;
+        }
+
+        .client-name {
+            margin-top: 20px;
+        }
+
+        .client-charges {
+            padding-left: 10px;
+        }
+
+        .client-charges table {
+            border-spacing: 0;
+        }
+
+        .client-charges td {
+            padding: 0 8px 0 0;
+        }
+
+        .charges-label-col {
+            min-width: 200px;
+        }
+
+        .charges-taxes-row td {
+            border-bottom: 1px solid black;
+        }
+
+        .charges-total-col {
+            margin-top: 20px;
+        }
+
+        .important-information {
+            background-color: #F9F9F9;
+            padding: 10px 5px;
+        }
+
+        .em-contact-label {
+            font-weight: bold;
+        }
+
+        .info-bullet-list li {
+            list-style: initial;
+        }
+    </style>
+{% endblock %}

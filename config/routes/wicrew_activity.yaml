@@ -1,0 +1,2 @@
+wicrew_activity:
+    resource: "@WicrewActivityBundle/Resources/config/routes.yaml"

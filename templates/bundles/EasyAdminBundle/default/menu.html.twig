@@ -1,0 +1,116 @@
+{% macro render_menu_item(item, translation_domain) %}
+    {% if item.type == 'divider' %}
+        {{ item.label|trans(domain = translation_domain) }}
+    {% else %}
+        {% set path =
+            item.type == 'link' ? item.url :
+            item.type == 'route' ? path(item.route, item.params) :
+            item.type == 'entity' ? path('easyadmin', { entity: item.entity, action: 'list' }|merge(item.params)) :
+            item.type == 'empty' ? '#' : ''
+        %}
+
+        {# if the URL generated for the route belongs to the backend, regenerate
+           the URL to include the menu_params to display the selected menu item
+           (this is checked comparing the beginning of the route URL with the backend homepage URL)
+        #}
+        {% if item.type == 'route' and (path starts with path('easyadmin')) %}
+            {% set path = path(item.route, menu_params|merge(item.params)) %}
+        {% endif %}
+
+        <a href="{{ path }}"
+           class="{{ item.css_class|default('') }}"
+           {% if item.target|default(false) %}target="{{ item.target }}"{% endif %}
+                {% if item.rel|default(false) %}rel="{{ item.rel }}"{% endif %}>
+            {% if item.icon is not empty %}<i class="fa fa-fw {{ item.icon }}"></i>{% endif %}
+            <span>{{ item.label|trans(domain = translation_domain) }}</span>
+            {% if item.children|default([]) is not empty %}<i class="fa fa-fw fa-angle-right treeview-icon"></i>{% endif %}
+        </a>
+    {% endif %}
+{% endmacro %}
+
+{# Add a macro to figure out menu selection. #}
+{% macro is_this_menu_selected(item) %}
+    {% set active = false %}
+
+    {% if app.request.query.get('entity') and item.entity is defined %}
+        {% if app.request.query.get('entity')|default(-1) == item.entity %}
+            {% set active = true %}
+        {% endif %}
+    {% endif %}
+
+    {% if item.children is defined %}
+        {% for subitem in item.children %}
+            {% if app.request.query.get('entity') and subitem.entity is defined %}
+                {% if app.request.query.get('entity')|default(-1) == subitem.entity %}
+                    {% set active = true %}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    {% if active == true %}
+        {{ "1" }}
+    {% else %}
+        {{ "0" }}
+    {% endif %}
+{% endmacro %}
+
+{% macro get_submenu_index(item) %}
+    {% set retVal = -1 %}
+
+    {% if item.children is defined %}
+        {% for subitem in item.children %}
+            {% if app.request.query.get('entity') and subitem.entity is defined %}
+                {% if app.request.query.get('entity')|default(-1) == subitem.entity %}
+                    {% set retVal = loop.index0 %}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    {{ retVal }}
+{% endmacro %}
+
+{% import _self as helper %}
+
+{% block main_menu_before %}{% endblock %}
+
+{% set _translation_domain = (_entity_config.translation_domain)|default(easyadmin_config('translation_domain'))|default('messages') %}
+<ul class="sidebar-menu" data-widget="tree" data-animation-speed="250">
+    {% set _menu_items = easyadmin_config('design.menu') %}
+
+    {% block main_menu %}
+        {% for item in _menu_items %}
+            {% block menu_item %}
+                {# Inject macro here. #}
+                {% set isThisMenuSelectedMacro = helper.is_this_menu_selected(item).__toString()|trim() %}
+                {% set is_selected_menu = isThisMenuSelectedMacro == "1" %}
+                {% set subMenuIndex = helper.get_submenu_index(item).__toString()|trim() %}
+                {% set is_selected_submenu = is_selected_menu and subMenuIndex != -1 %}
+
+                {% if easyadmin_is_granted(item.permission) %}
+                    <li class="{{ item.type == 'divider' ? 'header' }} {{ item.children is not empty ? 'treeview' }} {{ is_selected_menu ? 'active' }} {{ is_selected_submenu ? 'submenu-active' }}">
+                        {{ helper.render_menu_item(item, _translation_domain) }}
+
+                        {% if item.children|default([]) is not empty %}
+                            <ul class="treeview-menu">
+                                {% for subitem in item.children %}
+                                    {% block menu_subitem %}
+                                        {% if easyadmin_is_granted(subitem.permission) %}
+                                            <li class="{{ subitem.type == 'divider' ? 'header' }} {{ is_selected_menu and subMenuIndex == subitem.submenu_index ? 'active' }}">
+                                                {{ helper.render_menu_item(subitem, _translation_domain) }}
+                                            </li>
+                                        {% endif %}
+                                    {% endblock menu_subitem %}
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </li>
+                {% endif %}
+            {% endblock menu_item %}
+        {% endfor %}
+    {% endblock main_menu %}
+</ul>
+
+{% block main_menu_after %}{% endblock %}
+

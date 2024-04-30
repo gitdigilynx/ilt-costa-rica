@@ -1,0 +1,19 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+<style>
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 500px;
+  background-color: #f5f6f8;
+  color: #2e6eb2;
+  text-align: center;
+  font-size: 50px;
+}
+</style>
+<div class="center">
+  <p>{% if message is defined and message is not empty %}{{message}}{% else %}{{'page.not.found'|trans()}}{% endif %}</p>
+</div>
+{% endblock %}

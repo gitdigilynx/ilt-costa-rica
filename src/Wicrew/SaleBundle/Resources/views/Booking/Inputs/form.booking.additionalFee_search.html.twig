@@ -1,0 +1,11 @@
+{% set identifier = type ~ '_' ~ bookingNumber %}
+{% set areaPostName = postDataSection ~ '[area_' ~ type ~ ']' %}
+
+<div class="area-type-section input-pin-icon floating-label-w-icon black-icon">
+    <div class="row-block">
+        <div class="floating-label-wrap">
+            {% include "@WicrewSale/Booking/Inputs/_partials/input.additionalFee_search.html.twig"%}
+        </div>
+    </div>
+</div>
+

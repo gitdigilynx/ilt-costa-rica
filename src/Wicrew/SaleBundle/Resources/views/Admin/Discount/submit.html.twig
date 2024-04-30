@@ -1,0 +1,58 @@
+<script>
+    // hide field amount/percentage depending on discount type
+        handleHideFieldAmountPercentage()
+
+        function handleHideFieldAmountPercentage() {
+            hideFieldAmountPercentage();
+            $('#discount_typeDiscount').change(function () {
+                hideFieldAmountPercentage();
+            });
+        }
+
+        function hideFieldAmountPercentage() {
+            let percentage_id = "{{constant('App\\Wicrew\\SaleBundle\\Entity\\Discount::TYPE_DISCOUNT_PERCENTAGE')}}";
+            let amount_id = "{{constant('App\\Wicrew\\SaleBundle\\Entity\\Discount::TYPE_DISCOUNT_AMOUNT')}}";
+
+            let value = $('#discount_typeDiscount').val();
+
+            if (value == percentage_id) {
+                $('#discount_reductionAmount').closest('.col-12').hide();
+                $('#discount_reductionPercentage').closest('.col-12').show();
+            } else if (value == amount_id) {
+                $('#discount_reductionAmount').closest('.col-12').show();
+                $('#discount_reductionPercentage').closest('.col-12').hide();
+            }
+        }
+
+    // code generation taken from prestashop admin.js
+        let generate_code_button = `
+            <div class="col-12 ">
+                <span class="input-group-btn">
+                    <a href="javascript:gencode(8);" class="btn btn-default"><i class="icon-random"></i>Generate a code</a>
+                </span>
+            </div>
+        `;
+        $('#discount_code').closest('.col-12').after(generate_code_button);
+
+        /* Code generator for Affiliation and vouchers */
+        function gencode(size)
+        {
+            getE('discount_code').value = '';
+            /* There are no O/0 in the codes in order to avoid confusion */
+            var chars = "123456789ABCDEFGHIJKLMNPQRSTUVWXYZ";
+            for (var i = 1; i <= size; ++i)
+                getE('discount_code').value += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+
+        function getE(name)
+        {
+            if (document.getElementById)
+                var elem = document.getElementById(name);
+            else if (document.all)
+                var elem = document.all[name];
+            else if (document.layers)
+                var elem = document.layers[name];
+            return elem;
+        }
+
+</script>

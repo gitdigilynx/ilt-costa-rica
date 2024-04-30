@@ -1,0 +1,485 @@
+{% set areaFromIdentifier = 'from_' ~ bookingNumber %}
+{% set areaFromSelectID = 'areas_select_' ~ areaFromIdentifier %}
+{% set areaFromNameAndTypeID = 'dest_' ~ areaFromIdentifier %}
+{% set areaFromAddressID = 'additionalFee_search_' ~ areaFromIdentifier %}
+{% set areaFromGooglePlaceID = 'placeID_' ~ areaFromIdentifier %}
+{% set areaFromFlightNumberID = 'flight_number_' ~ areaFromIdentifier %}
+{% set areaFromAirlineCompanyID = 'flight_company_' ~ areaFromIdentifier %}
+
+{% set areaToIdentifier = 'to_' ~ bookingNumber %}
+{% set areaToSelectID = 'areas_select_' ~ areaToIdentifier %}
+{% set areaToNameAndTypeID = 'dest_' ~ areaToIdentifier %}
+{% set areaToAddressID = 'additionalFee_search_' ~ areaToIdentifier %}
+{% set areaToGooglePlaceID = 'placeID_' ~ areaToIdentifier %}
+{% set areaToFlightNumberID = 'flight_number_' ~ areaToIdentifier %}
+{% set areaToAirlineCompanyID = 'flight_company_' ~ areaToIdentifier %}
+
+<script type="text/javascript">
+    // If a POST request to update a summary is already in progress.
+    let requestInProgressFor_{{ bookingNumber }} = false;
+    // When a watcher triggers while a request is in progress, we signal to do a new update once the first one finishes.
+    let needsNewUpdateFor_{{ bookingNumber }} = false;
+
+    function updateSummaryOfBookingNumber_{{ bookingNumber }}( edit_item = false ) {
+        let areaFrom = $("#{{ areaFromSelectID }}").children("option:selected").val();
+        if (areaFrom === undefined) {
+            areaFrom = $("#{{ areaFromNameAndTypeID }}").val();
+        }
+        areaFrom = JSON.parse(areaFrom);
+
+        let areaTo = $("#{{ areaToSelectID }}").children("option:selected").val();
+        if (areaTo === undefined) {
+            areaTo = $("#{{ areaToNameAndTypeID }}").val();
+        }
+        areaTo = JSON.parse(areaTo);
+
+        let addonsSelected = {};
+        $("#addons-for-{{ bookingNumber }}").find(".addon-group-item").each(function () {
+            let addonButtonElement = $(this).find("[id^=addon_]");
+            if (addonButtonElement.is(":checked")) {
+                let addonJSON = {
+                    enabled: 1
+                };
+
+                // Single toggle addon?
+                if ($(this).hasClass("addon-type-checkbox")) {
+                    let quantityInput = $(this).find(".addon-quantity input");
+                    if (quantityInput.length > 0) {
+                        let quantity = parseInt(quantityInput.val().toString());
+                        if (quantity > 0) {
+                            addonJSON["quantity"] = quantity;
+                        } else {
+                            // Unset enable value.
+                            delete addonJSON["enabled"];
+                        }
+                    }
+                } else {
+                    // Check each option.
+                    let addonOptionsSelected = {};
+                    $(this).find("[id^=addonOption_]:checked").each(function () {
+                        let addonOptionJSON = {
+                            enabled: 1
+                        };
+
+                        let addonOptionContainer = $(this).parents(".addon-item");
+                        let quantityInput = addonOptionContainer.find(".addon-option-quantity input");
+                        if (quantityInput.length > 0) {
+                            let quantity = parseInt(quantityInput.val().toString());
+                            if (quantity > 0) {
+                                addonOptionJSON["quantity"] = quantity;
+                            } else {
+                                // Unset enable value.
+                                delete addonOptionJSON["enabled"];
+                            }
+                        }
+
+                        let labelInput = addonOptionContainer.find(".addon-option-label input");
+                        let label = labelInput.val().toString();
+                        addonOptionJSON["label"] = label;
+                        addonOptionsSelected[$(this).val()] = addonOptionJSON;
+
+                    });
+
+                    if (Object.keys(addonOptionsSelected).length > 0) {
+                        // Merge both objects.
+                        addonJSON = {
+                            ...addonJSON,
+                            ...addonOptionsSelected
+                        };
+                    } else {
+                        // Unset enable value. No options are selected.
+                        delete addonJSON["enabled"];
+                    }
+                }
+
+                addonsSelected[addonButtonElement.val()] = addonJSON;
+            }
+        });
+
+        let extrasSelected = {};
+        $("#extras-for-{{ bookingNumber }}").find(".addon-group-item").each(function () {
+            let extraButtonElement = $(this).find("[id^=addon_]");
+            if (extraButtonElement.is(":checked")) { let extraJSON = {
+                    enabled: 1
+                };
+
+                // Single toggle extra?
+                if ($(this).hasClass("addon-type-checkbox")) {
+                    let quantityInput = $(this).find(".addon-quantity input");
+                    if (quantityInput.length > 0) {
+                        let quantity = parseInt(quantityInput.val().toString());
+                        if (quantity > 0) {
+                            extraJSON["quantity"] = quantity;
+                        } else {
+                            // Unset enable value.
+                            delete extraJSON["enabled"];
+                        }
+                    }
+                } else {
+                    // Check each option.
+                    let extraOptionsSelected = {};
+                    $(this).find("[id^=addonOption_]:checked").each(function () {
+                        let extraOptionJSON = {
+                            enabled: 1
+                        };
+
+                        let extraOptionContainer = $(this).parents(".addon-item");
+                        let quantityInput = extraOptionContainer.find(".addon-option-quantity input");
+                        if (quantityInput.length > 0) {
+                            let quantity = parseInt(quantityInput.val().toString());
+                            if (quantity > 0) {
+                                extraOptionJSON["quantity"] = quantity;
+                            } else {
+                                // Unset enable value.
+                                delete extraOptionJSON["enabled"];
+                            }
+                        }
+
+                        let labelInput = extraOptionContainer.find(".addon-option-label input");
+                        let label = labelInput.val().toString();
+                        extraOptionJSON["label"] = label;
+
+                        extraOptionsSelected[$(this).val()] = extraOptionJSON;
+                    });
+
+                    if (Object.keys(extraOptionsSelected).length > 0) {
+                        // Merge both objects.
+                        extraJSON = {
+                            ...extraJSON,
+                            ...extraOptionsSelected
+                        };
+                    } else {
+                        // Unset enable value. No options are selected.
+                        delete extraJSON["enabled"];
+                    }
+                }
+
+                extrasSelected[extraButtonElement.val()] = extraJSON;
+            }
+        });
+        
+        let custom_services = $("input.customService").serializeArray(); console.log(custom_services);
+
+        let data = {
+            {% if idType != "jbj" %}
+            "{{ idType }}": {{ bookingID }},
+            {% endif %}
+            bookingNumber: {{ bookingNumber }},
+            pickupDate: $("#{{ pickupDateID }}").val(),
+            pickupTime: $("#{{ pickupTimeID }}").val(),
+            activityType: $("#activityType").val(),
+            adultCount: $("#{{ adultCountID }}").val(),
+            childCount: $("#{{ childCountID }}").val(),
+            areaFrom: {
+                id: areaFrom["id"],
+                type: areaFrom["type"],
+                name: areaFrom["name"],
+                address: $("#{{ areaFromAddressID }}").val(),
+                googlePlaceID: $("#{{ areaFromGooglePlaceID }}").val(),
+                flightNumber: $("#{{ areaFromFlightNumberID }}").val(),
+                airlineCompany: $("#{{ areaFromAirlineCompanyID }}").val()
+            },
+            areaTo: {
+                id: areaTo["id"],
+                type: areaTo["type"],
+                name: areaTo["name"],
+                address: $("#{{ areaToAddressID }}").val(),
+                googlePlaceID: $("#{{ areaToGooglePlaceID }}").val(),
+                flightNumber: $("#{{ areaToFlightNumberID }}").val(),
+                airlineCompany: $("#{{ areaToAirlineCompanyID }}").val()
+            },
+            addons: addonsSelected,
+            extras: extrasSelected,
+            custom_services: custom_services,
+        };
+
+        {% if idType == "jbj" %}
+            const productID = $('input[name="{{ postDataSection }}[id]"]').val();
+            if (productID !== "") {
+                data["productID"] = productID;
+
+                {% if jbjType is not defined or jbjType != "private" %}
+                    let optionSelected =  $("#departure-at").children("option:selected");
+                    if (optionSelected.val() !== "") {
+                        const valueSet = JSON.parse(optionSelected.val().toString());
+                        data["pickupTime"] = valueSet["pickTime"];
+                    }
+                {% endif %}
+            } else {
+                let summaryElement = $("#summary-{{ bookingNumber }}");
+                if (summaryElement.length > 0) {
+                    $("#summary-{{ bookingNumber }}").remove();
+                    $("#subtotal-for-{{ bookingNumber }}").val("0");
+                    $("#taxes-for-{{ bookingNumber }}").val("0");
+                    updateGrandTotal();
+                }
+
+                return;
+            }
+        {% endif %}
+
+        if ( edit_item || window.location.pathname.indexOf("edit_item") > 0 ) {
+            data.activityID = $("select#dl_activity_id").val();
+        }
+        
+        jQuery.ajax({
+            url: "{{ url('update_summary') }}",
+            type: "POST",
+            data: data,
+            
+            success: function (response) {
+                if (response.status === "success") {
+                    
+                    if ("activityTimes" in response){
+                        let prevPickTime = $("#pickup_time_{{ bookingNumber }}").val();
+                        $("#pickup_time_{{ bookingNumber }}").find('option').remove().end();
+
+                        $.each(response.activityTimes, function(key, value) {   
+                            $("#pickup_time_{{ bookingNumber }}").append( $("<option></option>").attr("value", value).text(value) ); 
+                        });
+
+                        $("#pickup_time_{{ bookingNumber }}").val(prevPickTime);
+
+                    }
+                    
+                    if (!needsNewUpdateFor_{{ bookingNumber }}) {
+                        let newHTML = response.html;
+                        let summaryElement = $("#summary-{{ bookingNumber }}");
+                        if (summaryElement.length > 0) {
+                            $("#summary-{{ bookingNumber }}").replaceWith(newHTML);
+                        } else {
+                            $(".summary-main-block").find("h2").after(newHTML);
+                        }
+
+                        // Update totals.
+                        $("#subtotal-for-{{ bookingNumber }}").val(response["subtotal"]);
+                        $("#taxes-for-{{ bookingNumber }}").val(response["taxes"]);
+                        updateGrandTotal();
+
+                        const LATE_NOTICE_ID = "late-notice-{{ bookingNumber }}";
+
+                        $(`.notice#${LATE_NOTICE_ID}`).remove();
+                        if (response.hasOwnProperty("lateNotice")) {
+                            $(".notice").attr("hidden", "hidden"); // Hide other notices.
+                            let newNotice = $(`<div class="notice" id="${LATE_NOTICE_ID}"></div>`);
+                            newNotice.text(response.lateNotice);
+                            newNotice.appendTo(".notices");
+                        } else {
+                            let notices = $(".notice");
+                            let anyVisible = false;
+                            notices.each(function () {
+                                if (!anyVisible && $(this).is(":visible")) {
+                                    anyVisible = true;
+                                }
+                            })
+
+                            if (!anyVisible) {
+                                notices.first().removeAttr("hidden");
+                            }
+                        }
+
+                        requestInProgressFor_{{ bookingNumber }} = false;
+                    } else {
+                        needsNewUpdateFor_{{ bookingNumber }} = false;
+                        updateSummaryOfBookingNumber_{{ bookingNumber }}()
+                    }
+                } else {
+                    alert(response.message);
+                    requestInProgressFor_{{ bookingNumber }} = false;
+                    return false;
+                }
+            },
+            error: function () {
+                requestInProgressFor_{{ bookingNumber }} = false;
+            }
+        });
+    }
+
+    // $(document).on("ready", function () {
+    $("input.updates-summary-of-{{ bookingNumber }}, select.updates-summary-of-{{ bookingNumber }}").on("input", function () {
+        if (!requestInProgressFor_{{ bookingNumber }}) {
+            requestInProgressFor_{{ bookingNumber }} = true;
+            updateSummaryOfBookingNumber_{{ bookingNumber }}();
+        } else {
+            needsNewUpdateFor_{{ bookingNumber }} = true;
+        }
+
+    });
+
+    // If the address is manually edited by the user then remove the place ID.
+    $("#{{ areaFromAddressID }}").on("input", function () {
+        let placeElement = $("#{{ areaFromGooglePlaceID }}");
+        if (placeElement.val().length > 0) {
+            placeElement.val("");
+            placeElement.trigger("input");
+        }
+    });
+
+    $("#{{ areaToAddressID }}").on("input", function () {
+        let placeElement = $("#{{ areaToGooglePlaceID }}");
+        if (placeElement.val().length > 0) {
+            placeElement.val("");
+            placeElement.trigger("input");
+        }
+    })
+    // }); 
+
+    $(".addon-item-listing .addon-item input[name$='[quantity]']").each(function() {
+        let orig_val = $( this ).val();
+        let parentContainer = $(this).parents(".addon-item-listing");
+        if( orig_val > 0 ) {
+            parentContainer.find('input[type="checkbox"]').prop( "checked", true ).change();
+            parentContainer.find('input[type="checkbox"]').parents(".addon-item").addClass("active");
+            needsNewUpdateFor_{{ bookingNumber }} = false;
+            updateSummaryOfBookingNumber_{{ bookingNumber }}();
+        }   
+    });
+
+    $("select#dl_activity_id").on('change', function(){    // IF ACTIVITY IS CHANGED.
+        let activityTypes = $("select#dl_activity_id").find(':selected').data('types').toString().split(",");
+        if( $.inArray( 1, activityTypes ) && $.inArray( 2, activityTypes ) ){
+            $('select#activityType').html('<option value="" selected="selected">Please select</option> <option value="2"> Private </option> <option value="1"> Group </option>');
+        }else if( $.inArray( 1, activityTypes ) && !$.inArray( 2, activityTypes ) ){
+            $('select#activityType').html('<option value="" selected="selected">Please select</option> <option value="1"> Group </option>');
+        }else if( !$.inArray( 1, activityTypes ) && $.inArray( 2, activityTypes ) ){
+            $('select#activityType').html('<option value="" selected="selected">Please select</option> <option value="2"> Private </option>');
+        }
+        $('select#activityType').select2({
+            placeholder: "Please select",                    
+        });
+        $('input[name="products[{{ bookingNumber }}][id]"]').val( $(this).val() );
+        updateSummaryOfBookingNumber_{{ bookingNumber }}( true );
+            
+    });
+</script>
+
+<style>
+    .addon_img_container {
+        width: 106px;
+        min-width: 106px;
+        height: auto;
+        max-height: 200px;
+    }
+    
+    .addon_img_container img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+    
+    .addon-group-item > .container {
+        display: flex;
+        gap: 15px;
+        height: 100%;
+        border: 1px solid #C0C1C6;
+        padding: 15px;
+        justify-content: flex-start;
+        align-items: flex-start;
+    }
+    
+    .addon-group-item .addon_label h3 {
+        font: normal normal 800 20px/30px Poppins;
+        letter-spacing: 0px;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        height: 1.5em;
+    }
+    
+    div.addon-group-item {
+        height: 247px;
+        border: none;
+        padding: 7.5px;
+    }
+    
+    .addon_label .addon-description, .addon_label .addon-description * {
+        margin: 0px;
+        padding: 0;
+        list-style: none;
+    }
+    
+    div.custom-checkbox-style  label {
+        padding-left: 0;
+    }
+    
+    .addon_label {
+        padding-left: 10px;
+    }
+    
+    .addon-option-quantity .pd-plus,.addon-option-quantity span.pd-minus {
+        font-weight: bold;
+    }
+    
+    .addon-group-item .addon-price-description div.addon-type,.addon-group-item .addon-price-description div.addon-price {
+        font-size: 12px;
+        font-weight: 400;
+    }
+    
+    .addon-item-listing div.addon-item {
+        align-items: center;
+    }
+    
+    button.slick-arrow {
+        background: #fff;
+        width: 40px;
+        height: 40px;
+    }
+
+    button.slick-arrow:before {
+        color: black;
+        font-size: 40px;
+        opacity: 1;
+        font-weight: bold;
+    }
+
+    button.slick-prev.slick-arrow {
+        left: -60px;
+    }
+
+    button.slick-next.slick-arrow {
+        right: -60px;
+    }
+    div.addon-section-title {
+        background: none;
+        border: none;
+        padding: 0px;
+    }
+    ul.slick-dots li.slick-active button:before {
+        background: black;
+    }
+    
+    ul.slick-dots li button:before {
+        background: #fff;
+        border: 1px solid black;
+    }
+
+    .addon-section-title h4 {
+        font: normal normal normal 39px/24px Poppins;
+    }
+
+    .addon-section-title p {
+        font: normal normal normal 20px/24px Poppins;
+        margin-top: 20px;
+        margin-bottom: 40px;
+    }
+    .addon_label_container {
+        width: 100%;
+    }   
+  
+</style>
+<script> 
+
+    $(document).ready(function(){
+        $('#{{pickupTimeID}}').timepicker( { format:'HH:mm' } );
+        let timePickerElements = $(".booking-pickup-time");
+        timePickerElements.timepicker( { format:'HH:mm' } );
+
+    });
+
+    $(function() {
+        $('.addon-option-quantity input').trigger('input'); 
+    });
+
+</script>

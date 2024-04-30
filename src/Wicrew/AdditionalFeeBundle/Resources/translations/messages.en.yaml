@@ -1,0 +1,17 @@
+additional_fee.title: Additional Fee
+additional_fee.tab.general: General
+additional_fee.group.information: Information
+additional_fee.area: Area
+additional_fee.types: Types
+additional_fee.type.option.transportation: Transportation
+additional_fee.type.option.activity: Activity
+additional_fee.hotel_name: Hotel name
+additional_fee.google_place_id: Google Place ID
+additional_fee.extra_fee: Extra fee
+additional_fee.rack_price: Rack price
+additional_fee.net_price: Net price
+additional_fee.tax: Tax
+additional_fee.description: Description
+
+google.place.search_input.placeholder: Enter a location
+google.place.info.id: "Place ID: "

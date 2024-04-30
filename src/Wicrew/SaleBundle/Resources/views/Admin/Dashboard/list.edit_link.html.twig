@@ -1,0 +1,158 @@
+<button class="action-inline-save" name="id" value="{{ item.id }}">
+   <i class="fa fa-floppy-o"aria-hidden="true" title="Save"></i>
+</button>
+<div class="dropdown {{ item.id }}">
+
+   <i class="fa fa-ellipsis-h" aria-hidden="true" title="More options"></i>
+
+   <div class="dropdown-content {{ item.id }}">
+
+      <button class="btn btn-primary action-inline-modify"
+         name="modify_id" value="{{ item.id }}" style="margin-top:5px;width: 100%;"><span>{{ 'action.modify'|trans() }}</span>
+      </button>
+      <button class="btn btn-primary action-inline-resent-confirmation"
+         name="resent_confirmation_id" value="{{ item.id }}" style="margin-top:5px;width: 100%;"><span>{{ 'action.resent.confirmation'|trans() }}</span>
+      </button>
+      {# <button class="btn btn-primary action-inline-send-email-to-driver"
+         name="send_email_to_driver_id" value="{{ item.id }}" style="margin-top:5px;width: 100%;"><span>{{ 'action.send.email.to.driver'|trans() }}</span>
+      </button> #}
+      <button class="btn btn-primary action-inline-send-email-from-front" name="send_email_from_front" value="{{ item.id }}" style="margin-top:5px;width: 100%;"><span>Create email</span> </button>
+      <button class="btn btn-primary action-inline-send-confirmation-from-front" id=""name="send_confirmation_from_front" value="{{ item.id }}" style="margin-top:5px;width: 100%;"><span>Create Confirmation</span> </button>
+      <button id="addNoteBtn_{{ item.id }}" class="btn btn-primary action-inline-add-note-to-driver" name="add_note_to_driver" value="{{ item.id }}" style="margin-top:5px;width: 100%;">
+         <span>Notes</span>
+      </button>
+      <button id="addDriverBtn_{{ item.id }}" class="btn btn-primary action-inline-add-driver" name="add_driver" value="{{ item.id }}" style="margin-top:5px;width: 100%;">
+         <span>Add Supplier</span>
+      </button>
+
+      <button class="btn btn-primary action-inline-see-order" value="{{ item.order.id }}" style="margin-top:5px;width: 100%;">
+         <span>See Order</span>
+      </button>
+
+      <div id="addNoteModal_{{ item.id }}" data-oid="{{item.order.id}}" class="addNoteModal modal" style="padding-right: 15px; align-items: center; justify-content: center; width: 100%; background: #0000009c;">
+         <div class="modal-dialog">
+            <div class="modal-content">
+               
+               <form id="addNewNoteForm{{item.id}}" class="addNewNoteForm" data-oid="{{item.order.id}}"  data-itemid="{{item.id}}">
+                  <div class="modal-header">
+                     <h5 class="modal-title">
+                       Notes
+                     </h5>
+                     
+                     <button type="button" class="btn btn-sm btn-close" id="modalCloseBtn_{{ item.id }}" formtarget="_self">
+                        <i class="fa fa-close"></i>
+                     </button>
+                     
+                  </div>
+                  {# <div class="modal-subheader">
+                     <button onclick="showCustomerNotesFunc({{ item.order.id }}, {{ item.id }})" type="button" class="btn btn-sm btn-customerNotes" value="{{ item.id }}" formtarget="_self">
+                        Customer Notes
+                     </button>
+                     
+                     <button onclick="showDriverNotesFunc({{ item.order.id }}, {{ item.id }})" type="button" class="btn btn-sm btn-driverNotes selected" value="{{ item.id }}" formtarget="_self">
+                        Driver Notes
+                     </button>
+                  </div> #}
+                  <div class="modal-body" style="padding: 1rem;">
+
+                     {# <div class="customerNotesSection" style="display: none;">
+                        <div class="NotesContainerHeading">
+                           Customer Notes:
+                        </div>
+                        <div id="customer_notes_{{ item.id }}" class="previous_notes_container customerNotes">
+                        {% set customer_notes_arr = item.order.customerNotes|split('<br><br>') %}
+                        {% for customer_note in customer_notes_arr %}
+                           <div class="single-note-container">
+                              <div class="single-note-content" data-orderid="{{ item.order.id }}" data-itemid="{{ item.id }}" data-notenum="{{ loop.index }}">{{ customer_note|trim }}</div>         
+                           </div>
+                        {% endfor %}  
+                        </div>
+                     </div> #}
+
+                     <div class="driverNotesSection">
+                        <div class="NotesContainerHeading">
+                           Customer Notes:
+                        </div>
+                        <div id="previous_notes_{{ item.id }}" class="previous_notes_container driver">
+                        {% set customer_notes_arr = item.customerNotes|split('<br><br>') %}
+                        {% for customer_note in customer_notes_arr %}
+                           <div class="single-note-container">
+                              <div class="single-note-content" data-orderid="{{ item.order.id }}" data-itemid="{{ item.id }}" data-notenum="{{ loop.index }}">{{ customer_note|raw }}</div>         
+                              <button id="editNoteBtn_{{ item.order.id }}_{{ item.id }}_{{ loop.index }}" data-orderid="{{ item.order.id }}" data-itemid="{{ item.id }}" data-loopindex="{{ loop.index }}" class="editNoteBtn" type="button" onclick="editnotebtnclick({{ item.order.id }}, {{ item.id }}, {{ loop.index }})"> <i class="fa fa-edit"></i> </button>
+                              <button data-orderid="{{ item.order.id }}" data-itemid="{{ item.id }}" data-loopindex="{{ loop.index }}" class="deletenoteBtn" type="button"  onclick="deleteNotebtnclick( this, {{ item.order.id }}, {{ item.id }}, {{ loop.index }} )"> <i class="fa fa-trash-o" aria-hidden="true"></i> </button>
+                              <div id="edit_note_{{ item.order.id }}_{{ item.id }}_{{ loop.index }}" class="editNoteTextAreaContainer">
+                                 <i class="fa fa-close" onclick="closeEditorFunc({{ item.order.id }}, {{ item.id }}, {{ loop.index }})"></i>
+                                 <textarea id="editNoteTextArea_{{ item.order.id }}_{{ item.id }}_{{ loop.index }}" class="editNoteTextArea">{{customer_note|raw}}</textarea>
+                                 <button type="button" id="updateNote_{{ item.order.id }}_{{ item.id }}_{{ loop.index }}" class="btn btn-editNote" onclick="updateNoteClickFunc(this, {{ item.order.id }}, {{ item.id }}, {{ loop.index }})" data-orderid="{{ item.order.id }}" data-itemid="{{ item.id }}" data-notenum="{{ loop.index }}"> <i class="fa fa-save"></i> Update </button>
+                              
+                              </div>
+                           </div>
+                        {% endfor %}  
+                        </div>
+                        {# <div class="addNewNoteContainer">
+                           <input type="hidden" name="oid" class="order_id_input" value="{{item.order.id}}" />
+                           <textarea name="notes" class="addNewNoteTextArea" placeholder="Enter a new note here..."></textarea>
+                        </div> #}
+                     </div>
+                     
+                  </div>
+                  <div class="modal-footer" style="padding: 1rem;">
+                     <button type="button" value="{{ item.id }}" class="btn btn-primary btn-saveNewNote">
+                        <i class="fa fa-save"></i> Save
+                     </button>
+                     {# <button type="button" class="btn btn-primary btn-notifyDriverNewNote" value="{{ item.id }}">
+                        <i class="fa fa-bell"></i> Notify Driver
+                     </button> #}
+
+                  </div>
+               </form>
+            </div>
+         </div>
+      </div>
+
+      <script>
+      // Get the modal
+      var modal_{{ item.id }} = document.getElementById("addNoteModal_{{ item.id }}");
+      // Get the button that opens the modal
+      var btn_{{ item.id }} = document.getElementById("addNoteBtn_{{ item.id }}");
+      // Get the <span> element that closes the modal
+      var closeBtn_{{ item.id }} = document.getElementById("modalCloseBtn_{{ item.id }}");
+      // When the user clicks the button, open the modal 
+      btn_{{ item.id }}.onclick = function() {
+         modal_{{ item.id }}.style.display = "flex";
+         //   $('#previous_notes_{{ item.id }}').scrollTop(150);
+         $('#previous_notes_{{ item.id }}').scrollTop($('#previous_notes_{{ item.id }}')[0].scrollHeight);
+      }
+      // When the user clicks on <span> (x), close the modal
+      closeBtn_{{ item.id }}.onclick = function() {
+         modal_{{ item.id }}.style.display = "none";
+      }
+      // When the user clicks anywhere outside of the modal, close it
+      window.onclick = function(event) {
+         if (event.target == modal_{{ item.id }}) {
+            modal_{{ item.id }}.style.display = "none";
+         }
+      }
+
+      // OPEN DOWPDOWN ON CLICK ON ICON 
+      $(".dropdown.{{ item.id }}").click(function(){
+         let clicked_position = $("section.content-footer").offset().top - $(this).offset().top;
+         if(clicked_position < 344){
+            $(".dropdown-content.{{ item.id }}").css({"display": "flex", "top": "unset", "bottom": "0"});
+         }else{
+            $(".dropdown-content.{{ item.id }}").css({"display": "flex", "top": "0", "bottom": "unset"});
+         }
+      });
+      
+      // CLOSE DOWPDOWN IF CLICKED OUTSIDE OF DROPDOWN 
+      $(document).mouseup(function( e ) {
+         var container = $(".dropdown-content.{{ item.id }}");
+         // if the target of the click isn't the container nor a descendant of the container
+         if (!container.is(e.target) && container.has(e.target).length === 0) {
+            container.hide();
+         }
+      });
+      </script>
+   </div>
+</div>
+

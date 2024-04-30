@@ -1,0 +1,15 @@
+<tr>
+    <td class="wrapper main-header main-footer" style="background-color:white">
+        <table>
+            <tr>
+                <td>
+                    {% if isUsedInPdf is defined and isUsedInPdf %}
+                        <img src="{{ imageToBase64( '/signature-email-ILT.jpg' ) }}" alt="" style="width: 74%;">
+                    {% else %} 
+                        <img src="/signature-email-ILT.jpg" alt="" style="width: 74%;">
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    </td>
+</tr>

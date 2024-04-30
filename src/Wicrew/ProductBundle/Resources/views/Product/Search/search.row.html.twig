@@ -1,0 +1,161 @@
+{% set postDataSection = "trip[" ~ index ~ "]" %}
+
+<div {% if index == 1 %}class="vehicle-search-box vehicle-search" data-trip-index="{{ (tripCount is defined) ? tripCount : '1' }}"
+     {% else %}class="vehicle-search-box vehicle-search-multi"{% endif %}
+>
+    <div class="multi-destination-title" {{ (tripSearchType != constant('App\\Wicrew\\ProductBundle\\Entity\\Product::TRIP_TYPE_MULTI_DESTINATION')) ? 'hidden' : '' }}>
+        <h3>Ride {{ index }}</h3>
+    </div>
+    <div class="column">
+        <div class="input-box">
+            <label>{{ 'from'|trans }}</label>
+            <div class="input input-pin-icon black-icon">
+                <select class="search-from" style="display: none;" name="{{ postDataSection }}[pickArea]" required>
+                    <option value="">{{ 'core.option.please_select'|trans }}</option>
+                    {% for area in areas %}
+                        <option value="{{ area.id }}"
+                                {{ (trip is defined and trip["pickArea"] == area.id) ? 'class="selected" selected="selected"' : '' }}
+                                {{ (trip is defined and trip["dropArea"] == area.id) ? 'disabled' : '' }}
+                        >{{ area.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="flex-with-spacer {% if index == 1 %}original-dates-container{% endif %}">
+            <div class="input-box">
+                <label>{{ 'search.departing'|trans }}</label>
+                <div class="input input-calendar-icon black-icon">
+                    <input type="text"
+                           class="date-from form_datepicker dl_date_pickup"
+                           required
+                           placeholder="mm dd, yyyy"
+                           name="{{ postDataSection }}[dateFrom]"
+                           {% if trip is defined %}value="{{ trip["dateFrom"] }}"{% endif %}
+                    readOnly />
+                </div>
+            </div>
+            <div class="flex-spacer" {{ (tripSearchType == constant('App\\Wicrew\\ProductBundle\\Entity\\Product::TRIP_TYPE_ONE_WAY')) ? 'hidden' : '' }}></div>
+            <div class="input-box for-round-trip" {{ (tripSearchType != constant('App\\Wicrew\\ProductBundle\\Entity\\Product::TRIP_TYPE_ROUND_TRIP')) ? 'hidden' : '' }}>
+                <label>{{ 'search.returning'|trans }}</label>
+                <div class="input input-calendar-icon black-icon">
+                    <input type="text"
+                           class="roundTripEnd form_datepicker {% if index == 1 %}date-to-original{% endif %}"
+                           placeholder="mm dd, yyyy"
+                           name="{{ postDataSection }}[dateTo]"
+                           {% if trip is defined %}value="{{ trip["dateTo"] }}"{% endif %}
+                           readOnly
+                    />
+                </div>
+            </div>
+            {% if tripSearchType == constant('App\\Wicrew\\ProductBundle\\Entity\\Product::TRIP_TYPE_MULTI_DESTINATION') %}
+                <div class="input-box" {% if index == 1 %}id="original-passenger-input-box"{% endif %}>
+                    {% include "@WicrewProduct/Product/Search/search.passenger-drop.html.twig" %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="swapper"></div>
+
+    <div class="column">
+        <div class="input-box toField">
+            <label>{{ 'to'|trans }}</label>
+            <div class="input input-pin-icon black-icon">
+                <select class="search-to" style="display: none;" name="{{ postDataSection }}[dropArea]" required>
+                    <option value="">{{ 'core.option.please_select'|trans }}</option>
+                    {% for area in areas %}
+                        <option value="{{ area.id }}"
+                                {{ (trip is defined and trip["dropArea"] == area.id) ? 'class="selected" selected="selected"' : '' }}
+                                {{ (trip is defined and trip["pickArea"] == area.id) ? 'disabled' : '' }}
+                        >{{ area.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="flex-with-spacer">
+            <div {% if index == 1 %}class="original-passenger-input-wrapper"{% endif %}>
+                {% if tripSearchType != constant('App\\Wicrew\\ProductBundle\\Entity\\Product::TRIP_TYPE_MULTI_DESTINATION') %}
+                    <div class="input-box {% if index == 1 %}original-passenger-input-box{% endif %}">
+                        {% include "@WicrewProduct/Product/Search/search.passenger-drop.html.twig" %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="flex-spacer"></div>
+            <input type='hidden' value='' name='selected_to_name' class='selected_to_name' />
+            <div class="{% if index == 1 %}original-search-button{% endif %}"
+                    {{ (tripSearchType == constant('App\\Wicrew\\ProductBundle\\Entity\\Product::TRIP_TYPE_MULTI_DESTINATION')) ? 'hidden' : '' }}>
+                <button type="button" class="search-btn">
+                    <img src="{{ absolute_url(asset('bundles/wicrewcore/images/search-icon.svg')) }}"/>{{ 'action.search'|trans }}
+                </button>
+                {% if index == 1 %}
+                    <button type="submit" id="submit-search" hidden></button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<style>
+    .search-container div.vehicle-search .column .input-box .input-pin-icon::before, 
+    .search-container div.vehicle-search-multi .column .input-box .input-pin-icon::before {
+        z-index: 999;
+    }
+
+    span.select2.select2-container,
+    span.select2.select2-container *{
+        height: 100%;
+    }
+
+    .select2-container--default span.select2-selection--single {
+        border: none;
+        padding-left: 28px;
+    }
+
+    .select2-container--default .select2-selection--single span.select2-selection__rendered {
+        line-height: 42px;
+        font-weight: 500;
+        color: black;
+        display: block;
+    }
+
+    .select2-container--default .select2-selection--single span.select2-selection__arrow {
+        height: 40px;
+    }
+
+    .select2-container--default .select2-selection--single span.select2-selection__arrow b {
+        border-color: #000 transparent transparent transparent;
+    }
+
+    .select2-container--default .select2-selection--single span.select2-selection__clear {
+        display: none;
+    }
+
+    .select2-container--default.select2-container--open .select2-selection--single span.select2-selection__arrow b {
+        border-color: transparent transparent #000 transparent;
+    }
+</style>
+<script>
+    $(window).on('load', function() {
+        $( "select" ).each(function( index ) {   
+            
+            let valToSet    = $(this).find("option.selected").val();
+            let valueText   = $(this).find("option.selected").text().trim();
+            
+            $(this).val(valToSet).attr( 'selected', true );
+            
+            $(this).select2({
+                placeholder: valueText,
+                width: '100%',
+            }).val(valToSet).trigger('change.select2');
+    
+        });
+    });
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet"/>

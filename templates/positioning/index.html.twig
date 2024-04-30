@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale|split('_')|first|default('en') }}">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noodp, noimageindex, notranslate, nocache" />
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <meta name="generator" content="EasyAdmin" />
+
+    <title>{% block page_title %}{{ block('content_title')|striptags|raw }}{% endblock %}</title>
+
+    {% block head_stylesheets %}
+        <link rel="stylesheet" href="{{ asset('bundles/easyadmin/app.css') }}">
+    {% endblock %}
+
+    {% for css_asset in easyadmin_config('design.assets.css') %}
+        <link rel="stylesheet" href="{{ asset(css_asset) }}">
+    {% endfor %}
+
+    {% if easyadmin_config('design.brand_color') != 'hsl(230, 55%, 60%)' %}
+        <style>
+            :root { --color-primary: {{ easyadmin_config('design.brand_color') }}; }
+        </style>
+    {% endif %}
+
+    {% block head_favicon %}
+        {% set favicon = easyadmin_config('design.assets.favicon') %}
+        <link rel="icon" type="{{ favicon.mime_type }}" href="{{ asset(favicon.path) }}" />
+    {% endblock %}
+
+    {% block head_javascript %}
+        <script src="{{ asset('bundles/easyadmin/app.js') }}"></script>
+    {% endblock head_javascript %}
+
+    {% if easyadmin_config('design.rtl') %}
+        <link rel="stylesheet" href="{{ asset('bundles/easyadmin/app-rtl.css') }}">
+    {% endif %}
+</head>
+
+{% block body %}
+    <body id="{% block body_id %}{% endblock %}" class="easyadmin {% block body_class %}{% endblock %}">
+    <script>
+        document.body.classList.add(
+            'easyadmin-content-width-' + (localStorage.getItem('easyadmin/content/width') || 'normal'),
+            'easyadmin-sidebar-width-' + (localStorage.getItem('easyadmin/sidebar/width') || 'normal')
+        );
+    </script>
+
+    {% block wrapper_wrapper %}
+        <div class="wrapper">
+            <div id="loader" style="position:fixed;top:0;left:0;right:0;height:100vh;background:#292D42;z-index:99999999;"><h1 style="top:40%;left:42%;position: fixed; color: #FC7C5C" class="loader-icon" width='200px' height='200px' >Loading...</h1></div>
+
+            {% block wrapper %}
+                <header class="main-header">
+                    {% block header %}
+                        <nav class="navbar" role="navigation">
+                            <button id="navigation-toggler" type="button" aria-label="Toggle navigation">
+                                <img src="../images/sidebar.svg"/>
+                            </button>
+
+                            <div id="header-logo">
+                                {% block header_logo %}
+                                    <a class="logo {{ easyadmin_config('site_name')|length > 14 ? 'logo-long' }}" title="{{ easyadmin_config('site_name')|striptags }}" href="{{ path('easyadmin') }}">
+                                        {{ easyadmin_config('site_name')|raw }}
+                                    </a>
+                                {% endblock header_logo %}
+                            </div>
+                        </nav>
+
+                        {% set _user_name = easyadmin_read_property(app.user, easyadmin_config('user.name_property_path'))|default('user.unnamed'|trans(domain = 'EasyAdminBundle')) %}
+                        {% set _logout_path = easyadmin_logout_path() %}
+                        {% set _user_has_logout = _logout_path is not empty %}
+                        {% set _user_is_impersonated = is_granted('ROLE_PREVIOUS_ADMIN') %}
+                        {% set _user_menu_content %}
+                            <div class="popover-content-section user-details {{ _user_has_logout or _user_is_impersonated ? 'user-has-actions' }}">
+                                <p class="small text-muted mb-0">{{ 'user.logged_in_as'|trans(domain = 'EasyAdminBundle') }}</p>
+                                <p class="user-details-name">
+                                    {% if app.user|default(false) == false %}
+                                        {{ 'user.anonymous'|trans(domain = 'EasyAdminBundle') }}
+                                    {% else %}
+                                        {{ _user_name }}
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                            {% block user_menu %}
+                                {% if _user_has_logout or _user_is_impersonated %}
+                                    <div class="popover-content-section user-menu">
+                                        {% if _user_has_logout %}
+                                            <a class="user-action user-action-logout" href="{{ _logout_path }}">{{ 'user.signout'|trans(domain = 'EasyAdminBundle') }}</a>
+                                        {% endif %}
+                                        {% if _user_is_impersonated %}
+                                            <a class="user-action user-action-exit-impersonation" href="?_switch_user=_exit">{{ 'user.exit_impersonation'|trans(domain = 'EasyAdminBundle') }}</a>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            {% endblock user_menu %}
+                        {% endset %}
+
+                        <div class="content-top navbar-custom-menu">
+                            {% block header_custom_menu %}
+                                <div class="user user-menu-wrapper {{ _user_is_impersonated ? 'user-is-impersonated' }}" data-toggle="popover" data-placement="bottom" data-container=".user-menu-wrapper" data-content="{{ _user_menu_content|e('html_attr') }}" data-html="true">
+                                    {% if easyadmin_config('user.display_avatar') %}
+                                        {% set _avatar_image_path = easyadmin_read_property(app.user, easyadmin_config('user.avatar_property_path')) %}
+                                        {% if null == _avatar_image_path %}
+                                            <i class="fa fa-fw {{ app.user is not null ? 'fa-user-circle' : 'fa-user-times' }} user-avatar"></i>
+                                        {% else %}
+                                            <img class="user-avatar" src="{{ _avatar_image_path }}" />
+                                        {% endif %}
+                                    {% endif %}
+                                    {% if easyadmin_config('user.display_name') %}
+                                        <span class="user-name">{{ _user_name }}</span>
+                                    {% endif %}
+                                </div>
+                            {% endblock header_custom_menu %}
+                        </div>
+                    {% endblock header %}
+                </header>
+
+                <aside class="main-sidebar">
+                    {% block sidebar %}
+                        <section class="sidebar">
+                            {% block main_menu_wrapper %}
+                                {{ include([
+                                    _entity_config is defined ? _entity_config.templates.menu,
+                                    easyadmin_config('design.templates.menu'),
+                                    '@EasyAdmin/default/menu.html.twig'
+                                ]) }}
+                            {% endblock main_menu_wrapper %}
+                        </section>
+
+                    {% endblock sidebar %}
+                </aside>
+
+                <div class="content-wrapper">
+                    {% block flash_messages %}
+                        {{ include(_entity_config is defined ? _entity_config.templates.flash_messages : '@EasyAdmin/default/flash_messages.html.twig') }}
+                    {% endblock flash_messages %}
+                    <div class="resizer-handler-container">
+                        <div id="sidebar-resizer-handler" class="resizer-handler resizer-handler-left"></div>
+                    </div>
+                    {% block content %}
+                        <div class="content">
+                            {% block content_header_wrapper %}
+                                {% set _has_content_help = _entity_config is defined and _entity_config[app.request.query.get('action')]['help']|default(false) %}
+                                <section class="content-header {{ _has_content_help ? 'has-content-help' }}">
+                                    {% block content_header %}
+                                        <div class="d-flex flex-row justify-content-between align-content-center w-100">
+                                            <div class="content-header-title">
+                                                <h1 class="title">{% block content_title %}Positioning{% endblock %}</h1>
+                                            </div>
+
+                                            {% block global_actions_wrapper %}
+                                                <div class="global-actions">{% block global_actions %}{% endblock %}</div>
+                                            {% endblock %}
+                                        </div>
+
+                                        {% block content_help %}
+                                            {% if _entity_config is defined and _entity_config[app.request.query.get('action')]['help']|default(false) %}
+                                                <div class="content-header-help">
+                                                    {{ _entity_config[app.request.query.get('action')]['help']|trans(domain = _entity_config.translation_domain)|raw }}
+                                                </div>
+                                            {% endif %}
+                                        {% endblock content_help %}
+                                    {% endblock content_header %}
+                                </section>
+                            {% endblock content_header_wrapper %}
+
+                            <section id="main" class="content-body">
+                                {% block main %}
+                                    <section id="main" class="content-body">
+
+                                        <div class="positioning-content-container">
+                                            <div class="positioning-content-heading">
+                                                <h4>Addons</h4>
+                                            </div>
+
+                                            <div class="positioning-content-content">
+                                                <ul id="addons_ul">
+                                                    {% for addon in addons %}
+                                                        <li data-id="{{ addon.id }}">{{ addon.label }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                            
+                                        </div>
+
+
+                                        <div class="positioning-content-container">
+                                            <div class="positioning-content-heading">
+                                                <h4>Extras</h4>
+                                            </div>
+
+                                            <div class="positioning-content-content">
+                                                <ul id="extras_ul">
+                                                    {% for extra in extras %}
+                                                        <li data-id="{{ extra.id }}">{{ extra.label }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        </div>
+
+
+                                        {% for location_name,location_activities in activities %}
+                                            <div class="positioning-content-container">
+                                                <div class="positioning-content-heading">
+                                                    <h4>{{ location_name }} Activities</h4>
+                                                </div>
+                                                <div class="positioning-content-content">
+                                                    <ul id="{{ location_name|replace({' ': '_', '&amp;': '_',  '&': '_'}) }}_ul" class="activities_ul">
+                                                        {% for activity in location_activities %}
+                                                            <li data-id="{{ activity.id }}">{{ activity.name }}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            
+                                            <script>
+                                                // <!-- (C) INIT ON  PAGE LOAD -->
+                                                window.addEventListener("DOMContentLoaded", () => {
+                                                    slist(document.getElementById("{{ location_name|replace({' ': '_', '&amp;': '_',  '&': '_'}) }}_ul"));
+                                                });
+                                            
+
+                                            </script>
+                                        {% endfor %}
+                                    
+                                    </section>
+
+                                    {% for js_asset in easyadmin_config('design.assets.js') %}
+                                        <script src="{{ asset(js_asset) }}"></script>
+                                    {% endfor %}
+
+                                {% endblock %}
+                            </section>
+
+                            {% block content_footer_wrapper %}
+                                <section class="content-footer">
+                                    {% block content_footer %}
+                                    <button class="btn btn-primary action-save">
+                                        <i class="fa fa-floppy-o" aria-hidden="true"></i> Save
+                                    </button>
+                                    {% endblock %}
+                                </section>
+                            {% endblock %}
+                        </div>
+                    {% endblock content %}
+
+                    <div id="content-resizer-handler" class="resizer-handler resizer-handler-right"></div>
+                </div>
+            {% endblock wrapper %}
+        </div>
+    {% endblock wrapper_wrapper %}
+
+    {% for js_asset in easyadmin_config('design.assets.js') %}
+        <script src="{{ asset(js_asset) }}"></script>
+    {% endfor %}
+
+    {% block body_javascript %}
+        <script>
+            $( window ).on( "load",function() {
+                $("aside.main-sidebar").delay(10000).fadeIn();
+                $("div#loader").delay(1000).fadeOut();
+            });
+
+
+            function slist (target) {
+                // (A) SET CSS + GET ALL LIST ITEMS
+                target.classList.add("slist");
+                let items = target.getElementsByTagName("li"), current = null;
+
+                // (B) MAKE ITEMS DRAGGABLE + SORTABLE
+                for (let i of items) {
+                    // (B1) ATTACH DRAGGABLE
+                    i.draggable = true;
+
+                    // (B2) DRAG START - YELLOW HIGHLIGHT DROPZONES
+                    i.ondragstart = (ev) => {
+                        current = i;
+                        for (let it of items) {
+                            if (it != current) { it.classList.add("hint"); }
+                        }
+                    };
+
+                    // (B3) DRAG ENTER - RED HIGHLIGHT DROPZONE
+                    i.ondragenter = (ev) => {
+                        if (i != current) { i.classList.add("active"); }
+                    };
+
+                    // (B4) DRAG LEAVE - REMOVE RED HIGHLIGHT
+                    i.ondragleave = () => {
+                    i.classList.remove("active");
+                    };
+
+                    // (B5) DRAG END - REMOVE ALL HIGHLIGHTS
+                    i.ondragend = () => { for (let it of items) {
+                        it.classList.remove("hint");
+                        it.classList.remove("active");
+                    }};
+
+                    // (B6) DRAG OVER - PREVENT THE DEFAULT "DROP", SO WE CAN DO OUR OWN
+                    i.ondragover = (evt) => { evt.preventDefault(); };
+
+                    // (B7) ON DROP - DO SOMETHING
+                    i.ondrop = (evt) => {
+                        evt.preventDefault();
+                        if (i != current) {
+                            let currentpos = 0, droppedpos = 0;
+                            for (let it=0; it<items.length; it++) {
+                                if (current == items[it]) { currentpos = it; }
+                                if (i == items[it]) { droppedpos = it; }
+                            }
+                            if (currentpos < droppedpos) {
+                                i.parentNode.insertBefore(current, i.nextSibling);
+                            } else {
+                                i.parentNode.insertBefore(current, i);
+                            }
+                        }
+                    };
+                }
+            }
+
+
+            $(document).ready(function () {
+
+                // MAKING POSITION MENU ITEM ACTIVE 
+                $("a.menu--positioning").parent().addClass("active");
+            });
+            
+            
+            // <!-- (C) INIT ON  PAGE LOAD -->
+            window.addEventListener("DOMContentLoaded", () => {
+                slist(document.getElementById("extras_ul"));
+                slist(document.getElementById("addons_ul"));
+            });
+
+            $( "button.action-save" ).click(function (e) { 
+                
+                if ($(this).hasClass("loading-button")) { return; }
+                $(this).addClass("loading-button");
+                $(this).prop('disabled', true); //disable.
+
+
+                // LOOPING OVER ADDONS AND GET THEIR PRORITY ORDER 
+                
+                let extras_arr = [];
+                $( "ul#extras_ul li" ).each(function( index, element ) {
+                    // element == this
+                    let extra_name  = $( element ).text();
+                    extras_arr.push(extra_name);
+                });
+
+                let addons_arr = [];
+                $( "ul#addons_ul li" ).each(function( index, element ) {
+                    // element == this
+                    let addons_name  = $( element ).text();
+                    addons_arr.push(addons_name);
+                });
+
+
+                let activities_arr = [];
+                $( "ul.activities_ul li" ).each(function( index, element ) {
+                    // element == this
+                    let activity_name  = $( element ).text();
+                    activities_arr.push(activity_name);
+                });
+                        
+                $.ajax({
+                    url: "{{ path('save_positioning') }}",
+                    method: 'POST',
+                    data: {
+                        extras: extras_arr,
+                        addons: addons_arr,
+                        activities: activities_arr
+                    },
+                    success: function(response) {
+                        response = $.parseJSON(response);
+                        if(response.status == "success"){
+                            location.reload();
+                        }else{
+                            alert(response.message);
+                            $(this).removeClass("loading-button");
+                            $(this).prop('disabled', false); //disable.
+
+                        }
+                    }
+                });
+            });
+
+            //icons
+            $(document).ready(function(){
+                //activity
+                var imageSrc = '../images/activity.svg'; 
+                var imgElement = $('<img>', {
+                    src: imageSrc,
+                    class: 'menu--activity'
+                });
+                $('.menu--activity i').replaceWith(imgElement);
+
+                var imageSrc = '../images/addon.svg'; 
+                //addon
+                var imgElement = $('<img>', {
+                    src: imageSrc,
+                    class: 'menu--addon',
+                });
+                $('.menu--addon i').replaceWith(imgElement);
+                //block
+
+                var imageSrc = '../images/block.svg'; 
+                var imgElement = $('<img>', {
+                    src: imageSrc,
+                    class: 'menu--block',
+                });
+                $('.menu--block i').replaceWith(imgElement);
+                //discount
+                var imageSrc = '../images/discount.svg'; 
+                var imgElement = $('<img>', {
+                    src: imageSrc,
+                    class: 'menu--discount' 
+                });
+                $('.menu--discount i').replaceWith(imgElement);
+                //system
+                var imageSrc = '../images/system.svg';
+                var imgElement = $('<img>', {
+                    src: imageSrc,
+                    class: 'menu--system'
+                });
+                $('.menu--system i').replaceWith(imgElement);
+            });
+
+
+            //logo image
+            $(document).ready(function () {
+                $('a.logo.logo-long').html('<img src="../images/logo.svg" alt="Logo">');
+            });
+        
+            $(document).ready(function() {
+                $('body.easyadmin-sidebar-width-normal .sidebar-menu a.sidebar--close i').removeClass('fa-angle-right').addClass('fa-angle-left');
+                $('body.easyadmin-sidebar-width-compact .sidebar-menu a.sidebar--close i').removeClass('fa-angle-left').addClass('fa-angle-right');
+
+                $('body.easyadmin-sidebar-width-normal .sidebar-menu a.sidebar--close span').text('Collapse Sidebar');
+                $('body.easyadmin-sidebar-width-compact .sidebar-menu a.sidebar--close span').text('Expand Sidebar');
+            });
+
+
+            $('.sidebar-menu a.sidebar--close').on('click', function() {
+                $('div#sidebar-resizer-handler').click();
+                const rowCount = $("table .data_row").length;
+                if(rowCount >= 33){
+                    $('.easyadmin-sidebar-width-normal .toolbar_container').css({'position':'fixed', 'width': 'calc(100% - 288px)'});					
+                    $('.easyadmin-sidebar-width-compact .toolbar_container').css({'position':'fixed', 'width': 'calc(100% - 100px)'});
+                }
+
+                $('body.easyadmin-sidebar-width-normal .sidebar-menu a.sidebar--close i').removeClass('fa-angle-right').addClass('fa-angle-left');
+                $('body.easyadmin-sidebar-width-compact .sidebar-menu a.sidebar--close i').removeClass('fa-angle-left').addClass('fa-angle-right');
+                
+                $('body.easyadmin-sidebar-width-normal .sidebar-menu a.sidebar--close span').text('Collapse Sidebar');
+                $('body.easyadmin-sidebar-width-compact .sidebar-menu a.sidebar--close span').text('Expand Sidebar');
+                
+            });
+
+        </script>
+        <style>
+            /* (A) LIST STYLES */
+            .slist {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+            .slist li {
+                margin: 10px;
+                padding: 8px;
+                border: 1px solid #dfdfdf;
+                background: #f5f5f5;
+                max-width: 530px;
+            }
+
+            /* (B) DRAG-AND-DROP HINT */
+            .slist li.hint {
+                border: 1px solid #ffc49a;
+                background: #feffb4;
+            }
+            .slist li.active {
+                border: 1px solid #ffa5a5;
+                background: #ffe7e7;
+            }
+            .positioning-content-heading {
+                padding: 0px 20px;
+            }
+
+            .positioning-content-container {
+                margin: 32px 0px;
+            }
+
+            .positioning-content-content {
+                padding: 0px 20px;
+            }
+            section.content-footer {
+                text-align: right;
+            }
+            body{
+                background: #292D42;
+            }
+            .main-sidebar{
+                background: #292D42;
+            }
+            .sidebar-menu .fa,
+            .treeview-menu a .fa{
+                color: #fff;
+                filter: opacity(100%);
+                font-size: 20px !important;
+            }
+            body.easyadmin-sidebar-width-compact .sidebar-menu a {
+                padding: 4px 12px 8px 8px;
+            }
+            .navbar-custom-menu .user {
+                flex-direction: row-reverse;
+                color: #fff;
+                text-transform: capitalize;
+            }
+            .navbar-custom-menu .user-avatar {
+                margin-left: 10px;
+            }
+            .sidebar-menu a{
+                color: #fff;
+            }
+            .sidebar-menu li:not(.submenu-active).active .fa, .sidebar-menu li:not(.submenu-active).active a {
+                color: #FC7C5C !important;
+                filter: opacity(100%);
+            }
+   
+            img.menu--activity, img.menu--addon, img.menu--block, img.menu--discount, img.menu--system {
+                width: 20px;
+                margin: 0 auto;
+                margin-right: 5px;
+            }
+           
+            .wrapper{
+                margin-left: 0;
+                margin-right: 0;
+            }
+            body:not(.easyadmin-content-width-full) .wrapper{
+                max-width: 100%;
+            }
+            .easyadmin-sidebar-width-compact .sidebar-menu>li:hover>a.sidebar--close>span {
+                left: 50px;
+                top: -4px;
+                padding: 10px 0;
+                padding-left: 20px;
+                border-radius: 4px;
+            }
+            a.logo.logo-long img{
+                height: 40px; 
+            }
+            @media screen and (min-width: 992px){
+                div.wrapper{
+                    width: calc(100% - 22px);
+                }
+                body.easyadmin-sidebar-width-compact div.wrapper {
+                    grid-template-columns: 10px auto;
+                }
+            }
+            .sidebar-menu a.sidebar--close {
+                position: fixed;
+                bottom: 0;
+                background: #292D42;
+                left: 0;
+                padding-top: 10px !important;
+                padding-left: 23px !important;
+                padding-bottom: 23px !important;
+            }
+            .easyadmin-sidebar-width-normal .sidebar-menu a.sidebar--close {
+                width: 266px;
+            }
+            .easyadmin-sidebar-width-compact .sidebar-menu a.sidebar--close {
+                width: 55px;
+            }
+            .sidebar-menu a{
+                padding: 4px 12px 8px 24px;
+            }
+            .main-header #header-logo{
+                margin-left: 18px !important;
+            }
+            body.easyadmin-sidebar-width-compact .main-sidebar {
+                width: 60px;
+                margin-left: 20px;
+            }
+            .easyadmin-sidebar-width-compact .main-header #header-logo a {
+                height: 40px !important;
+                display: inline-block;
+                width: 200px;
+            }
+            .easyadmin-sidebar-width-compact .content{
+                margin-left: 40px;
+            }
+            .easyadmin-sidebar-width-compact .sidebar-menu>li:hover>.treeview-menu, .easyadmin-sidebar-width-compact .sidebar-menu>li:hover>a>span {
+                background: #292D42;
+                padding-left: 30px;
+                width: 200px;
+            }
+            .easyadmin-sidebar-width-compact .sidebar-menu>li:hover>a.sidebar--close>span,
+            .easyadmin-sidebar-width-compact .sidebar-menu>li:hover>a>span  {
+                left: 50px;
+                top: -4px;
+                padding: 10px 0;
+                padding-left: 20px;
+                border-radius: 4px;
+            }
+            .easyadmin-sidebar-width-compact .sidebar-menu>li:hover>a>span{
+                top: 0 !important;
+                padding: 12px 0;
+            }
+            aside.main-sidebar a {
+                color: #fff;
+                font-weight: 400;
+                font-size: 16px;
+                line-height: 24px;
+                letter-spacing: 0.5px;
+            }
+            body.easyadmin-sidebar-width-compact .sidebar-menu li:hover {
+                background: #292D42;
+            }
+            .easyadmin-sidebar-width-normal .content-wrapper{
+                margin-left: 50px;
+            }
+            .easyadmin-sidebar-width-normal .main-sidebar{
+                width: 266px;
+            }
+            a.menu--system {
+                margin-bottom: 100px;
+            }
+            ul.sidebar-menu.tree li a span{
+                margin-left: 20PX;
+                font-size: 16px;
+                line-height: 24px;
+                letter-spacing: 0.5px;
+            }
+            .sidebar-menu a {
+                padding: 4px 12px 8px 30px;
+            }
+            .main-header #header-logo a {
+                width: 200px;
+                display: inline-block;
+            }
+            .main-header #header-logo a {
+                width: 200px;
+                display: inline-block;
+            }
+            body.easyadmin-sidebar-width-compact .sidebar-menu li:hover{
+                width: 200px;
+            }
+            .easyadmin-sidebar-width-compact .sidebar-menu>li:hover>a.sidebar--close>span {
+                left: 50px;
+                top: -4px;
+                padding: 10px 0;
+                padding-left: 20px;
+                border-radius: 4px;
+            }
+            .easyadmin-sidebar-width-compact .sidebar-menu>li:hover>a>span {
+                background: #292D42;
+                padding-left: 20px !IMPORTANT;
+                padding: 10px 0;
+                top: -6px;
+                left: 17px;
+                width: 195px;
+                border-radius: 5px;
+            }
+            .easyadmin-sidebar-width-compact .sidebar-menu a.sidebar--close {
+                width: 77px;
+            }
+            section.content-footer {
+                width: auto;
+                margin-right: 0;
+            }
+            body.easyadmin-sidebar-width-compact .sidebar-menu a img {
+                margin-left: 2px;
+            }
+            i.fa.fa-fw.fa-money-bill-alt,
+            i.fa.fa-fw.fa-shuttle-van,
+            i.fa.fa-fw.fa-handshake,
+            i.fa.fa-fw.fa-funnel-dollar {
+                margin-left: 0px;
+            }
+            .easyadmin-sidebar-width-compact i.fa.fa-fw.fa-money-bill-alt,
+            .easyadmin-sidebar-width-compact i.fa.fa-fw.fa-shuttle-van,
+            .easyadmin-sidebar-width-compact i.fa.fa-fw.fa-handshake,
+            .easyadmin-sidebar-width-compact i.fa.fa-fw.fa-funnel-dollar{
+                margin-left: 2px;
+            }
+             .treeview .treeview-icon {
+                top: 7px;
+                position: absolute;
+                right: 40px;
+            }
+            .treeview a.menu--archives .treeview-icon {
+                right: 36%;
+            }
+        </style>
+    {% endblock body_javascript %}
+    </body>
+{% endblock body %}
+</html>

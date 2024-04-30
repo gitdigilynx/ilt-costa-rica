@@ -1,0 +1,4 @@
+#wicrew_member:
+#    resource: '@WicrewMemberBundle/Controller/DashboardController.php'
+#    type: annotation
+#    prefix: /admin
